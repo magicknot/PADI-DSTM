@@ -1,0 +1,21 @@
+\subsection{Servidor}
+O conjunto das instâncias da classe Servidor representa a memória distribuída onde são armazenados os \textit{PadInt}s. De seguida apresentam-se os atributos desta classe.
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{2cm} | p{5cm} |}
+\hline
+\textbf{Variável} & \textbf{Descrição} \\
+\hline
+Pedidos & Lista de pedidos feitos ao servidor quando o servidor entra no modo \textit{Freeze} \\
+\hline
+Réplica & Endereço do outro servidor \\
+\hline
+Valor original & Estrutura que mapeia \textit{UID}s em \textit{PadInt}s \\
+\hline
+\end{tabular}
+\caption{Atributos da classe Servidor}
+\end{table}
+
+A localização de cada \textit{PadInt} depende do número total de servidores primários, ou seja, é dada por:
+
+\centerline{\textit{UID} \textbf{mod}  \textit{Nº de Servidores}}

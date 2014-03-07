@@ -1,0 +1,20 @@
+\subsection{Biblioteca}
+Esta é a classe que representa a biblioteca usada pelos clientes para comunicar com o sistema de memória distribuida. Esta classe tem a seguinte estrutura:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{2cm} | p{5cm} |}
+\hline
+\textbf{Variável} & \textbf{Descrição} \\
+\hline
+Nº de Servidores & Número total de servidores primários existentes  \\
+\hline
+TID & Transacção atribuída pelo \textit{Master} \\
+\hline
+(UID, Servidor) & Lista de associações entre \textit{UID}s e o seu respectivo \textit{Servidor} \\
+\hline
+Cache de Servidores & Estrutura que mapeia \textit{UID} no \textit{Servidor} em que o \textit{PadInt} está armazenado \\
+\hline
+\end{tabular}
+\caption{Atributos da classe Biblioteca} \label{lib}
+\end{table}

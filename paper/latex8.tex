@@ -11,6 +11,8 @@
 \usepackage{latex8}
 \usepackage{times}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
 
 %\documentstyle[times,art10,twocolumn,latex8]{article}
 
@@ -32,10 +34,29 @@
 
 \input{solucao.tex}
 
-\input{estruturas.tex}
 
-\input{algoritmos.tex}
+%%%%%%%
+\section{Estruturas de Dados}
 
+\input{master.tex}
+
+\input{servidor.tex}
+
+\input{padint.tex}
+
+\input{lock.tex}
+
+\input{lib.tex}
+%%%%%%%%
+
+\section{Algoritmos propostos}
+
+\input{locking.tex}
+\input{commit.tex}
+\input{deadlocks.tex}
+\input{aborts.tex}
+
+%%%%%%%%%%%%
 \input{tolerancia.tex}
 
 \input{conclusao.tex}
