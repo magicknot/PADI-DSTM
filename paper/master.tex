@@ -1,10 +1,10 @@
 \subsection{Master}
 
-Esta classe é o gestor do sistema de memória distribuída e é responsável por armazenar os dados globais do sistema. 
+Esta classe gere o sistema de memória distribuída e é responsável por armazenar os dados globais do sistema.
 
 É importante salientar que a lista \textit{Servidores} tem como finalidade garantir que no caso em que o servidor primário for substituído, o endereço registado é actualizado e os clientes continuam a conseguir aceder aos \textit{PadInt}s sem perturbações. Para além disto, os \textit{TID} são atribuídos de forma sequencial e única. 
 
-De seguida apresenta-se a estrutura interna desta classe.
+De seguida apresentam-se as estruturas internas desta classe.
 \begin{table}[H]
 \centering
 \begin{tabular}{| p{2cm} | p{5cm} |}
