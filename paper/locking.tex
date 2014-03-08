@@ -1,6 +1,6 @@
 \subsection{Locking}
 
-\subsubsection{obterLockEscrita(TID, UID)}
+\subsubsection{obterLockLeitura(TID, UID)}
 
 \begin{figure}[H]
 \centering
@@ -9,6 +9,8 @@
 \end{figure}
 
 \subsubsection{obterLockLeitura(TID, UID)}
+
+
 Caso não exista no servidor um \textit{lock} de leitura ou escrita sobre o \textit{PadInt} identificado pelo \textit{UID} atribuído à transacção com \textit{TID}, verifica-se se existe um \textit{lock} de escrita e se existir é posto na variável \textit{Leitores à espera} o \textit{TID}. Caso contrário é atribuído à transacção um \textit{lock} de leitura do \textit{PadInt}.
 
 \subsubsection{libertarLockEscrita(TID, UID)}
@@ -19,10 +21,10 @@ O servidor remove o \textit{lock} de escrita da transacção identificada por \t
 
 \subsubsection{tiraQueueEscrita(UID)}
 
-Se no \textit{PadInt} identificado pelo \textit{UID}, existir na variável \textit{Promoção} uma transacção a promover, essa transacção é removida da fila e é invocado o método \textit{obterLockEscrita(TID,UID)}. Caso contrário, é verificado se existe na fila de \textit{locks} de escrita pendentes do \textit{UID} alguma transacção pendente:
+Se no \textit{PadInt} identificado pelo \textit{UID}, existir na variável \textit{Promoção} uma transacção a promover, essa transacção é da \textit{Promoção} e é invocado o método \textit{obterLockEscrita(TID,UID)}. Caso contrário, é verificado se existe na fila de \textit{locks} de escrita pendentes do \textit{UID} alguma transacção pendente:
 \begin{itemize}
-	\item Se existir, o \textit{TID} dessa transacção é removida da fila e é invocado o método \textit{obterLockEscrita(TID,UID)}. 
-	\item Se não existir e se existe na fila de \textit{locks} de read pendentes algum \textit{TID}  que esteja associado a \textit{UID}, esse \textit{TID} é removido da fila e é invocado o método \textit{obterLockLeitura(TID,UID)}.
+	\item Se existir, o \textit{TID} dessa transacção é removida dos \textit{Escritores à espera} e é invocado o método \textit{obterLockEscrita(TID,UID)}. 
+	\item Se não existir e se existe nos \textit{Leitores à espera} algum \textit{TID}  que esteja associado a \textit{UID}, esse \textit{TID} é removido e é invocado o método \textit{obterLockLeitura(TID,UID)}.
 \end{itemize}
 
 \subsubsection{libertarLockLeitura(TID, UID)}
@@ -37,7 +39,7 @@ No método \textit{tiraQueueLeitura(UID)} verifica-se se existe um único \texti
 
 \subsubsection{escrevePadInt(TID, UID, value)}
 
-Este método chama o método \textit{obterLockEscrita(TID, UID)} e quando o \textit{lock} de escrita é colocado na variável \textit{Escritor}, o valor é escrito. De seguida é retornado um \textit{ack} à Biblioteca. No caso em que ocorre um abort devido ao um deadlock é lançada uma excepção.
+Este método chama o método \textit{obterLockEscrita(TID, UID)} e quando o \textit{lock} de escrita é atribuído, o valor é escrito. De seguida é retornado um \textit{ack} à Biblioteca. No caso em que ocorre um abort devido ao um deadlock é lançada uma excepção.
 
 \subsubsection{lePadInt(TID, UID)}
 
