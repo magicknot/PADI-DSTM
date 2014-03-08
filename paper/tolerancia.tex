@@ -9,7 +9,7 @@ Quando o antigo servidor primário, que recebeu o pedido de freeze ou fail e nã
 \item Se não aconteceu, é enviado um \textit{i’m alive} para o secundário. No caso de ter estado em freeze executa os pedidos que registou e continua o seu funcionamento normal, no caso de ter estado em fail continua a operar de forma normal enquanto primário.
 \item Se aconteceu, independentemente do estado anterior ser fail ou freeze, o servidor termina a sua execução.
 \end{itemize}
-Na situação inversa, ou seja, o servidor secundário não enviou a resposta a um pedido no intervalo de tempo máximo previsto, o servidor primário cria um novo servidor secundário e quando o antigo servidor secundário receber recover, termina a sua execução independentemente do estado anterior. 
+Na situação inversa, ou seja, o servidor secundário não enviou a resposta a um pedido no intervalo de tempo máximo, o servidor primário cria um novo servidor secundário e quando o antigo servidor secundário receber recover, termina a sua execução independentemente do estado anterior. 
 
 No caso em que recebeu recover, vindo do estado de freeze e o servidor primário ainda está a espera da resposta, executa os pedidos pendentes, responde ao servidor primário e continua a operar de forma normal. 
 

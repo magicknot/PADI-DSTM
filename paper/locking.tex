@@ -9,14 +9,13 @@
 \end{figure}
 
 \subsubsection{obterLockLeitura(TID, UID)}
-
-Caso não exista no servidor um \textit{lock} de leitura ou escrita sobre o \textit{PadInt} identificado pelo \textit{UID} atribuído à transacção com \textit{TID}, é verificado se existe um \textit{lock} de escrita. Se existir é colocado na variável \textit{Leitores à espera} desse PadInt o \textit{TID}. Caso contrário é atribuído à transacção um \textit{lock} de leitura do \textit{PadInt}.
+Caso não exista no servidor um \textit{lock} de leitura ou escrita sobre o \textit{PadInt} identificado pelo \textit{UID} atribuído à transacção com \textit{TID}, verifica-se se existe um \textit{lock} de escrita e se existir é posto na variável \textit{Leitores à espera} o \textit{TID}. Caso contrário é atribuído à transacção um \textit{lock} de leitura do \textit{PadInt}.
 
 \subsubsection{libertarLockEscrita(TID, UID)}
 
-O servidor remove o \textit{lock} de escrita da transacção identificada por \textit{TID}, associado ao inteiro identificado por \textit{UID}.
+O servidor remove o \textit{lock} de escrita da transacção identificada por \textit{TID}, associada ao PadInt identificado por \textit{UID}.
 
-É invocado o método \textit{tiraQueueEscrita(UID)}, para que outras transações possam associar os seus locks ao mesmo PadInt.
+É invocado o método \textit{tiraQueueEscrita(UID)}, para que outras transações possam associar outros locks ao PadInt.
 
 \subsubsection{tiraQueueEscrita(UID)}
 
@@ -28,9 +27,9 @@ Se no \textit{PadInt} identificado pelo \textit{UID}, existir na variável \text
 
 \subsubsection{libertarLockLeitura(TID, UID)}
 
-O servidor remove o \textit{lock} de leitura, da transacção identificada pelo \textit{TID}, associado ao \textit{PadInt} identificado por \textit{UID}.
+O servidor remove o \textit{lock} de leitura, da transacção identificada pelo \textit{TID}, associada ao \textit{PadInt} identificado por \textit{UID}.
 
-É invocado o método \textit{tiraQueueLeitura(UID)}, para que outras transações possam associar os seus locks ao mesmo PadInt.
+É invocado o método \textit{tiraQueueLeitura(UID)}, para que outras transações possam associar outros locks ao PadInt.
 
 \subsubsection{tiraQueueEscrita(UID)}
 
