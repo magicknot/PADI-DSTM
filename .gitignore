@@ -110,3 +110,4 @@ UpgradeLog*.XM
 # LaTeX
 *.aux
 *.synctex.gz
+*.pdf
