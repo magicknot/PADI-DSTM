@@ -3,7 +3,7 @@ Esta é a classe que representa a biblioteca usada pelos clientes para comunicar
 
 \begin{table}[H]
 \centering
-\begin{tabular}{| p{2cm} | p{5cm} |}
+\begin{tabular}{| p{2,1cm} | p{5cm} |}
 \hline
 \textbf{Variável} & \textbf{Descrição} \\
 \hline
@@ -14,6 +14,8 @@ TID & Transacção atribuída pelo \textit{Master} \\
 (UID, Servidor) & Lista de associações entre \textit{UID}s e o seu respectivo \textit{Servidor} \\
 \hline
 Cache de Servidores & Estrutura que mapeia \textit{UID} no \textit{Servidor} em que o \textit{PadInt} está armazenado \\
+\hline
+Temporizadores & Lista de \textit{timers} para cada servidor \\
 \hline
 \end{tabular}
 \caption{Atributos da classe Biblioteca} \label{lib}
