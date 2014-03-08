@@ -11,5 +11,3 @@ Assim, escolhemos utilizar \textit{Strict Two Phase Locking} ou \textit{S2PL}
 \subsection{Replicação activa vs replicação passiva}
 
 Depois de escolhermos qual o protocolo a usar, deparámo-nos com a escolha entre replicação activa e passiva. Inicialmente considerámos seguir replicação activa com um protocolo de \textit{Quorum Consensus}. No entanto, por esta precisar de três servidores (em vez dos dois necessários para a replicação passiva) e tendo também em conta que teríamos que enviar e receber mais mensagens do que as necessárias ao usar replicação passiva, optámos por esta última opção.
-
-\subsection{Arquitectura}

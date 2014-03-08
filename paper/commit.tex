@@ -2,14 +2,7 @@
 
 Quando é invocado o método TxCommit, são percorridos os pares \textit{(UID, servidor)} na estrutura descrita na Tabela~\ref{lib}, enviando a cada servidor primário um pedido para que faça commit de todos os \textit{PadInts} que foram acedidos para leitura ou escrita durante o decorrer da transação atual.
 
-Ao receber o pedido de commit, o servidor primário percorre a lista de identificadores de \textit{PadInt}s envolvidos no commit e, para cada um deles, verifica se o \textit{TID} recebido como argumento pertence a alguma das seguintes variáveis da classe \textit{PadInt} ilustradas na Tabela~\ref{tab:padint}:
-\begin{itemize}
-	\item Leitores;
-	\item Escritor;
-	\item Leitores à espera;
-	\item Escritores à espera;
-	\item Promoção.
-\end{itemize}
+Ao receber o pedido de commit, o servidor primário percorre a lista de identificadores de \textit{PadInt}s envolvidos no commit e, para cada um deles, verifica se o \textit{TID} recebido como argumento pertence a alguma das seguintes variáveis da classe \textit{PadInt} ilustradas na Tabela~\ref{tab:padint}: Leitores, Escritor, Leitores à espera, Escritores à espera, Promoção.
 
 Se \textit{TID} que identifica a transacção estiver contido nalguma das variáveis acima descritas, este é removido dessa variável. É também criado e guardado um par \textit{(TID, Boolean\footnote{O boolean indica se o commit teve sucesso ou não})}. Este par é usado se eventualmente o servidor primário entrar no estado de \textit{Fail}, o secundário assumir o papel de primário e a \textit{Lib} lhe pedir para responder a um commit/abort de uma transacção terminada, mas à qual o primário (agora em modo \textit{Fail}), nunca chegou a enviar uma mensagem de \textit{ack}.
 

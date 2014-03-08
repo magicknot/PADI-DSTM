@@ -1,5 +1,15 @@
-\section{Tolerância a Faltas}
+\section{Tolerância a Faltas - Fail, Freeze e Recover}
 
-\subsection{Fail}
+Sempre que um método do servidor (primário ou secundário) é invocado, é também verificado se o servidor se encontra em estado freeze, fail ou normal.
 
-\subsection{Freeze}
+O servidor primário envia uma mensagem de \textit{i’m alive} ao respectivo servidor secundário a cada x segundos. Caso o secundário não receba a mensagem após o tempo limite, este regista-se no Master como primário e cria uma nova instância secundária.
+
+Quando o antigo servidor primário, que recebeu o pedido de freeze ou fail e não enviou um \textit{i’m alive} ao respectivo secundário, volta ao estado normal verifica se o secundário já assumiu o papel de servidor primário. Caso não o tenha feito, é enviado um \textit{i’m alive} para o secundário, no caso de ter estado freeze executa os pedidos que registou e continua o seu funcionamento normal e no caso de ter estado em fail, continua a operar de forma normal enquanto primário. Caso o tenha feita, independentemente do estado anterior ser fail u freeze, o servidor termina a sua execução.
+
+Na situação inversa, ou seja, o servidor secundário não enviou a resposta a um pedido no intervalo de tempo máximo previsto, o servidor primário cria um novo servidor secundário e quando o antigo servidor secundário voltar ao estado normal, termina a sua execução independentemente do estado anterior. 
+
+No caso em que regressou ao estado normal, vindo do estado de freeze e o servidor primário ainda está a espera da resposta, executa os pedidos pendentes, responde ao servidor primário e continua a operar de forma normal. 
+
+O caso em que o servidor secundário retorna do estado fail, por opção nossa não acontece.
+A alternativa seria esperar que o servidor voltasse e fazê-lo terminar de seguida, no entanto, como à partida sabemos que se o secundário falhou, assim que o primário atender um pedido o seu estado vai ficar inconsistente, então este termina assim que receber o pedido de fail, e o servidor primário acabará por criar um novo secundário quando o timeout expirar. 
+
