@@ -1,6 +1,6 @@
 \section{Tolerância a Faltas - Fail, Freeze e Recover}
 
-Sempre que um método do servidor é invocado, é também verificado se o servidor se encontra em estado freeze, fail ou normal.
+Sempre que um método do servidor é invocado é verificado se este se encontra no estado freeze, fail ou normal de forma a ser realizado o comportamento adequado.
 
 O servidor primário envia uma mensagem de \textit{i’m alive} ao respectivo servidor secundário a cada x segundos. Caso o secundário não receba a mensagem após o tempo limite, este regista-se no Master como primário e cria uma nova instância de secundário.
 
@@ -11,7 +11,6 @@ Quando o antigo servidor primário, que recebeu o pedido de freeze ou fail e nã
 \end{itemize}
 Na situação inversa, ou seja, o servidor secundário não enviou a resposta a um pedido no intervalo de tempo máximo, o servidor primário cria um novo servidor secundário e quando o antigo servidor secundário receber recover, termina a sua execução independentemente do estado anterior. 
 
-No caso em que recebeu recover, vindo do estado de freeze e o servidor primário ainda está a espera da resposta, executa os pedidos pendentes, responde ao servidor primário e continua a operar de forma normal. 
+No caso em que recebeu recover, vindo do estado de freeze e o servidor primário ainda está a espera da resposta, executa os pedidos pendentes, responde ao primário e continua a operar de forma normal. 
 
-O caso em que o servidor secundário retorna do estado fail, por opção nossa não acontece.A alternativa seria esperar que o servidor voltasse e fazê-lo terminar de seguida, no entanto, como à partida sabemos que se o secundário falhou, assim que o primário atender um pedido o seu estado vai ficar inconsistente, então este termina assim que receber o pedido de fail, parecendo ao servidor primário que não respondeu no intervalo de tempo máximo previsto.
-
+O caso em que o servidor secundário retorna do estado fail, por opção nossa não acontece. A alternativa seria esperar que o servidor voltasse e fazê-lo terminar de seguida, no entanto, como à partida sabemos que se o secundário falhou, assim que o primário atender um pedido o seu estado vai ficar inconsistente, então este termina assim que receber o pedido de fail, parecendo ao servidor primário que não respondeu no intervalo de tempo máximo previsto.

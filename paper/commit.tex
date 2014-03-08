@@ -4,12 +4,12 @@ Quando é invocado o método TxCommit, são percorridos os pares \textit{(UID, s
 
 Ao receber o pedido de commit, o servidor primário percorre a lista de identificadores de \textit{PadInt}s envolvidos no commit e, para cada um deles, verifica se o \textit{TID} recebido como argumento pertence a alguma das variáveis da classe \textit{PadInt} ilustradas na Tabela~\ref{tab:padint}: Leitores, Escritor, Leitores à espera, Escritores à espera, Promoção.
 
-Se \textit{TID} que identifica a transacção estiver contido nalguma das variáveis acima descritas, este é removido dessa variável. É também criado e guardado um par \textit{(TID,valor final da transação)}. Este par é usado se eventualmente o servidor primário entrar no estado de \textit{Fail}, o secundário assumir o papel de primário e a \textit{Lib} lhe pedir para responder a um commit/abort de uma transacção terminada, mas à qual o primário (agora em modo \textit{Fail}), nunca chegou a enviar uma mensagem de \textit{ack}.
+Se \textit{TID} que identifica a transacção estiver contido nalguma das variáveis acima descritas, este é removido dessa variável. É também criado e guardado um par \textit{(TID,valor final da transação)}. Este par é usado se eventualmente o servidor primário deixar de responder, o secundário assumir o papel de primário e a Biblioteca lhe pedir para responder a um commit/abort de uma transacção terminada, mas à qual o primário (agora em modo \textit{Fail}), nunca chegou a enviar uma mensagem de \textit{ack}.
 
 O servidor primário faz o pedido ao servidor secundário para que execute o commit, invocando o mesmo método com os mesmos argumentos. Depois de executar o pedido do primário, o secundário envia um \textit{ack} ao primário a confirmar que executou o método.
 
 O servidor primário recebe o \textit{ack} do secundário e reporta à Biblioteca o sucesso do commit.
 
-Se na etapa anterior o \textit{TID} não pertence a nenhuma das variáveis anteriormente descritas e o \textit{TID} da transacção a ser tratada é o mesmo que foi registado da última vez que se guardou o par descrito acima, então o valor registado no par como resultado final da transacção é devolvido como retorno à lib e o par é apagado.
+Se na etapa anterior o \textit{TID} não pertence a nenhuma das variáveis anteriormente descritas e o \textit{TID} da transacção a ser tratada é o mesmo que foi registado da última vez que se guardou o par descrito acima, então o valor registado no par como resultado final da transacção é devolvido como retorno à Biblioteca e o par é apagado.
 
 É importante referir que no passo em que são removidos os \textit{locks}, a motivação para se verificar se o \textit{TID} se encontra na lista de variáveis acima referidas e não apenas nas variáveis \textit{Leitores} e \textit{Escritor}, prende-se com o facto de não existir nenhuma forma de impedir que o cliente tente obter locks e faça commit ou abort à transacção antes sequer de os ter obtido.

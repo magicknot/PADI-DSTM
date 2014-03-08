@@ -39,7 +39,7 @@ No método \textit{tiraQueueLeitura(UID)} verifica-se se existe um único \texti
 
 \subsubsection{escrevePadInt(TID, UID, value)}
 
-Este método chama o método \textit{obterLockEscrita(TID, UID)} e quando o \textit{lock} de escrita é atribuído, o valor é escrito. De seguida é retornado um \textit{ack} à Biblioteca. No caso em que ocorre um abort devido ao um deadlock é lançada uma excepção.
+Este método chama o método \textit{obterLockEscrita(TID, UID)} e quando o \textit{lock} de escrita é atribuído, o valor é escrito. De seguida é retornado um \textit{ack} à Biblioteca. Se um deadlock provocar um abort, é lançada uma excepção.
 
 \subsubsection{lePadInt(TID, UID)}
 
