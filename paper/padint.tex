@@ -1,0 +1,30 @@
+\subsection{PadInt}
+
+Esta classe representa o objecto gerido pelo \textit{PADI-DSTM} que guarda um inteiro, onde o \textit{lock} é apenas o TID. Esta classe é composta por:
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{2cm} | p{5,5cm} |}
+\hline
+\textbf{Variável} & \textbf{Descrição} \\
+\hline
+UID & Identificador do PadInt que representa \\
+\hline
+Valor actual & Valor no momento actual da transacção \\
+\hline
+Valor original & Valor no início da transacção \\
+\hline
+Temporizador & Usado na detecção de deadlocks \\
+\hline
+Promoção & Referência para a próxima transação a ser promovida\\
+\hline
+Leitores & Fila de transacções com locks de leitura atribuídos \\
+\hline
+Escritor & Transacção com lock de escrita atribuído\\
+\hline
+Leitores à espera & Fila de transações com locks de leitura à espera \\
+\hline
+Escritores à espera & Fila de transações com locks de escrita à espera\\
+\hline
+\end{tabular}
+\caption{Atributos da classe PadInt}\label{tab:padint}
+\end{table}

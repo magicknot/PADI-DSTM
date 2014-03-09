@@ -1,0 +1,3 @@
+\subsection{Abort}
+
+O método \textit{TxAbort} é em tudo semelhante ao método \textit{TxCommit}, a diferença é que antes de libertar cada \textit{lock} de escrita associado a cada \textit{UID} referenciado pela transação, o valor actual do \textit{PadInt} é substituído pelo valor registado como sendo o valor original antes da transação o ter alterado, i.é., é reposto o valor do último commit realizado com sucesso. 

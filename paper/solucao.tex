@@ -1,0 +1,13 @@
+\section{Solução}
+
+\subsection{2PC vs S2PL vs Timestamps}
+
+Inicialmente considerámos seguir uma abordagem optimista. No entanto, não conhecendo a relação existente entre o número de leituras e escritas, admitimos que existe igual número de leituras e escritas, logo o número de conflitos poderá vir a ser grande. 
+
+Constatando esse potencial bottleneck de performance no nosso sistema, optámos por abandonar as soluções que usam timestamps ou two-phase-commit (2PC). Um outro argumento contra o 2PC é a possibilidade das transacções poderem abortar (se surgir algum conflito) depois de já terem realizado algum trabalho, o que implicaria refazer-se esse trabalho.
+
+Assim, escolhemos utilizar \textit{Strict Two Phase Locking} ou \textit{S2PL}
+
+\subsection{Replicação activa vs replicação passiva}
+
+Depois de escolhermos qual o protocolo a usar, deparámo-nos com a escolha entre replicação activa e passiva. Inicialmente considerámos usar replicação activa com um protocolo de \textit{Quorum Consensus}. No entanto, por esta precisar de três servidores (em vez dos dois necessários para a replicação passiva) e tendo também em conta que teríamos que enviar e receber mais mensagens do que as necessárias ao usar replicação passiva, optámos por esta última opção.

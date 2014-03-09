@@ -1,0 +1,3 @@
+\subsection{Detecção de deadlocks}
+
+Para a detecção de deadlocks usamos um temporizador para cada \textit{PadInt} existente no servidor. Este temporizador é activado quando se coloca um pedido em espera, seja para promoção de lock ou para obter lock de escrita/leitura. Quando o temporizador expira é feito abort da transação\footnote{Admitindo que existem mais transacções à espera de serem promovidas ou para lerem/escreverem} (ou transações no caso de existirem locks de leitura atribuídos) que possuía o lock e escolhe-se um pedido dos que estão em espera para ser executado pela seguinte ordem: pedido de promoção, pedido de lock de escrita e finalmente pedido de lock de leitura.
