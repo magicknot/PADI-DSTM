@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PadInt.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
