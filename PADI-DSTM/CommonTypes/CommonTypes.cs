@@ -9,13 +9,13 @@ namespace CommonTypes {
     }
 
     public interface IServer {
-        void allocatePadInt(int uid);
+        void allocatePadInt (int uid);
     }
 
     public interface IMaster {
-        void registerServer(String address);
-        int getNextTID();
-        int getNServers();
-        String getServerAddress(int serverID);
+        void registerServer (String address);
+        int getNextTID ();
+        int getNServers ();
+        String getServerAddress (int serverID);
     }
 }

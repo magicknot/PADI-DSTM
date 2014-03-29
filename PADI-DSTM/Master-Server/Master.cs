@@ -12,26 +12,26 @@ namespace MasterServer {
         private int nServers;
         private Dictionary<int, string> registeredServers;
 
-        public Master() {
+        public Master () {
             registeredServers = new Dictionary<int, string>();
             lastTID = 0;
             nServers = 0;
 
         }
 
-        public int getNextTID() {
+        public int getNextTID () {
             return lastTID++;
         }
 
-        public void registerServer(String address) {
+        public void registerServer (String address) {
             registeredServers.Add(nServers++, address);
         }
 
-        public int getNServers() {
+        public int getNServers () {
             return registeredServers.Count;
         }
 
-        public String getServerAddress(int serverID) {
+        public String getServerAddress (int serverID) {
             return registeredServers[serverID];
         }
 

@@ -10,7 +10,8 @@ using System.Runtime.Remoting.Channels.Tcp;
 
 
 namespace PadInt_Server {
-    class Server : MarshalByRefObject, IServer  {
+
+    class Server : MarshalByRefObject, IServer {
 
         /* Pending request list */
         //private List<Request> requestList = new List<Request>();
@@ -19,18 +20,15 @@ namespace PadInt_Server {
         private Dictionary<int, PadInt> padIntDict = new Dictionary<int, PadInt>();
         //arranjar nome melhor???
 
-        public void allocatePadInt (int uid)
-        {
+        public void allocatePadInt (int uid) {
 
         }
 
-        public void writePadInt (int tid, int uid, int value)
-        {
+        public void writePadInt (int tid, int uid, int value) {
 
         }
 
-        public void readPadInt (int tid, int uid)
-        {
+        public void readPadInt (int tid, int uid) {
 
         }
     }
