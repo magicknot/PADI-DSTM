@@ -10,7 +10,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 
 
 namespace PadInt_Server {
-    class Server : IServer, MarshalByRefObject {
+    class Server : MarshalByRefObject, IServer  {
 
         /* Pending request list */
         //private List<Request> requestList = new List<Request>();
