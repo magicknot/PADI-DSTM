@@ -13,7 +13,7 @@ namespace ClientLibrary {
 
 
 
-    class Library {
+    public class Library {
 
         private const int NINTSPERSERVER = 10;
         private IMaster masterServer;
