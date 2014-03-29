@@ -11,7 +11,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 namespace MasterServer {
     class MasterApp {
 
-        private const int MASTERADDRESS=8086;
+        private const int MASTERADDRESS = 8086;
 
         static void Main(string[] args) {
 

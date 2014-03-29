@@ -14,8 +14,8 @@ namespace MasterServer {
 
         public Master() {
             registeredServers = new Dictionary<int, string>();
-            lastTID=0;
-            nServers=0;
+            lastTID = 0;
+            nServers = 0;
 
         }
 
