@@ -24,46 +24,47 @@ namespace ClientLibrary {
 
         //Qual é a ideia de guardar timers?
 
-        public Library() {
+        public Library () {
 
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
-            masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             writtenList = new List<int>();
         }
 
         //porque boolean?
-        public Boolean init() {
+        public Boolean init () {
             nServers = masterServer.getNServers();
 
             return true;
         }
 
-        public bool txBegin() {
+        public bool txBegin () {
             actualTID = masterServer.getNextTID();
             return true;
         }
 
-        public bool txCommit() {
+        public bool txCommit () {
             writtenList.Sort();
             throw new NotImplementedException();
         }
 
-        public PadIntStub createPadInt(int uid) {
-            int serverID=0;
-            if(uid>=NINTSPERSERVER*nServers) {
-                serverID=nServers-1;
-            } else {
-                for(int i=0; i<nServers; i++) {
-                    if(uid<(i+1)*NINTSPERSERVER) {
-                        serverID=i;
+        public PadIntStub createPadInt (int uid) {
+            int serverID = 0;
+            if (uid >= NINTSPERSERVER * nServers) {
+                serverID = nServers - 1;
+            }
+            else {
+                for (int i = 0; i < nServers; i++) {
+                    if (uid < (i + 1) * NINTSPERSERVER) {
+                        serverID = i;
                     }
                 }
             }
 
             String address = masterServer.getServerAddress(serverID);
 
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:"+address + "/PadIntServer");
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
             server.createPadInt(uid);
 
             return new PadIntStub(uid, actualTID, address, this);
@@ -71,29 +72,30 @@ namespace ClientLibrary {
 
         }
 
-        public PadIntStub accessPadInt(int uid) {
+        public PadIntStub accessPadInt (int uid) {
 
-            int serverID=0;
-            if(uid>=NINTSPERSERVER*nServers) {
-                serverID=nServers-1;
-            } else {
-                for(int i=0; i<nServers; i++) {
-                    if(uid<(i+1)*NINTSPERSERVER) {
-                        serverID=i;
+            int serverID = 0;
+            if (uid >= NINTSPERSERVER * nServers) {
+                serverID = nServers - 1;
+            }
+            else {
+                for (int i = 0; i < nServers; i++) {
+                    if (uid < (i + 1) * NINTSPERSERVER) {
+                        serverID = i;
                     }
                 }
             }
 
             String address = masterServer.getServerAddress(serverID);
 
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:"+ address + "/PadIntServer");
-            if(server.confirmPadInt())
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
+            if (server.confirmPadInt())
                 return new PadIntStub(uid, actualTID, address, this);
             else
                 return null;
         }
 
-        protected void registerWrite(int uid) {
+        protected void registerWrite (int uid) {
             writtenList.Add(uid);
         }
 

@@ -12,23 +12,36 @@ namespace ClientLibrary {
         private int tid;
         private Library library;
 
-        public PadIntStub(int uid, int tid, string address, Library library) {
+        /* Structure that stores PadInt's uid of the transaction read locks */
+        private List<int> readLocks;
+
+        /* Structure that stores PadInt's uid of the transaction writes locks */
+        private List<int> writeLocks;
+
+        /* Structure that maps UID to PadInt's actual value */
+        private Dictionary<int, int> padIntDict;
+
+        public PadIntStub (int uid, int tid, string address, Library library) {
             this.uid = uid;
             this.address = address;
             this.library = library;
+            this.readLocks = new List<int>();
+            this.writeLocks = new List<int>();
+            this.padIntDict = new Dictionary<int, int>();
         }
 
-        public int read() {
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:"+ address + "/PadIntServer");
+        public int read () {
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
             return server.readPadInt(tid, uid);
         }
-        public bool write(int value) {
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:"+ address + "/PadIntServer");
+        public bool write (int value) {
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
 
-            if(server.writePadInt(tid, uid, value)) {
+            if (server.writePadInt(tid, uid, value)) {
                 library.registerWrite(uid);
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
