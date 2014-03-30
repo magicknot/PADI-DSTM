@@ -20,16 +20,24 @@ namespace PadInt_Server {
         private Dictionary<int, PadInt> padIntDict = new Dictionary<int, PadInt>();
         //arranjar nome melhor???
 
-        public void allocatePadInt (int uid) {
-
+        public void createPadInt(int uid) {
+            throw new NotImplementedException();
         }
 
-        public void writePadInt (int tid, int uid, int value) {
-
+        public Boolean confirmPadInt(int uid) {
+            throw new NotImplementedException();
         }
 
-        public void readPadInt (int tid, int uid) {
+        public bool writePadInt(int tid, int uid, int value) {
+            throw new NotImplementedException();
+        }
 
+        public int readPadInt(int tid, int uid) {
+            throw new NotImplementedException();
+        }
+
+        public bool confirmPadInt() {
+            throw new NotImplementedException();
         }
     }
 }
