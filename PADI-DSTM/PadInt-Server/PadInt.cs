@@ -119,10 +119,8 @@ namespace PadInt_Server {
              * ver como e´ o caso em que existe alguma
              * no promotion e depois vem para aqui.
              * Ver caso da tiraQueueLeitura.
+             * 
              */
-
-
-
 
             /* if don't exists a writer or readers */
             if (!(writer > -1 || readers.Count > 0)) {
@@ -217,6 +215,7 @@ namespace PadInt_Server {
         /* 
         *  */
         private void dequeueWriteLock (int uid) {
+            int temp = -1;
             /* quando tira do promotion meter a -1 */
 
             /* TODO
@@ -235,6 +234,27 @@ namespace PadInt_Server {
              *                      getLockLeitura
              * 
              */
+            if (promotion != -1) {
+                temp = promotion;
+                promotion = -1;
+                getWriteLock(temp, uid);
+            }
+            else {
+                if (pendingWriters.Count > 0) {
+                    /* removes the first writer in the queue */
+                    temp = pendingWriters[0];
+                    pendingWriters.RemoveAt(0);
+                    getWriteLock(temp, uid);
+                }
+                else {
+                    if (pendingReaders.Count > 0) {
+                        /* removes the first reader in the queue */
+                        temp = pendingReaders[0];
+                        pendingReaders.RemoveAt(0);
+                        getReadLock(temp, uid);
+                    }
+                }
+            }
         }
     }
 }
