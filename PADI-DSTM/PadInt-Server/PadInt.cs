@@ -8,6 +8,9 @@ namespace PadInt_Server {
 
     class PadInt {
 
+        /* constante used in the initialization of int variables */
+        private const int INITIALIZATION = -1;
+
         /* PadInt's uid */
         private int uid;
 
@@ -22,7 +25,7 @@ namespace PadInt_Server {
 
         /* uid of the next transaction to be promoted.
          *
-         * Value -1 means that there is no transaction,
+         * Value INITIALIZATION means that there is no transaction,
          *  identified by tid, waiting for promotion. 
          */
         private int promotion;
@@ -32,7 +35,7 @@ namespace PadInt_Server {
 
         /* Transaction' tid with atributed write lock.
          * 
-         * Value -1 means that there is no transaction,
+         * Value INITIALIZATION means that there is no transaction,
          *  identified by tid, writing. 
          */
         private int writer;
@@ -44,15 +47,15 @@ namespace PadInt_Server {
         private List<int> pendingWriters;
 
         /* uid represetns the PadInt's uid */
-        protected PadInt(int uid) {
+        public PadInt(int uid) {
 
             this.uid = uid;
             this.actualValue = 0;
             this.originalValue = 0;
             //this.timer = ...
-            this.promotion = -1;//confirmar???
+            this.promotion = INITIALIZATION;
             this.readers = new List<int>();
-            this.writer = -1; //confirmar???
+            this.writer = INITIALIZATION;
             this.pendingReaders = new List<int>();
             this.pendingWriters = new List<int>();
         }
@@ -83,7 +86,7 @@ namespace PadInt_Server {
          * as soon as possible.
          * 
          * Returns true if successful */
-        public bool getReadLock(int tid, int uid) {
+        public bool getReadLock(int tid) {
 
             /* ve se não há algum escritor 
              *  se nao existir mete nos leitores
@@ -91,19 +94,21 @@ namespace PadInt_Server {
              */
 
             /* if there is no writer */
-            if(writer > -1) {
+            if(writer == INITIALIZATION) {
                 readers.Add(tid);
             } else {
                 pendingReaders.Add(tid);
             }
 
-            /* TODO
+            /* TODO !!!!!
              * 
              * VER COMO E HISTORIA DE FICAR PARADO `A ESPERA SE SO´ 
              * RESPONDER DEPOIS DE TER O LOCK. MESMO QUE ISSO SEJA NO
-             * SERVER TB TEM QUE SER VISTO AQUI DE ALGUMA FORMA*/
+             * SERVER TB TEM QUE SER VISTO AQUI DE ALGUMA FORMA
+             */
 
             return true;
+            /* retorna false caso abort??? depois com os timer? */
         }
 
         /* Assigns to the transaction identified by tid
@@ -111,7 +116,7 @@ namespace PadInt_Server {
          * as soon as possible.
          * 
          * Returns true if successful */
-        public bool getWriteLock(int tid, int uid) {
+        public bool getWriteLock(int tid) {
 
             /* TODO
              * 
@@ -122,7 +127,7 @@ namespace PadInt_Server {
              */
 
             /* if don't exists a writer or readers */
-            if(!(writer > -1 || readers.Count > 0)) {
+            if(writer == INITIALIZATION || readers.Count == 0) {
                 writer = tid;
             } else {
                 /* if the lock is a write lock */
@@ -142,12 +147,13 @@ namespace PadInt_Server {
                     } else {
                         /* if there is only a
                          *  reader (transaction identified by tid) */
+                        readers.Remove(tid);
                         if(readers.Count == 1) {
                             writer = tid;
                         } else {
                             /* if there is no transaction wainting
                              * for promotion */
-                            if(promotion == -1) {
+                            if(promotion == INITIALIZATION) {
                                 promotion = tid;
                             } else {
                                 /* abort */
@@ -166,83 +172,73 @@ namespace PadInt_Server {
         * owned by a transaction identified by tid.
         *
         * Returns true if successful */
-        public bool freeReadLock(int tid, int uid) {
+        public void freeReadLock(int tid) {
             readers.Remove(tid);
-            dequeueReadLock(uid);
-            return true;
+            dequeueReadLock();
         }
 
         /* Frees a write lock over the PadInt, identified by uid,
         * owned by a transaction identified with tid.
         *
         * Returns true if successful */
-        public bool freeWriteLock(int tid, int uid) {
+        public void freeWriteLock(int tid) {
             /* "frees" writer variable */
-            writer = -1;
-            dequeueWriteLock(uid);
-            return true;
+            writer = INITIALIZATION;
+            dequeueWriteLock();
         }
 
-        /* 
-        *  */
-        private void dequeueReadLock(int uid) {
-            int temp = -1;
+        /* If called when does not exist any reader,
+         *  see if exists any transaction waiting for
+         *  a promotion then do the promotion. If only
+         *  exists pending writers, assigns the lock to
+         *  the first one.
+         */
+        private void dequeueReadLock() {
+            int temp = INITIALIZATION;
 
-            if(readers.Count == 1) {
-                if(promotion != -1) {
+            if(readers.Count == 0) {
+                if(promotion != INITIALIZATION) {
                     /* "frees" promotion variable */
                     temp = promotion;
-                    promotion = -1;
-                    getWriteLock(temp, uid);
+                    promotion = INITIALIZATION;
+                    getWriteLock(temp);
                 } else {
                     if(pendingWriters.Count > 0) {
                         /* removes the first writer in the queue */
                         temp = pendingWriters[0];
                         pendingWriters.RemoveAt(0);
-                        getWriteLock(temp, uid);
+                        getWriteLock(temp);
                     }
                 }
             }
         }
 
-        /* 
-        *  */
-        private void dequeueWriteLock(int uid) {
-            int temp = -1;
-            /* quando tira do promotion meter a -1 */
+        /* If exists any transaction waiting for a promotion
+         *  then do the promotion. Otherwise if exists pending
+         *  writers, assigns the lock to the first one.
+         * If none of the last cenarios was true see if exists
+         *  any pending reader and assigns the lock to the
+         *  first one.
+         */
+        private void dequeueWriteLock() {
+            int temp = INITIALIZATION;
 
-            /* TODO
-             * 
-             * ve se ha na promotion
-             * se sim invoca getLockWrite
-             * senao 
-             *      ve na fila de writes
-             *          se existir 
-             *              tira
-             *              chama getLockWrites
-             *          senao
-             *              ve na fila dos leitores
-             *                  se existir
-             *                      tira
-             *                      getLockLeitura
-             * 
-             */
-            if(promotion != -1) {
+            if(promotion != INITIALIZATION) {
                 temp = promotion;
-                promotion = -1;
-                getWriteLock(temp, uid);
+                promotion = INITIALIZATION;
+                getWriteLock(temp);
             } else {
                 if(pendingWriters.Count > 0) {
                     /* removes the first writer in the queue */
                     temp = pendingWriters[0];
                     pendingWriters.RemoveAt(0);
-                    getWriteLock(temp, uid);
+                    getWriteLock(temp);
                 } else {
                     if(pendingReaders.Count > 0) {
                         /* removes the first reader in the queue */
                         temp = pendingReaders[0];
                         pendingReaders.RemoveAt(0);
-                        getReadLock(temp, uid);
+                        getReadLock(temp);
                     }
                 }
             }
