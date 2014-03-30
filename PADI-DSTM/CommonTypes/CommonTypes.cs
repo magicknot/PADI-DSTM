@@ -11,7 +11,7 @@ namespace CommonTypes {
     public interface IServer {
         void createPadInt(int uid);
 
-        bool confirmPadInt();
+        bool confirmPadInt(int uid);
 
         int readPadInt(int tid, int uid);
         bool writePadInt(int tid, int uid, int value);

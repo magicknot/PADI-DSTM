@@ -24,7 +24,7 @@ namespace PadInt_Server {
             throw new NotImplementedException();
         }
 
-        public Boolean confirmPadInt(int uid) {
+        public bool confirmPadInt(int uid) {
             throw new NotImplementedException();
         }
 
@@ -33,10 +33,6 @@ namespace PadInt_Server {
         }
 
         public int readPadInt(int tid, int uid) {
-            throw new NotImplementedException();
-        }
-
-        public bool confirmPadInt() {
             throw new NotImplementedException();
         }
     }
