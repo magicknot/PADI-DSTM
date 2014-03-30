@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PadInt_Server {
     class Program {
-        static void Main (string[] args) {
+        static void Main(string[] args) {
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ClientLibrary {
         /* Structure that maps UID to PadInt's actual value */
         private Dictionary<int, int> padIntDict;
 
-        public PadIntStub (int uid, int tid, string address, Library library) {
+        public PadIntStub(int uid, int tid, string address, Library library) {
             this.uid = uid;
             this.address = address;
             this.library = library;
@@ -30,18 +30,17 @@ namespace ClientLibrary {
             this.padIntDict = new Dictionary<int, int>();
         }
 
-        public int read () {
+        public int read() {
             IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
             return server.readPadInt(tid, uid);
         }
-        public bool write (int value) {
+        public bool write(int value) {
             IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
 
-            if (server.writePadInt(tid, uid, value)) {
+            if(server.writePadInt(tid, uid, value)) {
                 library.registerWrite(uid);
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }

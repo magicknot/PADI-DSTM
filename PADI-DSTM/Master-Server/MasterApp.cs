@@ -13,7 +13,7 @@ namespace MasterServer {
 
         private const int MASTERADDRESS = 8086;
 
-        static void Main (string[] args) {
+        static void Main(string[] args) {
 
             TcpChannel channel = new TcpChannel(MASTERADDRESS);
             ChannelServices.RegisterChannel(channel, true);
@@ -23,7 +23,7 @@ namespace MasterServer {
 
             Console.WriteLine("Master up and running on port " + MASTERADDRESS);
 
-            while (true)
+            while(true)
                 ;
 
         }
