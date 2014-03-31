@@ -88,7 +88,8 @@ namespace PadInt_Server {
             return false;
         }
 
-        public void commit(int tid) {
+        /* usedPadInts sao os uid usados pela transacao tid */
+        public void commit(int tid, List<int> usedPadInts) {
             throw new NotImplementedException();
             /* TODO !!!!!
              * 
@@ -101,18 +102,31 @@ namespace PadInt_Server {
 
             /* ainda nao esta acabado */
 
-            foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
-                //freeReadLock(int tid)
-                //freeWriteLock(int tid)
+            foreach(int padInt in usedPadInts) {
 
-                /* apenas precisa de fazer isto apenas quando sao escritas */
-                entry.Value.OriginalValue = entry.Value.ActualValue;
+                /* PadInt padInt = getPadInt(uid);
+                 * 
+                 * chama metodo commit do PadInt que faz:
+                 * 
+                 * liberta locks de read: freeReadLock(int tid)
+                 * liberta locks de write: freeWriteLock(int tid)
+                 * 
+                 * verifica se o tid da transaccao nao esta na promotion
+                 *  - se estiver e for commit manda abort????
+                 *  - se estiver e for abort limpa apenas
+                 * 
+                 * apenas precisa de fazer isto apenas quando sao escritas:
+                 * entry.Value.OriginalValue = entry.Value.ActualValue;
+                 
+                 */
+
             }
 
             /* retorna algum tipo de msg a indicar que fez o commit? */
         }
 
-        public void abort(int tid) {
+        /* usedPadInts sao os uid usados pela transacao tid */
+        public void abort(int tid, List<int> usedPadInts) {
             throw new NotImplementedException();
             /* TODO !!!!!
              * 
@@ -124,17 +138,26 @@ namespace PadInt_Server {
              */
 
             /* ainda nao esta acabado */
-            foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
-                //freeReadLock(int tid)
-                //freeWriteLock(int tid)
+            foreach(int padInt in usedPadInts) {
 
-                /* apenas e so´ no caso em que era lock de write e´
-                 * que faz isto
+                /* PadInt padInt = getPadInt(uid);
+                 * 
+                 * chama metodo abort do PadInt que faz:
+                 * 
+                 * liberta locks de read: freeReadLock(int tid)
+                 * liberta locks de write: freeWriteLock(int tid)
+                 * 
+                 * verifica se o tid da transaccao nao esta na promotion
+                 *  - se estiver e for commit manda abort????
+                 *  - se estiver e for abort limpa apenas
+                 * 
+                 * apenas e so´ no caso em que era lock de write e´ que faz isto:
+                 * entry.Value.ActualValue = entry.Value.OriginalValue;
+                 
                  */
-                entry.Value.ActualValue = entry.Value.OriginalValue;
             }
 
-            /* retorna algum tipo de msg a indicar que fez o commit? */
+            /* retorna algum tipo de msg a indicar que fez o abort? */
         }
     }
 }

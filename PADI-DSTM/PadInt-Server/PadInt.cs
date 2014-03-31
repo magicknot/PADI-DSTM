@@ -256,5 +256,36 @@ namespace PadInt_Server {
                 }
             }
         }
+
+        public void commit(int tid) {
+            /* TODO */
+
+            /* ver se da´ para fazer fusao com o metodo abort */
+
+            /* liberta locks de read: freeReadLock(int tid)
+                 * liberta locks de write: freeWriteLock(int tid)
+                 * 
+                 * verifica se o tid da transaccao nao esta na promotion
+                 *  - se estiver e for commit manda abort????
+                 *  - se estiver e for abort limpa apenas
+                 * 
+                 * apenas precisa de fazer isto apenas quando sao escritas:
+                 * entry.Value.OriginalValue = entry.Value.ActualValue; */
+        }
+
+        public void abort(int tid) {
+            /* TODO */
+
+
+            /* liberta locks de read: freeReadLock(int tid)
+                 * liberta locks de write: freeWriteLock(int tid)
+                 * 
+                 * verifica se o tid da transaccao nao esta na promotion
+                 *  - se estiver e for commit manda abort????
+                 *  - se estiver e for abort limpa apenas
+                 * 
+                 * apenas e so´ no caso em que era lock de write e´ que faz isto:
+                 * entry.Value.ActualValue = entry.Value.OriginalValue; */
+        }
     }
 }
