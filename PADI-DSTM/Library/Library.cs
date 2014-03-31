@@ -87,13 +87,13 @@ namespace ClientLibrary {
             String address = masterServer.getServerAddress(serverID);
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
-            if(server.confirmPadInt())
+            if(server.confirmPadInt(uid))
                 return new PadIntStub(uid, actualTID, address, this);
             else
                 return null;
         }
 
-        protected void registerWrite(int uid) {
+        public void registerWrite(int uid) {
             writtenList.Add(uid);
         }
 
