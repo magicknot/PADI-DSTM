@@ -87,5 +87,54 @@ namespace PadInt_Server {
             /* e´preciso? */
             return false;
         }
+
+        public void commit(int tid) {
+            throw new NotImplementedException();
+            /* TODO !!!!!
+             * 
+             * se por acaso usarmos o tab no cliente para guardar valores para
+             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
+             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
+             *  primeiro os writes para todos os PadInt que escreveu para assim
+             *  actualizar no server.
+             */
+
+            /* ainda nao esta acabado */
+
+            foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
+                //freeReadLock(int tid)
+                //freeWriteLock(int tid)
+
+                /* apenas precisa de fazer isto apenas quando sao escritas */
+                entry.Value.OriginalValue = entry.Value.ActualValue;
+            }
+
+            /* retorna algum tipo de msg a indicar que fez o commit? */
+        }
+
+        public void abort(int tid) {
+            throw new NotImplementedException();
+            /* TODO !!!!!
+             * 
+             * se por acaso usarmos o tab no cliente para guardar valores para
+             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
+             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
+             *  primeiro os writes para todos os PadInt que escreveu para assim
+             *  actualizar no server.
+             */
+
+            /* ainda nao esta acabado */
+            foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
+                //freeReadLock(int tid)
+                //freeWriteLock(int tid)
+
+                /* apenas e so´ no caso em que era lock de write e´
+                 * que faz isto
+                 */
+                entry.Value.ActualValue = entry.Value.OriginalValue;
+            }
+
+            /* retorna algum tipo de msg a indicar que fez o commit? */
+        }
     }
 }
