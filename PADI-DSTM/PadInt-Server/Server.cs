@@ -21,14 +21,13 @@ namespace PadInt_Server {
         //arranjar nome melhor???
 
         /* Obtain the PadInt identified by uid.
-         * Return null if not found. 
+         * Returns null if not found. 
          */
         private PadInt getPadInt(int uid) {
 
             foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
                 if(entry.Key == uid) {
                     return entry.Value;
-                    break;
                 }
             }
 

@@ -117,11 +117,7 @@ namespace PadInt_Server {
         /* Returns true if the transaction identified by tid
          *  has a write lock over the PadInt identified by uid */
         public bool hasWriteLock(int tid) {
-            if(writer == tid) {
-                return true;
-            }
-
-            return false;
+            return writer == tid;
         }
 
         /* Assigns to the transaction identified by tid
