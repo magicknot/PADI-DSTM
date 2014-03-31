@@ -44,11 +44,7 @@ namespace PadInt_Server {
         public bool confirmPadInt(int uid) {
             throw new NotImplementedException();
 
-            if(padIntDict.ContainsKey(uid)) {
-                return true;
-            }
-
-            return false;
+            return padIntDict.ContainsKey(uid);
         }
 
         /* Returns the value of the PadInt when the transaction
