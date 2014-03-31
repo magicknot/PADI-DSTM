@@ -114,6 +114,16 @@ namespace PadInt_Server {
             /* retorna false caso abort??? depois com os timer? */
         }
 
+        /* Returns true if the transaction identified by tid
+         *  has a write lock over the PadInt identified by uid */
+        public bool hasWriteLock(int tid) {
+            if(writer == tid) {
+                return true;
+            }
+
+            return false;
+        }
+
         /* Assigns to the transaction identified by tid
          * a write lock over the PadInt identified by uid,
          * as soon as possible.
