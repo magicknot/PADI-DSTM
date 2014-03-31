@@ -47,7 +47,7 @@ namespace PadInt_Server {
         private List<int> pendingWriters;
 
         /* uid represetns the PadInt's uid */
-        public PadInt(int uid) {
+        internal PadInt(int uid) {
 
             this.uid = uid;
             this.actualValue = 0;
@@ -60,17 +60,17 @@ namespace PadInt_Server {
             this.pendingWriters = new List<int>();
         }
 
-        public int Uid {
+        internal int Uid {
             get { return uid; }
             set { this.uid = value; }
         }
 
-        public int ActualValue {
+        internal int ActualValue {
             get { return actualValue; }
             set { this.actualValue = value; }
         }
 
-        public int OriginalValue {
+        internal int OriginalValue {
             get { return originalValue; }
             set { this.originalValue = value; }
         }
@@ -86,7 +86,7 @@ namespace PadInt_Server {
          * as soon as possible.
          * 
          * Returns true if successful */
-        public bool getReadLock(int tid) {
+        internal bool getReadLock(int tid) {
 
             /* ve se não há algum escritor 
              *  se nao existir mete nos leitores
@@ -116,7 +116,7 @@ namespace PadInt_Server {
 
         /* Returns true if the transaction identified by tid
          *  has a write lock over the PadInt identified by uid */
-        public bool hasWriteLock(int tid) {
+        internal bool hasWriteLock(int tid) {
             return writer == tid;
         }
 
@@ -125,7 +125,7 @@ namespace PadInt_Server {
          * as soon as possible.
          * 
          * Returns true if successful */
-        public bool getWriteLock(int tid) {
+        internal bool getWriteLock(int tid) {
 
             /* TODO
              * 
@@ -185,7 +185,7 @@ namespace PadInt_Server {
         * owned by a transaction identified by tid.
         *
         * Returns true if successful */
-        public void freeReadLock(int tid) {
+        internal void freeReadLock(int tid) {
             readers.Remove(tid);
             dequeueReadLock();
         }
@@ -194,7 +194,7 @@ namespace PadInt_Server {
         * owned by a transaction identified with tid.
         *
         * Returns true if successful */
-        public void freeWriteLock(int tid) {
+        internal void freeWriteLock(int tid) {
             /* "frees" writer variable */
             writer = INITIALIZATION;
             dequeueWriteLock();
@@ -206,7 +206,7 @@ namespace PadInt_Server {
          *  exists pending writers, assigns the lock to
          *  the first one.
          */
-        private void dequeueReadLock() {
+        internal void dequeueReadLock() {
             int temp = INITIALIZATION;
 
             if(readers.Count == 0) {
@@ -233,7 +233,7 @@ namespace PadInt_Server {
          *  any pending reader and assigns the lock to the
          *  first one.
          */
-        private void dequeueWriteLock() {
+        internal void dequeueWriteLock() {
             int temp = INITIALIZATION;
 
             if(promotion != INITIALIZATION) {
@@ -257,7 +257,7 @@ namespace PadInt_Server {
             }
         }
 
-        public void commit(int tid) {
+        internal void commit(int tid) {
             /* TODO */
 
             /* ver se da´ para fazer fusao com o metodo abort */
@@ -273,7 +273,7 @@ namespace PadInt_Server {
                  * entry.Value.OriginalValue = entry.Value.ActualValue; */
         }
 
-        public void abort(int tid) {
+        internal void abort(int tid) {
             /* TODO */
 
 
