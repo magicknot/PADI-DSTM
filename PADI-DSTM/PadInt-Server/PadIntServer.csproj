@@ -7,8 +7,8 @@
     <ProjectGuid>{7A204759-A532-484F-9C75-13D245A4897B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PadInt_Server</RootNamespace>
-    <AssemblyName>PadInt-Server</AssemblyName>
+    <RootNamespace>PadIntServer</RootNamespace>
+    <AssemblyName>PadIntServer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -46,6 +46,7 @@
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

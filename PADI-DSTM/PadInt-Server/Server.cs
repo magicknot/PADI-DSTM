@@ -9,7 +9,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
 
-namespace PadInt_Server {
+namespace PadIntServer {
 
     class Server : MarshalByRefObject, IServer {
 
@@ -18,12 +18,13 @@ namespace PadInt_Server {
 
         /* Structure that maps UID to PadInt */
         private Dictionary<int, PadInt> padIntDict = new Dictionary<int, PadInt>();
-        //arranjar nome melhor???
 
         /* Obtain the PadInt identified by uid.
          * Returns null if not found. 
          */
         private PadInt getPadInt(int uid) {
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " getPadInt " + " uid " + uid);
+
 
             foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
                 if(entry.Key == uid) {
@@ -35,14 +36,14 @@ namespace PadInt_Server {
         }
 
         public void createPadInt(int uid) {
-            throw new NotImplementedException();
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " createPadInt " + " uid " + uid);
+
 
             padIntDict.Add(uid, new PadInt(uid));
         }
 
         public bool confirmPadInt(int uid) {
-            throw new NotImplementedException();
-
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " confirmPadInt " + " uid " + uid);
             return padIntDict.ContainsKey(uid);
         }
 
@@ -52,6 +53,8 @@ namespace PadInt_Server {
          */
         public int readPadInt(int tid, int uid) {
             throw new NotImplementedException();
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " readPadInt " + " tid " + tid  + " uid " + uid );
+
 
             /* Obtain the PadInt identified by uid */
             PadInt padInt = getPadInt(uid);
@@ -66,7 +69,8 @@ namespace PadInt_Server {
         }
 
         public bool writePadInt(int tid, int uid, int value) {
-            throw new NotImplementedException();
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " writePadInt " + " tid " + tid + " uid " + uid + " value " + value);
+
 
             /* Obtain the PadInt identified by uid */
             PadInt padInt = getPadInt(uid);

@@ -31,11 +31,13 @@ namespace ClientLibrary {
         }
 
         public int read() {
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
+            Console.WriteLine(DateTime.Now + " PadIntStub " + " read ");
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
             return server.readPadInt(tid, uid);
         }
         public bool write(int value) {
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
+            Console.WriteLine(DateTime.Now + " PadIntStub " + " write " + " value " + value);
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
 
             if(server.writePadInt(tid, uid, value)) {
                 library.registerWrite(uid);

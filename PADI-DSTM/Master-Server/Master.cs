@@ -20,18 +20,22 @@ namespace MasterServer {
         }
 
         public int getNextTID() {
+            Console.WriteLine(DateTime.Now + " Master " + " getNextID ");
             return lastTID++;
         }
 
         public void registerServer(String address) {
+            Console.WriteLine(DateTime.Now + " Master " + " registerServer " + " address " + address);
             registeredServers.Add(nServers++, address);
         }
 
         public int getNServers() {
+            Console.WriteLine(DateTime.Now + " Master " + " getNServers ");
             return registeredServers.Count;
         }
 
         public String getServerAddress(int serverID) {
+            Console.WriteLine(DateTime.Now + " Master " + " getServerAddress " + " serverID " + serverID);
             return registeredServers[serverID];
         }
 
