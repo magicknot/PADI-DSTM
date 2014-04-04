@@ -57,8 +57,9 @@ namespace ClientLibrary {
 
         public PadIntStub createPadInt(int uid) {
             Console.WriteLine(DateTime.Now + " Library " + " createPadInt " + uid);
-
+        
             String address = serversList[getPadIntServerID(uid)];
+            Console.WriteLine(address);
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             bool possible = server.createPadInt(uid);
 
@@ -70,10 +71,10 @@ namespace ClientLibrary {
 
 
         public PadIntStub accessPadInt(int uid) {
-            Console.WriteLine(DateTime.Now +  " Library " + " operation " + " accessPadInt " + " uid " + uid);
+            Console.WriteLine(DateTime.Now +  " Library " + " accessPadInt " + " uid " + uid);
 
             String address = serversList[getPadIntServerID(uid)];
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             bool accessible = server.confirmPadInt(uid);
 
             if(accessible)
@@ -83,10 +84,12 @@ namespace ClientLibrary {
         }
 
         public int getNServers() {
+            Console.WriteLine(DateTime.Now +  " Library " + " getNServers ");
             return serversList.Count;
         }
 
         public int getPadIntServerID(int uid) {
+            Console.WriteLine(DateTime.Now +  " Library " + " getPadIntServerID " + " uid " + uid);
             int serverID = 0;
 
             for(int i = 0; i < getNServers(); i++) {
@@ -100,7 +103,7 @@ namespace ClientLibrary {
 
 
         public void registerWrite(int uid) {
-            Console.WriteLine(DateTime.Now + " Library " + " operation " + " registerWrite " + " uid " + uid);
+            Console.WriteLine(DateTime.Now + " Library " + " registerWrite " + " uid " + uid);
             writtenList.Add(uid);
         }
 

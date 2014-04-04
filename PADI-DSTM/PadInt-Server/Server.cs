@@ -20,13 +20,13 @@ namespace PadIntServer {
         /* Structure that maps UID to PadInt */
         private Dictionary<int, IPadInt> padIntDict = new Dictionary<int, IPadInt>();
         private int id;
-        private int maxCapacity=20;
+        private int maxCapacity=10;
 
         /* Obtain the PadInt identified by uid.
          * Returns null if not found. 
          */
         private IPadInt getPadInt(int uid) {
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " getPadInt " + " uid " + uid);
+            Console.WriteLine(DateTime.Now + " Server " + " getPadInt " + " uid " + uid);
 
 
             foreach(KeyValuePair<int, IPadInt> entry in padIntDict) {
@@ -39,7 +39,7 @@ namespace PadIntServer {
         }
 
         public bool createPadInt(int uid) {
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " createPadInt " + " uid " + uid);
+            Console.WriteLine(DateTime.Now + " Server " + " createPadInt " + " uid " + uid);
 
             try {
 
@@ -59,6 +59,7 @@ namespace PadIntServer {
         }
 
         public void movePadInts() {
+            Console.WriteLine(DateTime.Now +  " Server " + " movePadInts ");
             IMaster masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             Dictionary<int, String> serverAddresses = masterServer.updateMaxCapacity();
             Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
@@ -68,7 +69,7 @@ namespace PadIntServer {
                 return;
 
             for(int i=0; i < padIntDict.Count; i++) {
-                if(padIntDict[i]!=null && i<maxCapacity*id) {
+                if(padIntDict.ContainsKey(i) && i<maxCapacity*id) {
                     sparePadInts.Add(i, padIntDict[i]);
                     padIntDict.Remove(i);
                 }
@@ -86,8 +87,10 @@ namespace PadIntServer {
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
+            Console.WriteLine(DateTime.Now +  " Server " + " attachPadInts ");
             for(int i =0; i <sparedPadInts.Count; i++) {
-                padIntDict.Add(i, sparedPadInts[i]);
+                if(sparedPadInts.ContainsKey(i))
+                    padIntDict.Add(i, sparedPadInts[i]);
             }
 
             movePadInts();
@@ -99,7 +102,7 @@ namespace PadIntServer {
         }
 
         public bool confirmPadInt(int uid) {
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " confirmPadInt " + " uid " + uid);
+            Console.WriteLine(DateTime.Now + " Server " + " confirmPadInt " + " uid " + uid);
             return padIntDict.ContainsKey(uid);
         }
 
@@ -109,11 +112,11 @@ namespace PadIntServer {
          */
         public int readPadInt(int tid, int uid) {
             throw new NotImplementedException();
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " readPadInt " + " tid " + tid  + " uid " + uid);
+            Console.WriteLine(DateTime.Now + " Server " + " readPadInt " + " tid " + tid  + " uid " + uid);
 
 
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = (PadInt) getPadInt(uid);
+            PadInt padInt = (PadInt)getPadInt(uid);
 
             if(padInt != null) {
                 if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
@@ -125,11 +128,11 @@ namespace PadIntServer {
         }
 
         public bool writePadInt(int tid, int uid, int value) {
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " writePadInt " + " tid " + tid + " uid " + uid + " value " + value);
+            Console.WriteLine(DateTime.Now + " Server " + " writePadInt " + " tid " + tid + " uid " + uid + " value " + value);
 
 
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = (PadInt) getPadInt(uid);
+            PadInt padInt = (PadInt)getPadInt(uid);
 
             /* TODO
              * tem que se ver o caso em que se vai guardar

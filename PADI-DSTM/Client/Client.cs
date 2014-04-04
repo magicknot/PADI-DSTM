@@ -13,7 +13,10 @@ namespace Client {
             Library library = new Library();
             if(library.init()) {
                 library.txBegin();
-                library.createPadInt(1);
+                for(int i = 0; i<40; i++) {
+                    library.createPadInt(i);
+                }
+
             } else {
                 Console.WriteLine("There are no servers available");
             }

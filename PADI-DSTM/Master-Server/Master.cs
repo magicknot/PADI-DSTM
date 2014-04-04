@@ -11,7 +11,7 @@ namespace MasterServer {
         private int lastTID;
         private int nServers;
         private Dictionary<int, string> registeredServers;
-        private int maxServerCapacity;
+        private int maxServerCapacity=10;
 
         public Master() {
             registeredServers = new Dictionary<int, string>();
@@ -42,6 +42,7 @@ namespace MasterServer {
         }
 
         public Dictionary<int, string> updateMaxCapacity() {
+            Console.WriteLine(DateTime.Now +  " Master " + " updateMaxCapacity " );
             maxServerCapacity = 2* maxServerCapacity;
             return getServersList().Item1;
         }

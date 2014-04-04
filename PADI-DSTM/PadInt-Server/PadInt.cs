@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using CommonTypes;
 
 namespace PadIntServer {
-
-    class PadInt : MarshalByRefObject, IPadInt {
+    [Serializable]
+    class PadInt : IPadInt {
 
         /* constante used in the initialization of int variables */
         private const int INITIALIZATION = -1;
