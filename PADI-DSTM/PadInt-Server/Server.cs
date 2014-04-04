@@ -35,11 +35,17 @@ namespace PadIntServer {
             return null;
         }
 
-        public void createPadInt(int uid) {
+        public bool createPadInt(int uid) {
             Console.WriteLine(DateTime.Now + " Server " + " operation " + " createPadInt " + " uid " + uid);
 
+            try {
+                padIntDict.Add(uid, new PadInt(uid));
+                return true;
+            } catch(ArgumentException) {
+                return false;
+            }
 
-            padIntDict.Add(uid, new PadInt(uid));
+
         }
 
         public bool confirmPadInt(int uid) {
@@ -53,7 +59,7 @@ namespace PadIntServer {
          */
         public int readPadInt(int tid, int uid) {
             throw new NotImplementedException();
-            Console.WriteLine(DateTime.Now + " Server " + " operation " + " readPadInt " + " tid " + tid  + " uid " + uid );
+            Console.WriteLine(DateTime.Now + " Server " + " operation " + " readPadInt " + " tid " + tid  + " uid " + uid);
 
 
             /* Obtain the PadInt identified by uid */

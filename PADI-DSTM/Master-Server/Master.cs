@@ -24,20 +24,26 @@ namespace MasterServer {
             return lastTID++;
         }
 
-        public void registerServer(String address) {
+        public bool registerServer(String address) {
             Console.WriteLine(DateTime.Now + " Master " + " registerServer " + " address " + address);
-            registeredServers.Add(nServers++, address);
+
+            try {
+                registeredServers.Add(nServers++, address);
+                return true;
+            } catch(ArgumentException) {
+                return false;
+            }
         }
 
-        public int getNServers() {
-            Console.WriteLine(DateTime.Now + " Master " + " getNServers ");
-            return registeredServers.Count;
+        public Dictionary<int, string> getServersList() {
+            Console.WriteLine(DateTime.Now + " Master " + " getNServers " + registeredServers.Count);
+            return registeredServers;
         }
 
-        public String getServerAddress(int serverID) {
+        /*public String getServerAddress(int serverID) {
             Console.WriteLine(DateTime.Now + " Master " + " getServerAddress " + " serverID " + serverID);
             return registeredServers[serverID];
-        }
+        }*/
 
 
 

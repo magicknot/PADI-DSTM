@@ -18,7 +18,7 @@ namespace ClientLibrary {
 
         private const int NINTSPERSERVER = 10;
         private IMaster masterServer;
-        private int nServers;
+        private Dictionary<int, String> serversList;
         private int actualTID;
         private List<int> writtenList;
 
@@ -37,9 +37,9 @@ namespace ClientLibrary {
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            nServers = masterServer.getNServers();
+            serversList = masterServer.getServersList();
 
-            return true;
+            return serversList.Count != 0;
         }
 
         public bool txBegin() {
@@ -56,53 +56,51 @@ namespace ClientLibrary {
 
         public PadIntStub createPadInt(int uid) {
             Console.WriteLine(DateTime.Now + " Library " + " createPadInt " + uid);
-            int serverID = 0;
-            if(uid >= NINTSPERSERVER * nServers) {
-                serverID = nServers - 1;
-            } else {
-                for(int i = 0; i < nServers; i++) {
-                    if(uid < (i + 1) * NINTSPERSERVER) {
-                        serverID = i;
-                    }
-                }
-            }
 
-            String address = masterServer.getServerAddress(serverID);
-
+            String address = serversList[getPadIntServerID(uid)];
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             server.createPadInt(uid);
+            bool possible = server.confirmPadInt(uid);
 
-            return new PadIntStub(uid, actualTID, address, this);
-
-
-        }
-
-        public PadIntStub accessPadInt(int uid) {
-            Console.WriteLine(DateTime.Now +  " Library " + " operation " + " accessPadInt " + " uid " + uid);
-
-            int serverID = 0;
-            if(uid >= NINTSPERSERVER * nServers) {
-                serverID = nServers - 1;
-            } else {
-                for(int i = 0; i < nServers; i++) {
-                    if(uid < (i + 1) * NINTSPERSERVER) {
-                        serverID = i;
-                    }
-                }
-            }
-
-            String address = masterServer.getServerAddress(serverID);
-
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
-            if(server.confirmPadInt(uid))
+            if(possible)
                 return new PadIntStub(uid, actualTID, address, this);
             else
                 return null;
         }
 
+
+        public PadIntStub accessPadInt(int uid) {
+            Console.WriteLine(DateTime.Now +  " Library " + " operation " + " accessPadInt " + " uid " + uid);
+
+            String address = serversList[getPadIntServerID(uid)];
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
+            bool accessible = server.confirmPadInt(uid);
+
+            if(accessible)
+                return new PadIntStub(uid, actualTID, address, this);
+            else
+                return null;
+        }
+
+        public int getNServers() {
+            return serversList.Count;
+        }
+
+        public int getPadIntServerID(int uid) {
+            int serverID = 0;
+
+            for(int i = 0; i < getNServers(); i++) {
+                if(uid < (i + 1) * NINTSPERSERVER) {
+                    return serverID = i;
+                }
+            }
+
+            return serverID = getNServers() - 1;
+        }
+
+
         public void registerWrite(int uid) {
             Console.WriteLine(DateTime.Now + " Library " + " operation " + " registerWrite " + " uid " + uid);
-
             writtenList.Add(uid);
         }
 

@@ -23,6 +23,7 @@ namespace ClientLibrary {
 
         public PadIntStub(int uid, int tid, string address, Library library) {
             this.uid = uid;
+            this.tid = tid;
             this.address = address;
             this.library = library;
             this.readLocks = new List<int>();

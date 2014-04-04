@@ -14,8 +14,12 @@ namespace Client {
             if(library.init()) {
                 library.txBegin();
                 library.createPadInt(1);
-            } throw new FailedConnectionException("Master");
+            } else {
+                Console.WriteLine("There are no servers available");
+            }
 
+            while(true)
+                ;
 
         }
     }

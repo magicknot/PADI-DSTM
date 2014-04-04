@@ -9,18 +9,16 @@ namespace CommonTypes {
     }
 
     public interface IServer {
-        void createPadInt(int uid);
-
+        bool createPadInt(int uid);
         bool confirmPadInt(int uid);
-
         int readPadInt(int tid, int uid);
         bool writePadInt(int tid, int uid, int value);
     }
 
     public interface IMaster {
-        void registerServer(String address);
+        bool registerServer(String address);
         int getNextTID();
-        int getNServers();
-        String getServerAddress(int serverID);
+        Dictionary<int, string> getServersList();
+        //String getServerAddress(int serverID);
     }
 }
