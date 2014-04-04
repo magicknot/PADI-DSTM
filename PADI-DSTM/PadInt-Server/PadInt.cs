@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommonTypes;
 
 namespace PadIntServer {
 
-    class PadInt {
+    class PadInt : MarshalByRefObject, IPadInt {
 
         /* constante used in the initialization of int variables */
         private const int INITIALIZATION = -1;

@@ -21,7 +21,11 @@ namespace PadIntServer {
 
             RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            masterServer.registerServer("tcp://localhost:8001/PadIntServer");
+            int serverID = masterServer.registerServer("tcp://localhost:8001/PadIntServer");
+            if(serverID>0) {
+                padIntServer.setID(serverID);
+            }
+
 
             Console.WriteLine("Server up and running on port " + MASTERADDRESS);
             while(true)

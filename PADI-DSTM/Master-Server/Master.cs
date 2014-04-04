@@ -11,6 +11,7 @@ namespace MasterServer {
         private int lastTID;
         private int nServers;
         private Dictionary<int, string> registeredServers;
+        private int maxServerCapacity;
 
         public Master() {
             registeredServers = new Dictionary<int, string>();
@@ -24,20 +25,25 @@ namespace MasterServer {
             return lastTID++;
         }
 
-        public bool registerServer(String address) {
+        public int registerServer(String address) {
             Console.WriteLine(DateTime.Now + " Master " + " registerServer " + " address " + address);
 
             try {
                 registeredServers.Add(nServers++, address);
-                return true;
+                return nServers;
             } catch(ArgumentException) {
-                return false;
+                return -1;
             }
         }
 
-        public Dictionary<int, string> getServersList() {
+        public Tuple<Dictionary<int, string>, int> getServersList() {
             Console.WriteLine(DateTime.Now + " Master " + " getNServers " + registeredServers.Count);
-            return registeredServers;
+            return new Tuple<Dictionary<int, string>, int>(registeredServers, maxServerCapacity);
+        }
+
+        public Dictionary<int, string> updateMaxCapacity() {
+            maxServerCapacity = 2* maxServerCapacity;
+            return getServersList().Item1;
         }
 
         /*public String getServerAddress(int serverID) {

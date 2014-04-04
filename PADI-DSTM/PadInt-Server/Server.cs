@@ -7,6 +7,7 @@ using CommonTypes;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Collections;
 
 
 namespace PadIntServer {
@@ -17,16 +18,18 @@ namespace PadIntServer {
         //private List<Request> requestList = new List<Request>();
 
         /* Structure that maps UID to PadInt */
-        private Dictionary<int, PadInt> padIntDict = new Dictionary<int, PadInt>();
+        private Dictionary<int, IPadInt> padIntDict = new Dictionary<int, IPadInt>();
+        private int id;
+        private int maxCapacity=20;
 
         /* Obtain the PadInt identified by uid.
          * Returns null if not found. 
          */
-        private PadInt getPadInt(int uid) {
+        private IPadInt getPadInt(int uid) {
             Console.WriteLine(DateTime.Now + " Server " + " operation " + " getPadInt " + " uid " + uid);
 
 
-            foreach(KeyValuePair<int, PadInt> entry in padIntDict) {
+            foreach(KeyValuePair<int, IPadInt> entry in padIntDict) {
                 if(entry.Key == uid) {
                     return entry.Value;
                 }
@@ -39,13 +42,60 @@ namespace PadIntServer {
             Console.WriteLine(DateTime.Now + " Server " + " operation " + " createPadInt " + " uid " + uid);
 
             try {
-                padIntDict.Add(uid, new PadInt(uid));
+
+
+                if(padIntDict.Count<2*maxCapacity) {
+                    padIntDict.Add(uid, new PadInt(uid));
+                } else {
+                    movePadInts();
+                }
+
                 return true;
             } catch(ArgumentException) {
                 return false;
             }
 
 
+        }
+
+        public void movePadInts() {
+            IMaster masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+            Dictionary<int, String> serverAddresses = masterServer.updateMaxCapacity();
+            Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
+            maxCapacity=2*maxCapacity;
+
+            if(id == 1)
+                return;
+
+            for(int i=0; i < padIntDict.Count; i++) {
+                if(padIntDict[i]!=null && i<maxCapacity*id) {
+                    sparePadInts.Add(i, padIntDict[i]);
+                    padIntDict.Remove(i);
+                }
+            }
+
+            string leftServerAddress = serverAddresses[id-1];
+
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), leftServerAddress);
+            server.attachPadInts(serverAddresses, sparePadInts);
+
+
+
+
+
+        }
+
+        public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
+            for(int i =0; i <sparedPadInts.Count; i++) {
+                padIntDict.Add(i, sparedPadInts[i]);
+            }
+
+            movePadInts();
+
+        }
+
+        public void setMaxCapacity(int value) {
+            maxCapacity = value;
         }
 
         public bool confirmPadInt(int uid) {
@@ -63,7 +113,7 @@ namespace PadIntServer {
 
 
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = getPadInt(uid);
+            PadInt padInt = (PadInt) getPadInt(uid);
 
             if(padInt != null) {
                 if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
@@ -79,7 +129,7 @@ namespace PadIntServer {
 
 
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = getPadInt(uid);
+            PadInt padInt = (PadInt) getPadInt(uid);
 
             /* TODO
              * tem que se ver o caso em que se vai guardar
@@ -168,6 +218,10 @@ namespace PadIntServer {
             }
 
             /* retorna algum tipo de msg a indicar que fez o abort? */
+        }
+
+        internal void setID(int serverID) {
+            this.id=serverID;
         }
     }
 }

@@ -16,11 +16,11 @@ namespace ClientLibrary {
 
     public class Library {
 
-        private const int NINTSPERSERVER = 10;
         private IMaster masterServer;
         private Dictionary<int, String> serversList;
         private int actualTID;
         private List<int> writtenList;
+        private int maxServerCapacity;
 
         //Qual é a ideia de guardar timers?
 
@@ -37,8 +37,9 @@ namespace ClientLibrary {
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            serversList = masterServer.getServersList();
-
+            Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersList();
+            serversList = serversInfo.Item1;
+            maxServerCapacity = serversInfo.Item2;
             return serversList.Count != 0;
         }
 
@@ -59,8 +60,7 @@ namespace ClientLibrary {
 
             String address = serversList[getPadIntServerID(uid)];
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
-            server.createPadInt(uid);
-            bool possible = server.confirmPadInt(uid);
+            bool possible = server.createPadInt(uid);
 
             if(possible)
                 return new PadIntStub(uid, actualTID, address, this);
@@ -90,7 +90,7 @@ namespace ClientLibrary {
             int serverID = 0;
 
             for(int i = 0; i < getNServers(); i++) {
-                if(uid < (i + 1) * NINTSPERSERVER) {
+                if(uid < (i + 1) * maxServerCapacity) {
                     return serverID = i;
                 }
             }
