@@ -18,7 +18,7 @@ namespace Client {
                 }
 
             } else {
-                Console.WriteLine("There are no servers available");
+                library.log(new String[] { "There are no servers available" });
             }
 
             while(true)

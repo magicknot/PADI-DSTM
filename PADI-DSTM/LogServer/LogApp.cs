@@ -17,7 +17,7 @@ namespace LogServer {
 
             RemotingServices.Marshal(logServer, "LogServer", typeof(Log));
 
-            Console.WriteLine("Master up and running on port " + 7002);
+            Console.WriteLine("Log up and running on port " + 7002);
 
 
             while(true)

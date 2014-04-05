@@ -17,16 +17,15 @@ namespace MasterServer {
             registeredServers = new Dictionary<int, string>();
             lastTID = 0;
             nServers = 0;
-
         }
 
         public int getNextTID() {
-            Console.WriteLine(DateTime.Now + " Master " + " getNextID ");
+            log(new String[] { "Master", "getNextID" });
             return lastTID++;
         }
 
         public Tuple<int, int> registerServer(String address) {
-            Console.WriteLine(DateTime.Now + " Master " + " registerServer " + " address " + address);
+            log(new String[] { "Master", " registerServer", " address ", address.ToString() });
 
             try {
                 registeredServers.Add(nServers, address);
@@ -37,13 +36,18 @@ namespace MasterServer {
         }
 
         public Tuple<Dictionary<int, string>, int> getServersInfo(bool increase) {
-            Console.WriteLine(DateTime.Now + " Master " + " getNServers " + registeredServers.Count);
+            log(new String[] { "Master", "getNServers", registeredServers.Count.ToString() });
 
             if(increase) {
                 maxServerCapacity = 2* maxServerCapacity;
             }
 
             return new Tuple<Dictionary<int, string>, int>(registeredServers, maxServerCapacity);
+        }
+
+        internal void log(String[] args) {
+            ILog logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+            logServer.log(args);
         }
 
     }

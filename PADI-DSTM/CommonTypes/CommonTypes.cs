@@ -27,7 +27,7 @@ namespace CommonTypes {
     }
 
     public interface ILog {
-        int log(String[] logs);
+        void log(String[] logs);
     }
 
 }

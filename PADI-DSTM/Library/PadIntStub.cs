@@ -32,12 +32,12 @@ namespace ClientLibrary {
         }
 
         public int read() {
-            Console.WriteLine(DateTime.Now + " PadIntStub " + " read ");
+            library.log(new String[] { "PadIntStub", "read" });
             IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
             return server.readPadInt(tid, uid);
         }
         public bool write(int value) {
-            Console.WriteLine(DateTime.Now + " PadIntStub " + " write " + " value " + value);
+            library.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
             IServer server = (IServer)Activator.GetObject(typeof(IServer), "tcp://localhost:" + address + "/PadIntServer");
 
             if(server.writePadInt(tid, uid, value)) {

@@ -18,7 +18,6 @@ namespace MasterServer {
             TcpChannel channel = new TcpChannel(MASTERADDRESS);
             ChannelServices.RegisterChannel(channel, true);
             Master masterServer = new Master();
-
             RemotingServices.Marshal(masterServer, "MasterServer", typeof(Master));
 
             Console.WriteLine("Master up and running on port " + MASTERADDRESS);

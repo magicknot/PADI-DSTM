@@ -32,10 +32,12 @@ namespace ClientLibrary {
 
         //porque boolean?
         public Boolean init() {
-            Console.WriteLine(DateTime.Now + " Library " + " init ");
+
 
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
+            log(new String[] { "Library", "init" });
+
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
             serversList = serversInfo.Item1;
@@ -44,22 +46,21 @@ namespace ClientLibrary {
         }
 
         public bool txBegin() {
-            Console.WriteLine(DateTime.Now + " Library " + " txBegin ");
+            log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.getNextTID();
             return true;
         }
 
         public bool txCommit() {
-            Console.WriteLine(DateTime.Now + " Library " + " txCommit ");
+            log(new String[] { "Library", "txCommit" });
             writtenList.Sort();
             throw new NotImplementedException();
         }
 
         public PadIntStub createPadInt(int uid) {
-            Console.WriteLine(DateTime.Now + " Library " + " createPadInt " + uid);
-        
+            log(new String[] { "Library", "createPadInt", uid.ToString() });
+
             String address = serversList[getPadIntServerID(uid)];
-            Console.WriteLine(address);
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             bool possible = server.createPadInt(uid);
 
@@ -71,7 +72,7 @@ namespace ClientLibrary {
 
 
         public PadIntStub accessPadInt(int uid) {
-            Console.WriteLine(DateTime.Now +  " Library " + " accessPadInt " + " uid " + uid);
+            log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
             String address = serversList[getPadIntServerID(uid)];
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
@@ -84,12 +85,12 @@ namespace ClientLibrary {
         }
 
         public int getNServers() {
-            Console.WriteLine(DateTime.Now +  " Library " + " getNServers ");
+            log(new String[] { "Library", "getNServers" });
             return serversList.Count;
         }
 
         public int getPadIntServerID(int uid) {
-            Console.WriteLine(DateTime.Now +  " Library " + " getPadIntServerID " + " uid " + uid);
+            log(new String[] { "Library", "getPadIntServerID" + "uid" + uid.ToString() });
             int serverID = 0;
 
             for(int i = 0; i < getNServers(); i++) {
@@ -103,8 +104,13 @@ namespace ClientLibrary {
 
 
         public void registerWrite(int uid) {
-            Console.WriteLine(DateTime.Now + " Library " + " registerWrite " + " uid " + uid);
+            log(new String[] { "Library", "registerWrite" + "uid" + uid.ToString() });
             writtenList.Add(uid);
+        }
+
+        internal void log(String[] args) {
+            ILog logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+            logServer.log(args);
         }
 
     }

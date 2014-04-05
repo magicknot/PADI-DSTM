@@ -21,7 +21,6 @@ namespace PadIntServer {
         private Dictionary<int, IPadInt> padIntDict;
         private int id;
         private int maxCapacity;
-        ILog log;
         IMaster masterServer;
 
         public Server() {
@@ -32,7 +31,7 @@ namespace PadIntServer {
          * Returns null if not found. 
          */
         private IPadInt getPadInt(int uid) {
-            log.log(new String[] { "server", "getPadInt", "uid", uid.ToString() });
+            log(new String[] { "server", "getPadInt", "uid", uid.ToString() });
 
             foreach(KeyValuePair<int, IPadInt> entry in padIntDict) {
                 if(entry.Key == uid) {
@@ -44,7 +43,7 @@ namespace PadIntServer {
         }
 
         public bool createPadInt(int uid) {
-            log.log(new String[] { "server", id.ToString(), "createPadInt", "uid ", uid.ToString() });
+            log(new String[] { "server", id.ToString(), "createPadInt", "uid ", uid.ToString() });
 
             try {
 
@@ -66,7 +65,7 @@ namespace PadIntServer {
         }
 
         public void movePadInts(Dictionary<int, String> serverAddresses) {
-            log.log(new String[] { "server", id.ToString(), "movePadInts" });
+            log(new String[] { "server", id.ToString(), "movePadInts" });
 
             Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
             int originalCapacity = maxCapacity;
@@ -89,7 +88,7 @@ namespace PadIntServer {
 
 
             string leftServerAddress = serverAddresses[id-1];
-            log.log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
+            log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
 
             IServer server = (IServer)Activator.GetObject(typeof(IServer), leftServerAddress);
             server.attachPadInts(serverAddresses, sparePadInts);
@@ -101,7 +100,7 @@ namespace PadIntServer {
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
-            log.log(new String[] { "Server", id.ToString(), "attachPadInts" });
+            log(new String[] { "Server", id.ToString(), "attachPadInts" });
 
 
 
@@ -122,7 +121,7 @@ namespace PadIntServer {
         }
 
         public bool confirmPadInt(int uid) {
-            log.log(new String[] { "Server", id.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+            log(new String[] { "Server", id.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             return padIntDict.ContainsKey(uid);
         }
 
@@ -147,7 +146,7 @@ namespace PadIntServer {
         }
 
         public bool writePadInt(int tid, int uid, int value) {
-            log.log(new String[] { " Server ", id.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+            log(new String[] { " Server ", id.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
 
             /* Obtain the PadInt identified by uid */
@@ -250,8 +249,9 @@ namespace PadIntServer {
             masterServer = master;
         }
 
-        internal void setLog(ILog log) {
-            this.log= log;
+        public void log(String[] args) {
+            ILog logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+            logServer.log(args);
         }
 
     }

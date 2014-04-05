@@ -26,10 +26,9 @@ namespace PadIntServer {
 
             RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:8086/LogServer");
+
             Tuple<int, int> serverInfo = masterServer.registerServer("tcp://localhost:"+(8000+randomNumber)+"/PadIntServer");
             if(serverInfo!=null) {
-                padIntServer.setLog(logServer);
                 padIntServer.setMaster(masterServer);
                 padIntServer.setID(serverInfo.Item1);
                 padIntServer.setMaxCapacity(serverInfo.Item2);
