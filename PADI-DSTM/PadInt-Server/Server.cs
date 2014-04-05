@@ -155,7 +155,7 @@ namespace PadIntServer {
                     return true;
                 }
             } else {
-                //throw new PadIntNotFoundException() ;
+                throw new PadIntNotFoundException(uid);
             }
 
             /* e´preciso? */
@@ -176,8 +176,17 @@ namespace PadIntServer {
             bool resultCommit = true;
 
             foreach(int padIntUid in usedPadInts) {
+                PadInt padInt = (PadInt) getPadInt(padIntUid);
+
+                if(padInt == null) {
+                    throw new PadIntNotFoundException(padIntUid);
+                }
+            }
+
+            foreach(int padIntUid in usedPadInts) {
 
                 PadInt padInt = (PadInt) getPadInt(padIntUid);
+
                 if(!padInt.commit(tid)) {
                     resultCommit = false;
                 }
@@ -198,6 +207,14 @@ namespace PadIntServer {
              *  actualizar no server.
              */
             bool resultAbort = true;
+
+            foreach(int padIntUid in usedPadInts) {
+                PadInt padInt = (PadInt) getPadInt(padIntUid);
+
+                if(padInt == null) {
+                    throw new PadIntNotFoundException(padIntUid);
+                }
+            }
 
             foreach(int padIntUid in usedPadInts) {
 
