@@ -20,12 +20,14 @@ namespace CommonTypes {
     }
 
     public interface IMaster {
-        int registerServer(String address);
-        int getNextTID();
-        Tuple<Dictionary<int, string>,int> getServersList();
-        //String getServerAddress(int serverID);
 
-        Dictionary<int, string> updateMaxCapacity();
+        int getNextTID();
+        Tuple<int, int> registerServer(String address);
+        Tuple<Dictionary<int, string>, int> getServersInfo(bool increase);
+    }
+
+    public interface ILog {
+        int log(String[] logs);
     }
 
 }

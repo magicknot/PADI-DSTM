@@ -14,9 +14,11 @@ namespace PadIntServer {
 
         static void Main(string[] args) {
             IMaster masterServer;
+            ILog logServer;
             Server padIntServer = new Server();
+
             Random random = new Random();
-int randomNumber = random.Next(0, 100);
+            int randomNumber = random.Next(0, 100);
 
 
             TcpChannel channel = new TcpChannel(8000+randomNumber);
@@ -24,9 +26,13 @@ int randomNumber = random.Next(0, 100);
 
             RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            int serverID = masterServer.registerServer("tcp://localhost:"+(8000+randomNumber)+"/PadIntServer");
-            if(serverID>0) {
-                padIntServer.setID(serverID);
+            logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:8086/LogServer");
+            Tuple<int, int> serverInfo = masterServer.registerServer("tcp://localhost:"+(8000+randomNumber)+"/PadIntServer");
+            if(serverInfo!=null) {
+                padIntServer.setLog(logServer);
+                padIntServer.setMaster(masterServer);
+                padIntServer.setID(serverInfo.Item1);
+                padIntServer.setMaxCapacity(serverInfo.Item2);
             }
 
 

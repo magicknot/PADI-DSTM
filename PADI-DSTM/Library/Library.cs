@@ -37,7 +37,7 @@ namespace ClientLibrary {
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersList();
+            Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
             serversList = serversInfo.Item1;
             maxServerCapacity = serversInfo.Item2;
             return serversList.Count != 0;

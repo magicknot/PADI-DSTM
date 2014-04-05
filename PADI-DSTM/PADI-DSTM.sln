@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "CommonTypes\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientLibrary", "Library\ClientLibrary.csproj", "{8CF73195-6EEA-4CAE-8A0F-CCA50DD6460A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogServer", "LogServer\LogServer.csproj", "{AFBFD933-6D76-4998-9579-A9B383A86369}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{8CF73195-6EEA-4CAE-8A0F-CCA50DD6460A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CF73195-6EEA-4CAE-8A0F-CCA50DD6460A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CF73195-6EEA-4CAE-8A0F-CCA50DD6460A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFBFD933-6D76-4998-9579-A9B383A86369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBFD933-6D76-4998-9579-A9B383A86369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBFD933-6D76-4998-9579-A9B383A86369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBFD933-6D76-4998-9579-A9B383A86369}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

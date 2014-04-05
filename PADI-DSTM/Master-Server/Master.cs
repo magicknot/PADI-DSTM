@@ -25,34 +25,26 @@ namespace MasterServer {
             return lastTID++;
         }
 
-        public int registerServer(String address) {
+        public Tuple<int, int> registerServer(String address) {
             Console.WriteLine(DateTime.Now + " Master " + " registerServer " + " address " + address);
 
             try {
-                registeredServers.Add(nServers++, address);
-                return nServers;
+                registeredServers.Add(nServers, address);
+                return new Tuple<int, int>(nServers++, maxServerCapacity);
             } catch(ArgumentException) {
-                return -1;
+                return null;
             }
         }
 
-        public Tuple<Dictionary<int, string>, int> getServersList() {
+        public Tuple<Dictionary<int, string>, int> getServersInfo(bool increase) {
             Console.WriteLine(DateTime.Now + " Master " + " getNServers " + registeredServers.Count);
+
+            if(increase) {
+                maxServerCapacity = 2* maxServerCapacity;
+            }
+
             return new Tuple<Dictionary<int, string>, int>(registeredServers, maxServerCapacity);
         }
-
-        public Dictionary<int, string> updateMaxCapacity() {
-            Console.WriteLine(DateTime.Now +  " Master " + " updateMaxCapacity " );
-            maxServerCapacity = 2* maxServerCapacity;
-            return getServersList().Item1;
-        }
-
-        /*public String getServerAddress(int serverID) {
-            Console.WriteLine(DateTime.Now + " Master " + " getServerAddress " + " serverID " + serverID);
-            return registeredServers[serverID];
-        }*/
-
-
 
     }
 
