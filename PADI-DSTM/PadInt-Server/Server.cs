@@ -28,6 +28,22 @@ namespace PadIntServer {
             padIntDict = new Dictionary<int, IPadInt>();
         }
 
+        internal int ID {
+            set { this.id = value; }
+        }
+
+        internal int MaxCapacity {
+            set { this.maxCapacity = value; }
+        }
+
+        internal ILog Log {
+            set { this.log = value; }
+        }
+
+        internal IMaster MasterServer {
+            set { this.masterServer = value; }
+        }
+
         /* Obtain the PadInt identified by uid.
          * Returns null if not found. 
          */
@@ -47,9 +63,7 @@ namespace PadIntServer {
             log.log(new String[] { "server", id.ToString(), "createPadInt", "uid ", uid.ToString() });
 
             try {
-
-
-                if(padIntDict.Count<2*maxCapacity) {
+                if(padIntDict.Count < 2 * maxCapacity) {
                     padIntDict.Add(uid, new PadInt(uid));
                 } else {
 
@@ -61,8 +75,6 @@ namespace PadIntServer {
             } catch(ArgumentException) {
                 return false;
             }
-
-
         }
 
         public void movePadInts(Dictionary<int, String> serverAddresses) {
@@ -71,41 +83,29 @@ namespace PadIntServer {
             Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
             int originalCapacity = maxCapacity;
 
-
             if(id == 0)
                 return;
-            while(sparePadInts.Count < originalCapacity/2) {
-                maxCapacity=2*maxCapacity;
-                for(int i=0; i < padIntDict.Count; i++) {
-                    if(padIntDict.ContainsKey(i) && i<maxCapacity*id) {
+            while(sparePadInts.Count < originalCapacity / 2) {
+                maxCapacity = 2 * maxCapacity;
+                for(int i = 0; i < padIntDict.Count; i++) {
+                    if(padIntDict.ContainsKey(i) && i < maxCapacity * id) {
                         sparePadInts.Add(i, padIntDict[i]);
                         padIntDict.Remove(i);
                     }
                 }
             }
 
-
-
-
-
-            string leftServerAddress = serverAddresses[id-1];
+            string leftServerAddress = serverAddresses[id - 1];
             log.log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
 
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), leftServerAddress);
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), leftServerAddress);
             server.attachPadInts(serverAddresses, sparePadInts);
-
-
-
-
-
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
             log.log(new String[] { "Server", id.ToString(), "attachPadInts" });
 
-
-
-            for(int i =0; i <sparedPadInts.Count; i++) {
+            for(int i = 0; i < sparedPadInts.Count; i++) {
                 if(sparedPadInts.ContainsKey(i))
                     padIntDict.Add(i, sparedPadInts[i]);
             }
@@ -114,11 +114,6 @@ namespace PadIntServer {
                 return;
 
             movePadInts(serverAddresses);
-
-        }
-
-        public void setMaxCapacity(int value) {
-            maxCapacity = value;
         }
 
         public bool confirmPadInt(int uid) {
@@ -133,9 +128,8 @@ namespace PadIntServer {
         public int readPadInt(int tid, int uid) {
             throw new NotImplementedException();
 
-
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = (PadInt)getPadInt(uid);
+            PadInt padInt = (PadInt) getPadInt(uid);
 
             if(padInt != null) {
                 if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
@@ -149,14 +143,9 @@ namespace PadIntServer {
         public bool writePadInt(int tid, int uid, int value) {
             log.log(new String[] { " Server ", id.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
-
             /* Obtain the PadInt identified by uid */
-            PadInt padInt = (PadInt)getPadInt(uid);
+            PadInt padInt = (PadInt) getPadInt(uid);
 
-            /* TODO
-             * tem que se ver o caso em que se vai guardar
-             * o valor original a ser usado no abort 
-             */
             if(padInt != null) {
                 if(padInt.getWriteLock(tid)) {
                     padInt.ActualValue = value;
@@ -171,8 +160,7 @@ namespace PadIntServer {
         }
 
         /* usedPadInts sao os uid usados pela transacao tid */
-        public void commit(int tid, List<int> usedPadInts) {
-            throw new NotImplementedException();
+        public bool commit(int tid, List<int> usedPadInts) {
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -181,35 +169,21 @@ namespace PadIntServer {
              *  primeiro os writes para todos os PadInt que escreveu para assim
              *  actualizar no server.
              */
+            bool resultCommit = true;
 
-            /* ainda nao esta acabado */
+            foreach(int padIntUid in usedPadInts) {
 
-            foreach(int padInt in usedPadInts) {
-
-                /* PadInt padInt = getPadInt(uid);
-                 * 
-                 * chama metodo commit do PadInt que faz:
-                 * 
-                 * liberta locks de read: freeReadLock(int tid)
-                 * liberta locks de write: freeWriteLock(int tid)
-                 * 
-                 * verifica se o tid da transaccao nao esta na promotion
-                 *  - se estiver e for commit manda abort????
-                 *  - se estiver e for abort limpa apenas
-                 * 
-                 * apenas precisa de fazer isto apenas quando sao escritas:
-                 * entry.Value.OriginalValue = entry.Value.ActualValue;
-                 
-                 */
-
+                PadInt padInt = (PadInt) getPadInt(padIntUid);
+                if(!padInt.commit(tid)) {
+                    resultCommit = false;
+                }
             }
 
-            /* retorna algum tipo de msg a indicar que fez o commit? */
+            return resultCommit;
         }
 
         /* usedPadInts sao os uid usados pela transacao tid */
-        public void abort(int tid, List<int> usedPadInts) {
-            throw new NotImplementedException();
+        public bool abort(int tid, List<int> usedPadInts) {
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -218,41 +192,17 @@ namespace PadIntServer {
              *  primeiro os writes para todos os PadInt que escreveu para assim
              *  actualizar no server.
              */
+            bool resultAbort = true;
 
-            /* ainda nao esta acabado */
-            foreach(int padInt in usedPadInts) {
+            foreach(int padIntUid in usedPadInts) {
 
-                /* PadInt padInt = getPadInt(uid);
-                 * 
-                 * chama metodo abort do PadInt que faz:
-                 * 
-                 * liberta locks de read: freeReadLock(int tid)
-                 * liberta locks de write: freeWriteLock(int tid)
-                 * 
-                 * verifica se o tid da transaccao nao esta na promotion
-                 *  - se estiver e for commit manda abort????
-                 *  - se estiver e for abort limpa apenas
-                 * 
-                 * apenas e so´ no caso em que era lock de write e´ que faz isto:
-                 * entry.Value.ActualValue = entry.Value.OriginalValue;
-                 
-                 */
+                PadInt padInt = (PadInt) getPadInt(padIntUid);
+                if(!padInt.abort(tid)) {
+                    resultAbort = false;
+                }
             }
 
-            /* retorna algum tipo de msg a indicar que fez o abort? */
+            return resultAbort;
         }
-
-        internal void setID(int serverID) {
-            this.id=serverID;
-        }
-
-        internal void setMaster(IMaster master) {
-            masterServer = master;
-        }
-
-        internal void setLog(ILog log) {
-            this.log= log;
-        }
-
     }
 }

@@ -186,19 +186,28 @@ namespace PadIntServer {
         * owned by a transaction identified by tid.
         *
         * Returns true if successful */
-        internal void freeReadLock(int tid) {
-            readers.Remove(tid);
-            dequeueReadLock();
+        internal bool freeReadLock(int tid) {
+            if(readers.Remove(tid)) {
+                dequeueReadLock();
+                return true;
+            } else {
+                return false;
+            }
         }
 
         /* Frees a write lock over the PadInt, identified by uid,
         * owned by a transaction identified with tid.
         *
         * Returns true if successful */
-        internal void freeWriteLock(int tid) {
+        internal bool freeWriteLock(int tid) {
             /* "frees" writer variable */
-            writer = INITIALIZATION;
-            dequeueWriteLock();
+            if(writer != INITIALIZATION) {
+                writer = INITIALIZATION;
+                dequeueWriteLock();
+                return true;
+            } else {
+                return false;
+            }
         }
 
         /* If called when does not exist any reader,
@@ -258,35 +267,72 @@ namespace PadIntServer {
             }
         }
 
-        internal void commit(int tid) {
-            /* TODO */
+        /* Receives the identifier of a transaction and does a commit.
+         * 
+         * Free promotion variable, removes all read/write locks atributed
+         *  to this transaction and removes all possible pending locks.
+         * 
+         * Finally, updates PadInt's originalValue because we do a successful
+         *  commit.
+         * 
+         * Returns true if successful.
+         */
+        internal bool commit(int tid) {
 
-            /* ver se da´ para fazer fusao com o metodo abort */
+            bool commitSuccessful = true;
 
-            /* liberta locks de read: freeReadLock(int tid)
-                 * liberta locks de write: freeWriteLock(int tid)
-                 * 
-                 * verifica se o tid da transaccao nao esta na promotion
-                 *  - se estiver e for commit manda abort????
-                 *  - se estiver e for abort limpa apenas
-                 * 
-                 * apenas precisa de fazer isto apenas quando sao escritas:
-                 * entry.Value.OriginalValue = entry.Value.ActualValue; */
+            if(pendingReaders.Remove(tid)) {
+                commitSuccessful = false;
+            }
+
+            if(pendingWriters.Remove(tid)) {
+                commitSuccessful = false;
+            }
+
+            freeReadLock(tid);
+
+            if(freeWriteLock(tid)) {
+                OriginalValue = ActualValue;
+            }
+
+            /* this must be done in the end because if we do this before
+             *  we return false and don't free the locks or pending locks.
+             */
+            if(promotion == tid) {
+                promotion = INITIALIZATION;
+                commitSuccessful = false;
+                //lanca excepcao NaoFezAindaEscrita
+            }
+
+            return commitSuccessful;
         }
 
-        internal void abort(int tid) {
-            /* TODO */
+        /* Receives the identifier of a transaction and does an abort.
+         * 
+         * Free promotion variable, removes all read/write locks atributed
+         *  to this transaction and removes all possible pending locks.
+         * 
+         * Finally, does the rollback of the PadInt's value.
+         * 
+         * Returns true if successful.
+         */
+        internal bool abort(int tid) {
 
+            pendingReaders.Remove(tid);
+            pendingWriters.Remove(tid);
 
-            /* liberta locks de read: freeReadLock(int tid)
-                 * liberta locks de write: freeWriteLock(int tid)
-                 * 
-                 * verifica se o tid da transaccao nao esta na promotion
-                 *  - se estiver e for commit manda abort????
-                 *  - se estiver e for abort limpa apenas
-                 * 
-                 * apenas e so´ no caso em que era lock de write e´ que faz isto:
-                 * entry.Value.ActualValue = entry.Value.OriginalValue; */
+            if(promotion == tid) {
+                promotion = INITIALIZATION;
+            }
+
+            freeReadLock(tid);
+
+            /* only if exists a write lock we do the rollback of the PadInt's value */
+            if(freeWriteLock(tid)) {
+                ActualValue = OriginalValue;
+            }
+
+            return true;
         }
     }
 }
