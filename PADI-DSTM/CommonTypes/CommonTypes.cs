@@ -32,4 +32,8 @@ namespace CommonTypes {
         void log(String[] logs);
     }
 
+    public interface IPadiException {
+        int getUid();
+    }
+
 }
