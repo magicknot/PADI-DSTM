@@ -128,6 +128,7 @@ namespace PadIntServer {
          * Throw an exceptio if PadInt not found. 
          */
         public int readPadInt(int tid, int uid) {
+            log(new String[] { "Server", id.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
             throw new NotImplementedException();
 
             /* Obtain the PadInt identified by uid */
@@ -163,6 +164,7 @@ namespace PadIntServer {
 
         /* usedPadInts sao os uid usados pela transacao tid */
         public bool commit(int tid, List<int> usedPadInts) {
+            log(new String[] { "Server", id.ToString(), "commit", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -186,6 +188,7 @@ namespace PadIntServer {
 
         /* usedPadInts sao os uid usados pela transacao tid */
         public bool abort(int tid, List<int> usedPadInts) {
+            log(new String[] { "Server", id.ToString(), "abort", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para

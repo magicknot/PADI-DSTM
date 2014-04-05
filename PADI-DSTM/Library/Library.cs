@@ -51,13 +51,49 @@ namespace ClientLibrary {
 
         public bool txCommit() {
             log(new String[] { "Library", "txCommit" });
+
+            int serverID = getPadIntServerID(writtenList.First());
+            int tempServerID;
+            List<int> toCommitList = new List<int>();
             writtenList.Sort();
+
+            foreach(int i in writtenList) {
+                tempServerID = getPadIntServerID(i);
+
+                if(tempServerID != serverID) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
+                    server.commit(actualTID, toCommitList);
+                    serverID = tempServerID;
+                    toCommitList= new List<int>();
+                }
+                toCommitList.Add(i);
+            }
+
             log(new String[] { " " });
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool txAbort() {
-            //TODO
+            log(new String[] { "Library", "txCommit" });
+
+            int serverID = getPadIntServerID(writtenList.First());
+            int tempServerID;
+            List<int> toCommitList = new List<int>();
+            writtenList.Sort();
+
+            foreach(int i in writtenList) {
+                tempServerID = getPadIntServerID(i);
+
+                if(tempServerID != serverID) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
+                    server.abort(actualTID, toCommitList);
+                    serverID = tempServerID;
+                    toCommitList= new List<int>();
+                }
+                toCommitList.Add(i);
+            }
+
+            log(new String[] { " " });
             return true;
         }
 

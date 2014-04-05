@@ -17,6 +17,8 @@ namespace CommonTypes {
         int readPadInt(int tid, int uid);
         bool writePadInt(int tid, int uid, int value);
         void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts);
+        bool commit(int tid, List<int> usedPadInts);
+        bool abort(int tid, List<int> usedPadInts);
     }
 
     public interface IMaster {
