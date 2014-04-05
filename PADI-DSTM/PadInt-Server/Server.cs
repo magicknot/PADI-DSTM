@@ -125,7 +125,7 @@ namespace PadIntServer {
 
         /* Returns the value of the PadInt when the transaction
          *  has the read/write lock.
-         * Throw an exceptio if PadInt not found. 
+         * Throw an exception if PadInt not found. 
          */
         public int readPadInt(int tid, int uid) {
             log(new String[] { "Server", id.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });

@@ -33,12 +33,12 @@ namespace ClientLibrary {
 
         public int read() {
             library.log(new String[] { "PadIntStub", "read" });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer),  address);
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
             return server.readPadInt(tid, uid);
         }
         public bool write(int value) {
             library.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer),  address );
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
 
             if(server.writePadInt(tid, uid, value)) {
                 library.registerWrite(uid);

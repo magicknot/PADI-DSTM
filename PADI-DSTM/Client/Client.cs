@@ -19,32 +19,111 @@ namespace Client {
             uid2 = 2;
         }
 
-        public static void test1() {
+        public static void testSimpleRead() {
 
-            Console.WriteLine("------Test1 Begin------");
+            Console.WriteLine("------Test: Simple read ------");
 
             Library library = new Library();
 
             Console.WriteLine("library created");
 
             if(library.init()) {
+                Console.WriteLine("init() Done");
+
                 library.txBegin();
 
                 Console.WriteLine("txBegin Done");
 
                 PadIntStub padInt0 = library.createPadInt(uid0);
-                PadIntStub padInt1 = library.createPadInt(uid1);
 
                 Console.WriteLine("padInts created");
 
                 Console.WriteLine("padInt0 read: " + padInt0.read());
 
-                //tirar comentado quando estiver feito
-                //library.txCommit();
+                library.txCommit();
+
+                Console.WriteLine("txBegin Done");
+            } else {
+                library.log(new String[] { "There are no servers available" });
+            }
+
+        }
+
+        public static void testSimpleWrite() {
+
+            Console.WriteLine("------Test: Simple write ------");
+
+            Library library = new Library();
+
+            Console.WriteLine("library created");
+
+            if(library.init()) {
+                Console.WriteLine("init() Done");
+
+                library.txBegin();
 
                 Console.WriteLine("txBegin Done");
 
+                PadIntStub padInt0 = library.createPadInt(uid0);
 
+                Console.WriteLine("padInts created");
+
+                if(padInt0.write(20)) {
+                    Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
+                }
+
+                library.txCommit();
+
+                Console.WriteLine("txCommit Done");
+            } else {
+                library.log(new String[] { "There are no servers available" });
+            }
+
+        }
+
+        public static void testSimpleAbort() {
+
+            Console.WriteLine("------Test: Simple Abort ------");
+
+            Library library = new Library();
+
+            Console.WriteLine("library created");
+
+            if(library.init()) {
+                Console.WriteLine("init() Done");
+
+                library.txBegin();
+
+                Console.WriteLine("txBegin Done");
+
+                PadIntStub padInt0 = library.createPadInt(uid0);
+
+                Console.WriteLine("padInts created");
+
+                if(padInt0.write(20)) {
+                    Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
+                }
+
+                library.txAbort();
+
+                Console.WriteLine("txAbort Done");
+
+                /* do a read to test if the abort was successful */
+                Console.WriteLine("I will test if the abort was successful...");
+
+                library.txBegin();
+                Console.WriteLine("txBegin Done");
+
+                /* the padInt's value must be equal to initialization value */
+                if(padInt0.read() == 0) {
+                    Console.WriteLine("it's OK");
+                } else {
+                    Console.WriteLine("BUG!!!!!: abort was not successful...");
+                }
+
+                library.txCommit();
+
+                Console.WriteLine("txBegin Done");
             } else {
                 library.log(new String[] { "There are no servers available" });
             }
@@ -55,10 +134,8 @@ namespace Client {
             Console.Title = "Client";
             Console.WriteLine("Client up and running..");
 
-            test1();
-
-            while(true)
-                ;
+            testSimpleRead();
+            testSimpleWrite();
         }
     }
 }

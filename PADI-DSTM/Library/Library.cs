@@ -64,7 +64,7 @@ namespace ClientLibrary {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
                     server.commit(actualTID, toCommitList);
                     serverID = tempServerID;
-                    toCommitList= new List<int>();
+                    toCommitList = new List<int>();
                 }
                 toCommitList.Add(i);
             }
@@ -88,7 +88,7 @@ namespace ClientLibrary {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
                     server.abort(actualTID, toCommitList);
                     serverID = tempServerID;
-                    toCommitList= new List<int>();
+                    toCommitList = new List<int>();
                 }
                 toCommitList.Add(i);
             }
