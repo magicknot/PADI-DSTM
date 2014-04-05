@@ -8,6 +8,8 @@ using CommonTypes;
 namespace LogServer {
     class Log : MarshalByRefObject, ILog {
 
+        System.IO.StreamWriter file =  new System.IO.StreamWriter("log.txt");
+
         public void log(String[] logs) {
 
             String message = DateTime.Now + " ";
@@ -16,7 +18,10 @@ namespace LogServer {
                 message += s + " ";
             }
 
-            Console.WriteLine(message,1000,1000);
+            Console.WriteLine(message);
+            file.WriteLine(message);
+            file.Flush();
+            //file.Close();
 
         }
 

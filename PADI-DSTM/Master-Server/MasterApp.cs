@@ -15,6 +15,8 @@ namespace MasterServer {
 
         static void Main(string[] args) {
 
+            Console.Title = "Master";
+
             TcpChannel channel = new TcpChannel(MASTERADDRESS);
             ChannelServices.RegisterChannel(channel, true);
             Master masterServer = new Master();

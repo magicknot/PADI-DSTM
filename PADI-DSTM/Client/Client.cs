@@ -8,7 +8,9 @@ using ClientLibrary;
 namespace Client {
     class Client {
         static void Main(string[] args) {
+            Console.Title = "Client";
             Console.WriteLine("Client up and running..");
+
 
             Library library = new Library();
             if(library.init()) {

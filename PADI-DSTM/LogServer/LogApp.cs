@@ -11,6 +11,8 @@ namespace LogServer {
     class LogApp {
         static void Main(string[] args) {
 
+            Console.Title = "Log";
+
             TcpChannel channel = new TcpChannel(7002);
             ChannelServices.RegisterChannel(channel, true);
             Log logServer = new Log();

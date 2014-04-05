@@ -20,6 +20,8 @@ namespace PadIntServer {
             Random random = new Random();
             int randomNumber = random.Next(0, 100);
 
+            Console.Title = "Server";
+
             TcpChannel channel = new TcpChannel(8000 + randomNumber);
             ChannelServices.RegisterChannel(channel, true);
 

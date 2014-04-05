@@ -98,11 +98,13 @@ namespace PadIntServer {
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
-            log(new String[] { "Server", id.ToString(), "attachPadInts" });
+            log(new String[] { "Server", id.ToString(), "attachPadInts", sparedPadInts.Count });
 
-            for(int i = 0; i < sparedPadInts.Count; i++) {
-                if(sparedPadInts.ContainsKey(i))
+             for(int i = 0; i < sparedPadInts.Count; i++) {
+                if(sparedPadInts.ContainsKey(i)) {
+                    log(new String[] { "attached padint", i.ToString() });
                     padIntDict.Add(i, sparedPadInts[i]);
+                }
             }
 
             if(id == 0)

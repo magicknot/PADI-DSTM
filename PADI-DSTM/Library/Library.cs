@@ -42,18 +42,23 @@ namespace ClientLibrary {
             Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
             serversList = serversInfo.Item1;
             maxServerCapacity = serversInfo.Item2;
+
+            log(new String[] { " " });
+
             return serversList.Count != 0;
         }
 
         public bool txBegin() {
             log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.getNextTID();
+            log(new String[] { " " });
             return true;
         }
 
         public bool txCommit() {
             log(new String[] { "Library", "txCommit" });
             writtenList.Sort();
+            log(new String[] { " " });
             throw new NotImplementedException();
         }
 
@@ -63,6 +68,8 @@ namespace ClientLibrary {
             String address = serversList[getPadIntServerID(uid)];
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             bool possible = server.createPadInt(uid);
+
+            log(new String[] { " " });
 
             if(possible)
                 return new PadIntStub(uid, actualTID, address, this);
@@ -78,6 +85,8 @@ namespace ClientLibrary {
             IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             bool accessible = server.confirmPadInt(uid);
 
+            log(new String[] { " " });
+
             if(accessible)
                 return new PadIntStub(uid, actualTID, address, this);
             else
@@ -90,25 +99,26 @@ namespace ClientLibrary {
         }
 
         public int getPadIntServerID(int uid) {
-            log(new String[] { "Library", "getPadIntServerID" + "uid" + uid.ToString() });
+            log(new String[] { "Library", "getPadIntServerID", "uid", uid.ToString() });
             int serverID = 0;
+            int nServers = getNServers();
 
-            for(int i = 0; i < getNServers(); i++) {
+            for(int i = 0; i < nServers; i++) {
                 if(uid < (i + 1) * maxServerCapacity) {
                     return serverID = i;
                 }
             }
 
-            return serverID = getNServers() - 1;
+            return serverID = nServers - 1;
         }
 
 
         public void registerWrite(int uid) {
-            log(new String[] { "Library", "registerWrite" + "uid" + uid.ToString() });
+            log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
             writtenList.Add(uid);
         }
 
-        internal void log(String[] args) {
+        public void log(String[] args) {
             ILog logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
             logServer.log(args);
         }
