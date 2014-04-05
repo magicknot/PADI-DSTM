@@ -52,17 +52,18 @@ namespace ClientLibrary {
         public bool txCommit() {
             log(new String[] { "Library", "txCommit" });
 
+            writtenList.Sort();
             int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
             List<int> toCommitList = new List<int>();
-            writtenList.Sort();
+            bool result=false;
 
             foreach(int i in writtenList) {
                 tempServerID = getPadIntServerID(i);
 
                 if(tempServerID != serverID) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
-                    server.commit(actualTID, toCommitList);
+                    result = result && server.commit(actualTID, toCommitList);
                     serverID = tempServerID;
                     toCommitList = new List<int>();
                 }
@@ -70,23 +71,24 @@ namespace ClientLibrary {
             }
 
             log(new String[] { " " });
-            return true;
+            return result;
         }
 
         public bool txAbort() {
             log(new String[] { "Library", "txCommit" });
 
+            writtenList.Sort();
             int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
             List<int> toCommitList = new List<int>();
-            writtenList.Sort();
+            bool result=false;
 
             foreach(int i in writtenList) {
                 tempServerID = getPadIntServerID(i);
 
                 if(tempServerID != serverID) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
-                    server.abort(actualTID, toCommitList);
+                    result = server.abort(actualTID, toCommitList) && result;
                     serverID = tempServerID;
                     toCommitList = new List<int>();
                 }
@@ -94,7 +96,7 @@ namespace ClientLibrary {
             }
 
             log(new String[] { " " });
-            return true;
+            return result;
         }
 
         public PadIntStub createPadInt(int uid) {
