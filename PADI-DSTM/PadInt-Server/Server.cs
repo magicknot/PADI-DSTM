@@ -75,36 +75,41 @@ namespace PadIntServer {
         public void movePadInts(Dictionary<int, String> serverAddresses) {
             log(new String[] { "server", id.ToString(), "movePadInts" });
 
-            Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
+            //fica a faltar fazer para os highers, usando a lista de servidores para
+            //saber se é o ultimo ou nao e dai decidir se chuta pra frente ou nao
+            Dictionary<int, IPadInt> lowerPadInts = new Dictionary<int, IPadInt>();
             int originalCapacity = maxCapacity;
 
             if(id == 0)
                 return;
-            while(sparePadInts.Count < originalCapacity / 2) {
+            while(lowerPadInts.Count < originalCapacity / 2) {
                 maxCapacity = 2 * maxCapacity;
-                for(int i = 0; i < padIntDict.Count; i++) {
-                    if(padIntDict.ContainsKey(i) && i < maxCapacity * id) {
-                        sparePadInts.Add(i, padIntDict[i]);
-                        padIntDict.Remove(i);
+
+                foreach(int key in padIntDict.Keys) {
+                    if(key < maxCapacity * id) {
+                        lowerPadInts.Add(key, padIntDict[key]);
                     }
                 }
+
+                foreach(int key in lowerPadInts.Keys) {
+                    padIntDict.Remove(key);
+                }
+
             }
 
             string leftServerAddress = serverAddresses[id - 1];
             log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), leftServerAddress);
-            server.attachPadInts(serverAddresses, sparePadInts);
+            server.attachPadInts(serverAddresses, lowerPadInts);
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
-            log(new String[] { "Server", id.ToString(), "attachPadInts", sparedPadInts.Count });
+            log(new String[] { "Server", id.ToString(), "attachPadInts", sparedPadInts.Count.ToString() });
 
-             for(int i = 0; i < sparedPadInts.Count; i++) {
-                if(sparedPadInts.ContainsKey(i)) {
-                    log(new String[] { "attached padint", i.ToString() });
-                    padIntDict.Add(i, sparedPadInts[i]);
-                }
+            foreach(int key in sparedPadInts.Keys) {
+                log(new String[] { "attached padint", key.ToString() });
+                padIntDict.Add(key, sparedPadInts[key]);
             }
 
             if(id == 0)
