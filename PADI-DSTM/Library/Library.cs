@@ -12,8 +12,6 @@ using System.Collections;
 
 namespace ClientLibrary {
 
-
-
     public class Library {
 
         private IMaster masterServer;
@@ -22,23 +20,19 @@ namespace ClientLibrary {
         private List<int> writtenList;
         private int maxServerCapacity;
 
-        //Qual é a ideia de guardar timers?
-
         public Library() {
-
 
             writtenList = new List<int>();
         }
 
         //porque boolean?
-        public Boolean init() {
-
+        public bool init() {
 
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             log(new String[] { "Library", "init" });
 
-            masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
             serversList = serversInfo.Item1;
             maxServerCapacity = serversInfo.Item2;
@@ -62,11 +56,16 @@ namespace ClientLibrary {
             throw new NotImplementedException();
         }
 
+        public bool txAbort() {
+            //TODO
+            return true;
+        }
+
         public PadIntStub createPadInt(int uid) {
             log(new String[] { "Library", "createPadInt", uid.ToString() });
 
             String address = serversList[getPadIntServerID(uid)];
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
             bool possible = server.createPadInt(uid);
 
             log(new String[] { " " });
@@ -77,12 +76,11 @@ namespace ClientLibrary {
                 return null;
         }
 
-
         public PadIntStub accessPadInt(int uid) {
             log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
             String address = serversList[getPadIntServerID(uid)];
-            IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
             bool accessible = server.confirmPadInt(uid);
 
             log(new String[] { " " });
@@ -112,17 +110,14 @@ namespace ClientLibrary {
             return serverID = nServers - 1;
         }
 
-
         public void registerWrite(int uid) {
             log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
             writtenList.Add(uid);
         }
 
         public void log(String[] args) {
-            ILog logServer =  (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+            ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
             logServer.log(args);
         }
-
     }
-
 }
