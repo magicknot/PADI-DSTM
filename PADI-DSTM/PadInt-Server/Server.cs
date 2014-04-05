@@ -82,6 +82,7 @@ namespace PadIntServer {
 
             if(id == 0)
                 return;
+
             while(lowerPadInts.Count < originalCapacity / 2) {
                 maxCapacity = 2 * maxCapacity;
 
@@ -94,7 +95,6 @@ namespace PadIntServer {
                 foreach(int key in lowerPadInts.Keys) {
                     padIntDict.Remove(key);
                 }
-
             }
 
             string leftServerAddress = serverAddresses[id - 1];
@@ -139,7 +139,7 @@ namespace PadIntServer {
                     return padInt.ActualValue;
                 }
             } else {
-                //throw new PadIntNotFoundException() ;
+                throw new PadIntNotFoundException(uid);
             }
         }
 
