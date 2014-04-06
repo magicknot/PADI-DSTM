@@ -32,8 +32,17 @@ namespace CommonTypes {
         void log(String[] logs);
     }
 
-    public interface IPadiException {
-        int getUid();
+    public abstract class IPadiException : System.Exception {
+        public abstract string getMessage();
+    }
+
+    public static class Logger {
+        static ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+
+        public static void log(String[] args) {
+            logServer.log(args);
+        }
+
     }
 
 }

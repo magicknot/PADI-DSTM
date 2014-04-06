@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\AlreadyRegisteredException.cs" />
+    <Compile Include="Exceptions\NoServersFoundException.cs" />
     <Compile Include="Master.cs" />
     <Compile Include="MasterApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

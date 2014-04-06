@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonTypes\CommonTypes.csproj">
+      <Project>{0561995b-bc5b-4bdb-96f1-22e8b5d6766b}</Project>
+      <Name>CommonTypes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Library\ClientLibrary.csproj">
       <Project>{8cf73195-6eea-4cae-8a0f-cca50dd6460a}</Project>
       <Name>ClientLibrary</Name>

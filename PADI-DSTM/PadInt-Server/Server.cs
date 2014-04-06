@@ -43,7 +43,7 @@ namespace PadIntServer {
          * Returns null if not found. 
          */
         private IPadInt getPadInt(int uid) {
-            log(new String[] { "server", "getPadInt", "uid", uid.ToString() });
+            Logger.log(new String[] { "server", "getPadInt", "uid", uid.ToString() });
 
             foreach(KeyValuePair<int, IPadInt> entry in padIntDict) {
                 if(entry.Key == uid) {
@@ -51,11 +51,11 @@ namespace PadIntServer {
                 }
             }
 
-            return null;
+            throw new PadIntNotFoundException(uid, id);
         }
 
         public bool createPadInt(int uid) {
-            log(new String[] { "server", id.ToString(), "createPadInt", "uid ", uid.ToString() });
+            Logger.log(new String[] { "server", id.ToString(), "createPadInt", "uid ", uid.ToString() });
 
             try {
                 if(padIntDict.Count < 2 * maxCapacity) {
@@ -73,7 +73,7 @@ namespace PadIntServer {
         }
 
         public void movePadInts(Dictionary<int, String> serverAddresses) {
-            log(new String[] { "server", id.ToString(), "movePadInts" });
+            Logger.log(new String[] { "server", id.ToString(), "movePadInts" });
 
             //fica a faltar fazer para os highers, usando a lista de servidores para
             //saber se é o ultimo ou nao e dai decidir se chuta pra frente ou nao
@@ -98,17 +98,17 @@ namespace PadIntServer {
             }
 
             string leftServerAddress = serverAddresses[id - 1];
-            log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
+            Logger.log(new String[] { "left server Address", "new capacity", maxCapacity.ToString() });
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), leftServerAddress);
             server.attachPadInts(serverAddresses, lowerPadInts);
         }
 
         public void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts) {
-            log(new String[] { "Server", id.ToString(), "attachPadInts", sparedPadInts.Count.ToString() });
+            Logger.log(new String[] { "Server", id.ToString(), "attachPadInts", sparedPadInts.Count.ToString() });
 
             foreach(int key in sparedPadInts.Keys) {
-                log(new String[] { "attached padint", key.ToString() });
+                Logger.log(new String[] { "attached padint", key.ToString() });
                 padIntDict.Add(key, sparedPadInts[key]);
             }
 
@@ -119,7 +119,7 @@ namespace PadIntServer {
         }
 
         public bool confirmPadInt(int uid) {
-            log(new String[] { "Server", id.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+            Logger.log(new String[] { "Server", id.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             return padIntDict.ContainsKey(uid);
         }
 
@@ -128,23 +128,26 @@ namespace PadIntServer {
          * Throw an exception if PadInt not found. 
          */
         public int readPadInt(int tid, int uid) {
-            log(new String[] { "Server", id.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
-            throw new NotImplementedException();
+            Logger.log(new String[] { "Server", id.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
-            /* Obtain the PadInt identified by uid */
-            PadInt padInt = (PadInt) getPadInt(uid);
+            try {
+                /* Obtain the PadInt identified by uid */
+                PadInt padInt = (PadInt) getPadInt(uid);
 
-            if(padInt != null) {
-                if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
-                    return padInt.ActualValue;
+                while(true) {
+
+                    if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
+                        return padInt.ActualValue;
+                    }
+
                 }
-            } else {
-                throw new PadIntNotFoundException(uid);
+            } catch(PadIntNotFoundException) {
+                throw;
             }
         }
 
         public bool writePadInt(int tid, int uid, int value) {
-            log(new String[] { " Server ", id.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+            Logger.log(new String[] { " Server ", id.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             /* Obtain the PadInt identified by uid */
             PadInt padInt = (PadInt) getPadInt(uid);
@@ -155,7 +158,7 @@ namespace PadIntServer {
                     return true;
                 }
             } else {
-                throw new PadIntNotFoundException(uid);
+                throw new PadIntNotFoundException(uid, id);
             }
 
             /* e´preciso? */
@@ -164,7 +167,7 @@ namespace PadIntServer {
 
         /* usedPadInts sao os uid usados pela transacao tid */
         public bool commit(int tid, List<int> usedPadInts) {
-            log(new String[] { "Server", id.ToString(), "commit", "tid", tid.ToString() });
+            Logger.log(new String[] { "Server", id.ToString(), "commit", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -179,7 +182,7 @@ namespace PadIntServer {
                 PadInt padInt = (PadInt) getPadInt(padIntUid);
 
                 if(padInt == null) {
-                    throw new PadIntNotFoundException(padIntUid);
+                    throw new PadIntNotFoundException(padIntUid, id);
                 }
             }
 
@@ -197,7 +200,7 @@ namespace PadIntServer {
 
         /* usedPadInts sao os uid usados pela transacao tid */
         public bool abort(int tid, List<int> usedPadInts) {
-            log(new String[] { "Server", id.ToString(), "abort", "tid", tid.ToString() });
+            Logger.log(new String[] { "Server", id.ToString(), "abort", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -212,7 +215,7 @@ namespace PadIntServer {
                 PadInt padInt = (PadInt) getPadInt(padIntUid);
 
                 if(padInt == null) {
-                    throw new PadIntNotFoundException(padIntUid);
+                    throw new PadIntNotFoundException(padIntUid, id);
                 }
             }
 
@@ -225,11 +228,6 @@ namespace PadIntServer {
             }
 
             return resultAbort;
-        }
-
-        public void log(String[] args) {
-            ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
-            logServer.log(args);
         }
     }
 }

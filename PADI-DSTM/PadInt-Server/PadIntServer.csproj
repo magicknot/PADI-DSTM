@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PadInt.cs" />
-    <Compile Include="PadIntNotFoundException.cs" />
+    <Compile Include="Exceptions\PadIntNotFoundException.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

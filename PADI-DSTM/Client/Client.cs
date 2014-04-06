@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ClientLibrary;
+using CommonTypes;
 
 namespace Client {
 
@@ -44,7 +45,7 @@ namespace Client {
 
                 Console.WriteLine("txBegin Done");
             } else {
-                library.log(new String[] { "There are no servers available" });
+                Logger.log(new String[] { "There are no servers available" });
             }
 
         }
@@ -76,7 +77,7 @@ namespace Client {
 
                 Console.WriteLine("txCommit Done");
             } else {
-                library.log(new String[] { "There are no servers available" });
+                Logger.log(new String[] { "There are no servers available" });
             }
 
         }
@@ -125,7 +126,7 @@ namespace Client {
 
                 Console.WriteLine("txBegin Done");
             } else {
-                library.log(new String[] { "There are no servers available" });
+               Logger.log(new String[] { "There are no servers available" });
             }
 
         }
