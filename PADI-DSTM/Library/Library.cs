@@ -77,7 +77,7 @@ namespace ClientLibrary {
 
             updateServersInfo();
             writtenList.Sort();
-            int serverID = getPadIntServerID(writtenList[0]);
+            int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
             List<int> toCommitList = new List<int>();
             bool result = false;
