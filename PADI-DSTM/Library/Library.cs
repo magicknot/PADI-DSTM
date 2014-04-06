@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using CommonTypes;
 using System.Collections;
+using System.Runtime.Serialization;
 
 
 namespace ClientLibrary {
@@ -45,10 +46,13 @@ namespace ClientLibrary {
                 Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
                 serversList = serversInfo.Item1;
                 maxServerCapacity = serversInfo.Item2;
+            } catch(SerializationException e) {
+                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
             } catch(IPadiException e) {
                 e.getMessage();
                 return false;
             }
+
             return true;
         }
 
@@ -67,7 +71,7 @@ namespace ClientLibrary {
             int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
             List<int> toCommitList = new List<int>();
-            bool result=false;
+            bool result = false;
 
             foreach(int i in writtenList) {
                 tempServerID = getPadIntServerID(i);
@@ -93,7 +97,7 @@ namespace ClientLibrary {
             int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
             List<int> toCommitList = new List<int>();
-            bool result=false;
+            bool result = false;
 
             foreach(int i in writtenList) {
                 tempServerID = getPadIntServerID(i);

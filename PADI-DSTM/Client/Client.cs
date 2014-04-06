@@ -126,7 +126,56 @@ namespace Client {
 
                 Console.WriteLine("txBegin Done");
             } else {
-               Logger.log(new String[] { "There are no servers available" });
+                Logger.log(new String[] { "There are no servers available" });
+            }
+
+        }
+
+        public static void testSimpleCommit() {
+
+            Console.WriteLine("------Test: Simple Commit ------");
+
+            Library library = new Library();
+
+            Console.WriteLine("library created");
+
+            if(library.init()) {
+                Console.WriteLine("init() Done");
+
+                library.txBegin();
+
+                Console.WriteLine("txBegin Done");
+
+                PadIntStub padInt0 = library.createPadInt(uid0);
+
+                Console.WriteLine("padInts created");
+
+                if(padInt0.write(21)) {
+                    Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
+                }
+
+                library.txCommit();
+
+                Console.WriteLine("txCommit Done");
+
+                /* do a read to test if the abort was successful */
+                Console.WriteLine("I will test if the commit was successful...");
+
+                library.txBegin();
+                Console.WriteLine("txBegin Done");
+
+                /* the padInt's value must be equal to initialization value */
+                if(padInt0.read() == 21) {
+                    Console.WriteLine("it's OK");
+                } else {
+                    Console.WriteLine("BUG!!!!!: abort was not successful...");
+                }
+
+                library.txCommit();
+
+                Console.WriteLine("txBegin Done");
+            } else {
+                Logger.log(new String[] { "There are no servers available" });
             }
 
         }
@@ -137,6 +186,8 @@ namespace Client {
 
             testSimpleRead();
             testSimpleWrite();
+            testSimpleAbort();
+            testSimpleCommit();
         }
     }
 }
