@@ -1,7 +1,7 @@
 PADI-DSTM
 =========
 
-The goal of this project is to design and implement PADI-DSTM, a distributed system to manage data objects that reside in memory and can be shared by transactional programs that execute in different machines. This will be a simplified version of a Distributed Software Trans- actional Memory System
+The goal of this project is to design and implement PADI-DSTM, a distributed system to manage data objects that reside in memory and can be shared by transactional programs that execute in different machines. This will be a simplified version of a Distributed Software Transactional Memory System
 
 [Important dates for the project](https://fenix.tecnico.ulisboa.pt/disciplinas/padi7645/2013-2014/2-semestre/project/important-dates-for-the-project)
 -------------------------------
