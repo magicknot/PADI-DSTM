@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommonTypes;
 
-namespace PadIntServer {
-    class WrongServerRequestException : IPadiException {
+namespace CommonTypes {
+    public class WrongServerRequestException : IPadiException {
         private int uid;
         private int serverID;
 

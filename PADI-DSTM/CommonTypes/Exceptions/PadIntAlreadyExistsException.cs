@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommonTypes;
 
-namespace PadIntServer {
-    class PadIntNotFoundException : IPadiException {
+namespace CommonTypes {
+    public class PadIntAlreadyExistsException : IPadiException {
         private int uid;
         private int serverID;
 
-        public PadIntNotFoundException(int uid, int serverID) {
+        public PadIntAlreadyExistsException(int uid, int serverID) {
             this.uid = uid;
             this.serverID = serverID;
         }
@@ -24,7 +23,7 @@ namespace PadIntServer {
         }
 
         public override String getMessage() {
-            return "The PadInt with uid " + uid + " was not found on server " + serverID;
+            return "The PadInt with uid " + uid + " already exists on server " + serverID;
         }
     }
 }

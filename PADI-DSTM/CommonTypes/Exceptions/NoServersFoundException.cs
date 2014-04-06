@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommonTypes;
 
-namespace MasterServer {
-    class NoServersFoundException : IPadiException {
+namespace CommonTypes {
+    public class NoServersFoundException : IPadiException {
 
         public NoServersFoundException() {
         }

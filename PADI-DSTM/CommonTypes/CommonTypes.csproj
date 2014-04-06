@@ -40,6 +40,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonTypes.cs" />
+    <Compile Include="Exceptions\AlreadyRegisteredException.cs" />
+    <Compile Include="Exceptions\NoServersFoundException.cs" />
+    <Compile Include="Exceptions\PadIntAlreadyExistsException.cs" />
+    <Compile Include="Exceptions\PadIntNotFoundException.cs" />
+    <Compile Include="Exceptions\WrongServerRequestException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
