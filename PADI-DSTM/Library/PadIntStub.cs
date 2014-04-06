@@ -33,18 +33,30 @@ namespace ClientLibrary {
 
         public int read() {
             Logger.log(new String[] { "PadIntStub", "read" });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            return server.readPadInt(tid, uid);
+
+            try {
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+                int result = server.readPadInt(tid, uid);
+                library.registerUID(uid);
+                return result;
+            } catch(WrongServerRequestException) {
+                throw;
+            } catch(PadIntNotFoundException) {
+                throw;
+            }
         }
         public bool write(int value) {
-            Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
 
-            if(server.writePadInt(tid, uid, value)) {
-                library.registerWrite(uid);
+            try {
+                Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+                server.writePadInt(tid, uid, value);
+                library.registerUID(uid);
                 return true;
-            } else {
-                return false;
+            } catch(WrongServerRequestException) {
+                throw;
+            } catch(PadIntNotFoundException) {
+                throw;
             }
         }
 

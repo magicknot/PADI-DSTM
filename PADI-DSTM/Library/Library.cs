@@ -20,6 +20,7 @@ namespace ClientLibrary {
         private int actualTID;
         private List<int> writtenList;
         private int maxServerCapacity;
+        private TcpChannel channel;
 
         public Library() {
 
@@ -29,7 +30,7 @@ namespace ClientLibrary {
         //porque boolean?
         public bool init() {
 
-            TcpChannel channel = new TcpChannel();
+            channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
 
@@ -39,6 +40,10 @@ namespace ClientLibrary {
             Logger.log(new String[] { " " });
 
             return result;
+        }
+
+        public void closeChannel() {
+            ChannelServices.UnregisterChannel(channel);
         }
 
         private bool updateServersInfo() {
@@ -172,7 +177,7 @@ namespace ClientLibrary {
             return serverID = nServers - 1;
         }
 
-        public void registerWrite(int uid) {
+        public void registerUID(int uid) {
             Logger.log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
             writtenList.Add(uid);
         }
