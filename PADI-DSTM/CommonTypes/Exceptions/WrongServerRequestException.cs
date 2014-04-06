@@ -25,5 +25,9 @@ namespace CommonTypes {
         public override String getMessage() {
             return "The request envolving " + uid + " on server " + serverID + " can't be fulfilled";
         }
+
+        public String Message {
+            get { return "The request envolving " + uid + " on server " + serverID + " can't be fulfilled"; }
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace MasterServer {
         private int lastTID;
         private int nServers;
         private Dictionary<int, string> registeredServers;
-        private int maxServerCapacity=10;
+        private int maxServerCapacity = 10;
 
         public Master() {
             registeredServers = new Dictionary<int, string>();
@@ -39,10 +39,10 @@ namespace MasterServer {
             Logger.log(new String[] { "Master", "getNServers", registeredServers.Count.ToString() });
 
             if(increase) {
-                maxServerCapacity = 2* maxServerCapacity;
+                maxServerCapacity = 2 * maxServerCapacity;
             }
 
-            if(registeredServers.Count==0) {
+            if(registeredServers.Count == 0) {
                 throw new NoServersFoundException();
             } else {
                 return new Tuple<Dictionary<int, string>, int>(registeredServers, maxServerCapacity);

@@ -25,5 +25,9 @@ namespace CommonTypes {
         public override String getMessage() {
             return "The PadInt with uid " + uid + " already exists on server " + serverID;
         }
+
+        public String Message {
+            get { return "The PadInt with uid " + uid + " already exists on server " + serverID; }
+        }
     }
 }

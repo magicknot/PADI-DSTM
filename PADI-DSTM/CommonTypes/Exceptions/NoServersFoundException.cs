@@ -14,5 +14,8 @@ namespace CommonTypes {
             return "Master server doesn't have any server registered";
         }
 
+        public String Message {
+            get { return "Master server doesn't have any server registered"; }
+        }
     }
 }

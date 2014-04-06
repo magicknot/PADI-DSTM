@@ -133,7 +133,13 @@ namespace ClientLibrary {
 
             String address = serversList[getPadIntServerID(uid)];
             IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            bool possible = server.createPadInt(uid);
+
+            bool possible = false;
+            try {
+                possible = server.createPadInt(uid);
+            } catch(SerializationException e) {
+                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+            }
 
             Logger.log(new String[] { " " });
 

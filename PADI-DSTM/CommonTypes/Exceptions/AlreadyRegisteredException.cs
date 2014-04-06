@@ -16,13 +16,16 @@ namespace CommonTypes {
             return serverID;
         }
 
+        public int getUid() {
+            throw new NotImplementedException();
+        }
+
         public override string getMessage() {
             return "The server with id " + serverID + " is already registered on master server";
         }
 
-
-        public int getUid() {
-            throw new NotImplementedException();
+        public String Message {
+            get { return "The server with id " + serverID + " is already registered on master server"; }
         }
     }
 }
