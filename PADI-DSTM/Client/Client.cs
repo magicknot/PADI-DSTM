@@ -43,11 +43,12 @@ namespace Client {
 
                 library.txCommit();
 
-                Console.WriteLine("txBegin Done");
+                Console.WriteLine("txCommit Done");
             } else {
                 Logger.log(new String[] { "There are no servers available" });
             }
 
+            Console.WriteLine("------------");
         }
 
         public static void testSimpleWrite() {
@@ -80,6 +81,7 @@ namespace Client {
                 Logger.log(new String[] { "There are no servers available" });
             }
 
+            Console.WriteLine("------------");
         }
 
         public static void testSimpleAbort() {
@@ -124,11 +126,12 @@ namespace Client {
 
                 library.txCommit();
 
-                Console.WriteLine("txBegin Done");
+                Console.WriteLine("txCommit Done");
             } else {
                 Logger.log(new String[] { "There are no servers available" });
             }
 
+            Console.WriteLine("------------");
         }
 
         public static void testSimpleCommit() {
@@ -173,11 +176,53 @@ namespace Client {
 
                 library.txCommit();
 
-                Console.WriteLine("txBegin Done");
+                Console.WriteLine("txCommit Done");
             } else {
                 Logger.log(new String[] { "There are no servers available" });
             }
 
+            Console.WriteLine("------------");
+        }
+
+        public static void testMultipleRead() {
+
+            Console.WriteLine("------Test: Multiple read ------");
+
+            Library library = new Library();
+
+            Console.WriteLine("library created");
+
+            if(library.init()) {
+                Console.WriteLine("init() Done");
+
+                library.txBegin();
+
+                Console.WriteLine("txBegin Done");
+
+                PadIntStub padInt0 = library.createPadInt(uid0);
+                PadIntStub padInt1 = library.createPadInt(uid1);
+                PadIntStub padInt2 = library.createPadInt(uid2);
+
+                Console.WriteLine("padInts created");
+
+                bool result = padInt0.read() == 0;
+                result = (padInt0.read() == padInt1.read());
+                result = (padInt0.read() == padInt2.read());
+
+                if(result) {
+                    Console.WriteLine("it's OK");
+                } else {
+                    Console.WriteLine("BUG!!!!!: multiple read was not successful...");
+                }
+
+                library.txCommit();
+
+                Console.WriteLine("txCommit Done");
+            } else {
+                Logger.log(new String[] { "There are no servers available" });
+            }
+
+            Console.WriteLine("------------");
         }
 
         static void Main(string[] args) {
