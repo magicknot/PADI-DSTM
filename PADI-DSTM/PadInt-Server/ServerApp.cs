@@ -13,32 +13,20 @@ namespace PadIntServer {
         private const int MASTERADDRESS = 8001;
 
         static void Main(string[] args) {
-            IMaster masterServer;
-            ILog logServer;
-            Server padIntServer = new Server();
 
+            Console.Title = "Server";
             Random random = new Random();
             int randomNumber = random.Next(0, 100);
 
-            Console.Title = "Server";
-
+            Server padIntServer = new Server();
             TcpChannel channel = new TcpChannel(8000 + randomNumber);
             ChannelServices.RegisterChannel(channel, true);
 
-            RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
-
-            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-            logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:8086/LogServer");
-
-            Tuple<int, int> serverInfo = masterServer.registerServer("tcp://localhost:" + (8000 + randomNumber) + "/PadIntServer");
-            if(serverInfo != null) {
-                padIntServer.MasterServer = masterServer;
-                padIntServer.ID = serverInfo.Item1;
-                padIntServer.MaxCapacity = serverInfo.Item2;
+            if(padIntServer.init(randomNumber)) {
+                RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
+                Console.WriteLine("Server up and running on port " + (8000 + randomNumber));
             }
 
-
-            Console.WriteLine("Server up and running on port " + (8000 + randomNumber));
             while(true)
                 ;
         }

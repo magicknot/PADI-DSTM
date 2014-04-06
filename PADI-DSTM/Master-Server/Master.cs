@@ -49,8 +49,4 @@ namespace MasterServer {
             }
         }
     }
-
-
-
-
 }

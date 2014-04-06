@@ -19,6 +19,7 @@ namespace CommonTypes {
         void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts);
         bool commit(int tid, List<int> usedPadInts);
         bool abort(int tid, List<int> usedPadInts);
+        Dictionary<int, IPadInt> removeFromTail();
     }
 
     public interface IMaster {

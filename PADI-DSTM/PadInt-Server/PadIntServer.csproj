@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\PadIntAlreadyExistsException.cs" />
+    <Compile Include="Exceptions\WrongServerRequestException.cs" />
     <Compile Include="PadInt.cs" />
     <Compile Include="Exceptions\PadIntNotFoundException.cs" />
     <Compile Include="Server.cs" />
