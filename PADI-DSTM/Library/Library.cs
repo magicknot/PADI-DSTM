@@ -71,13 +71,13 @@ namespace ClientLibrary {
         public bool txCommit() {
             Logger.log(new String[] { "Library", "txCommit" });
 
-            if(writtenList.Count==0) {
+            if(writtenList.Count == 0) {
                 Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
             }
 
             updateServersInfo();
             writtenList.Sort();
-            int serverID = getPadIntServerID(writtenList.First());
+            int serverID = getPadIntServerID(writtenList[0]);
             int tempServerID;
             List<int> toCommitList = new List<int>();
             bool result = false;
@@ -101,7 +101,7 @@ namespace ClientLibrary {
         public bool txAbort() {
             Logger.log(new String[] { "Library", "txCommit" });
 
-            if(writtenList.Count==0) {
+            if(writtenList.Count == 0) {
                 Logger.log(new String[] { "Library", "txCommit", "nothing to abort" });
             }
 
