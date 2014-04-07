@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using CommonTypes;
 
 namespace LogServer {
-    class Log : MarshalByRefObject, ILog {
+    class Log : MarshalByRefObject, ILog, IDisposable {
 
-        System.IO.StreamWriter file =  new System.IO.StreamWriter("log.txt");
+        System.IO.StreamWriter file = new System.IO.StreamWriter("log.txt");
+        bool disposed = false;
 
         public void log(String[] logs) {
 
@@ -21,10 +22,24 @@ namespace LogServer {
             Console.WriteLine(message);
             file.WriteLine(message);
             file.Flush();
-            //file.Close();
 
         }
 
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if(disposed)
+                return;
+
+            if(disposing) {
+                file.Close();
+            }
+
+            disposed = true;
+        }
 
     }
 

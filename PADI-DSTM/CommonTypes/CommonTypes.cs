@@ -33,8 +33,25 @@ namespace CommonTypes {
         void log(String[] logs);
     }
 
+    [Serializable]
     public abstract class IPadiException : System.Exception {
         public abstract string getMessage();
+
+
+
+        public IPadiException() {
+        }
+
+        public IPadiException(System.Runtime.Serialization.SerializationInfo info,
+        System.Runtime.Serialization.StreamingContext context)
+            : base(info, context) {
+        }
+
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) {
+            base.GetObjectData(info, context);
+        }
+
+
     }
 
     public static class Logger {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CommonTypes {
+    [Serializable]
     public class NoServersFoundException : IPadiException {
 
         public NoServersFoundException() {
@@ -12,10 +13,6 @@ namespace CommonTypes {
 
         public override string getMessage() {
             return "Master server doesn't have any server registered";
-        }
-
-        public String Message {
-            get { return "Master server doesn't have any server registered"; }
         }
     }
 }

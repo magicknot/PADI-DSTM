@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Client {
-    class FailedConnectionException : Exception {
+    [Serializable]
+    class FailedConnectionException : System.Exception {
         private string p;
 
         public FailedConnectionException(string p) {
