@@ -10,14 +10,26 @@ namespace Client {
 
     class Client {
 
-        private static int uid0;
-        private static int uid1;
-        private static int uid2;
+        private static Random random = new Random();
+        private static int nextUid = 0;
 
         public Client() {
-            uid0 = 0;
-            uid1 = 1;
-            uid2 = 2;
+            //random = new Random();
+            //nextUid = random.Next();
+        }
+
+        private static int getNextUid() {
+            /* first arg of Next its the minimum and the second arg is the maximum */
+            nextUid = random.Next(0, 100);
+            return nextUid;
+        }
+
+        public static void testRandom() {
+
+            Console.WriteLine("------Test random ------");
+
+            for(int i = 0; i < 20; i++)
+                Console.WriteLine("number = " + getNextUid());
         }
 
         public static void testSimpleRead() {
@@ -35,8 +47,8 @@ namespace Client {
                     library.txBegin();
                     Console.WriteLine("txBegin Done");
 
-                    PadIntStub padInt0 = library.createPadInt(uid0);
-                    Console.WriteLine("padInts created");
+                    PadIntStub padInt0 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt0 created with uid: " + nextUid);
 
                     Console.WriteLine("padInt0 read: " + padInt0.read());
 
@@ -69,8 +81,8 @@ namespace Client {
                     library.txBegin();
                     Console.WriteLine("txBegin Done");
 
-                    PadIntStub padInt0 = library.createPadInt(uid0);
-                    Console.WriteLine("padInts created");
+                    PadIntStub padInt0 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt0 created with uid: " + nextUid);
 
                     if(padInt0.write(20)) {
                         Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
@@ -105,8 +117,8 @@ namespace Client {
                     library.txBegin();
                     Console.WriteLine("txBegin Done");
 
-                    PadIntStub padInt0 = library.createPadInt(uid0);
-                    Console.WriteLine("padInts created");
+                    PadIntStub padInt0 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt0 created with uid: " + nextUid);
 
                     if(padInt0.write(20)) {
                         Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
@@ -122,10 +134,11 @@ namespace Client {
                     Console.WriteLine("txBegin Done");
 
                     /* the padInt's value must be equal to initialization value */
-                    if(padInt0.read() == 0) {
+                    int value = padInt0.read();
+                    if(value == 0) {
                         Console.WriteLine("it's OK");
                     } else {
-                        Console.WriteLine("BUG!!!!!: abort was not successful...");
+                        Console.WriteLine("BUG!!!!!: abort was not successful...  value = " + value);
                     }
                     library.txCommit();
                     Console.WriteLine("txCommit Done");
@@ -156,11 +169,11 @@ namespace Client {
                     library.txBegin();
                     Console.WriteLine("txBegin Done");
 
-                    PadIntStub padInt0 = library.createPadInt(uid0);
-                    Console.WriteLine("padInts created");
+                    PadIntStub padInt0 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt0 created with uid: " + nextUid);
 
                     if(padInt0.write(21)) {
-                        Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
+                        Console.WriteLine("padInt0 write done with value (21) : " + padInt0.read());
                     }
 
                     library.txCommit();
@@ -208,10 +221,12 @@ namespace Client {
                     library.txBegin();
                     Console.WriteLine("txBegin Done");
 
-                    PadIntStub padInt0 = library.createPadInt(uid0);
-                    PadIntStub padInt1 = library.createPadInt(uid1);
-                    PadIntStub padInt2 = library.createPadInt(uid2);
-                    Console.WriteLine("padInts created");
+                    PadIntStub padInt0 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt0 created with uid: " + nextUid);
+                    PadIntStub padInt1 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt1 created with uid: " + nextUid);
+                    PadIntStub padInt2 = library.createPadInt(getNextUid());
+                    Console.WriteLine("padInt2 created with uid: " + nextUid);
 
                     bool result = padInt0.read() == 0;
                     result = (padInt0.read() == padInt1.read());
@@ -242,10 +257,15 @@ namespace Client {
             Console.Title = "Client";
             Console.WriteLine("Client up and running..");
 
+            //testRandom();
             testSimpleRead();
             testSimpleWrite();
             testSimpleAbort();
             testSimpleCommit();
+            testMultipleRead();
+
+            while(true)
+                ;
         }
     }
 }
