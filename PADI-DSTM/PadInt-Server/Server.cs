@@ -28,7 +28,7 @@ namespace PadIntServer {
 
         public Server() {
             PdInts = new Dictionary<int, IPadInt>();
-            IsTail=true;
+            IsTail = true;
         }
 
         internal int ID {
@@ -70,8 +70,8 @@ namespace PadIntServer {
                 ID = serverInfo.Item1;
                 MaxCpt = serverInfo.Item2;
 
-                if(ID!=0) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), ServerAddrs[ID-1]);
+                if(ID != 0) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), ServerAddrs[ID - 1]);
                     Dictionary<int, IPadInt> importedPds = server.removeFromTail();
                     foreach(KeyValuePair<int, IPadInt> entry in importedPds) {
                         PdInts.Add(entry.Key, entry.Value);
@@ -86,7 +86,7 @@ namespace PadIntServer {
         }
 
         public Dictionary<int, IPadInt> removeFromTail() {
-            IsTail=false;
+            IsTail = false;
 
             Dictionary<int, IPadInt> sparePadInts = new Dictionary<int, IPadInt>();
 
