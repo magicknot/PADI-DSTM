@@ -1,5 +1,5 @@
 ﻿using System;
-using PADI_DSTM;
+/*using PADI_DSTM;
 
 class SampleApp {
     static void Main(string[] args) {
@@ -26,4 +26,4 @@ class SampleApp {
         res = PadiDstm.Fail("tcp://localhost:2002/Server");
         res = PadiDstm.TxCommit();
     }
-}
+}*/
