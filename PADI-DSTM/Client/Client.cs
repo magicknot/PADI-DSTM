@@ -173,7 +173,7 @@ namespace Client {
                 if(padInt0.read() == 21) {
                     Console.WriteLine("it's OK");
                 } else {
-                    Console.WriteLine("BUG!!!!!: abort was not successful...");
+                    Console.WriteLine("BUG!!!!!: commit was not successful...");
                 }
 
                 Library.txCommit();
@@ -234,11 +234,11 @@ namespace Client {
 
             if(Library.init()) {
                 //testRandom();
-                //testSimpleRead();
-                //testSimpleWrite();
+                testSimpleRead();
+                testSimpleWrite();
                 testSimpleAbort();
-                //testSimpleCommit();
-                //testMultipleRead();
+                testSimpleCommit();
+                testMultipleRead();
             } else {
                 Logger.log(new String[] { "There are no servers available" });
             }
