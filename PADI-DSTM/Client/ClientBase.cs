@@ -8,23 +8,24 @@ using CommonTypes;
 
 namespace Client {
 
-    class Client {
+    class ClientBase {
 
-        private static Random random = new Random();
-        private static int nextUid = 0;
+        private Random random;
+        private int nextUid;
 
-        public Client() {
-            //random = new Random();
-            //nextUid = random.Next();
+        public ClientBase() {
+            random = new Random();
+            nextUid = random.Next();
+            Library.init();
         }
 
-        private static int getNextUid() {
+        private int getNextUid() {
             /* first arg of Next its the minimum and the second arg is the maximum */
             nextUid = random.Next(0, 100);
             return nextUid;
         }
 
-        public static void testRandom() {
+        public void testRandom() {
 
             Console.WriteLine("------Test random ------");
 
@@ -32,7 +33,7 @@ namespace Client {
                 Console.WriteLine("number = " + getNextUid());
         }
 
-        public static void testSimpleRead() {
+        public void testSimpleRead() {
 
             Console.WriteLine("------Test: Simple read ------");
 
@@ -62,7 +63,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleWrite() {
+        public void testSimpleWrite() {
 
             Console.WriteLine("------Test: Simple write ------");
 
@@ -93,7 +94,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleAbort() {
+        public void testSimpleAbort() {
 
             Console.WriteLine("------Test: Simple Abort ------");
 
@@ -127,7 +128,7 @@ namespace Client {
                 if(value == 0) {
                     Console.WriteLine("it's OK");
                 } else {
-                    Console.WriteLine("BUG!!!!!: abort was not successful...  value = " + value);
+                    Console.WriteLine("BUG!!!!!: abort was not successful... value = " + value);
                 }
                 Library.txCommit();
                 Console.WriteLine("txCommit Done");
@@ -140,7 +141,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleCommit() {
+        public void testSimpleCommit() {
 
             Console.WriteLine("------Test: Simple Commit ------");
 
@@ -187,7 +188,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testMultipleRead() {
+        public void testMultipleRead() {
 
             Console.WriteLine("------Test: Multiple read ------");
 
@@ -226,25 +227,6 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
-        }
-
-        static void Main(string[] args) {
-            Console.Title = "Client";
-            Console.WriteLine("Client up and running..");
-
-            if(Library.init()) {
-                //testRandom();
-                testSimpleRead();
-                testSimpleWrite();
-                testSimpleAbort();
-                testSimpleCommit();
-                testMultipleRead();
-            } else {
-                Logger.log(new String[] { "There are no servers available" });
-            }
-
-            while(true)
-                ;
         }
     }
 }
