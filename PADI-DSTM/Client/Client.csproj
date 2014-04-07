@@ -42,10 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client2.cs" />
-    <Compile Include="Client1.cs" />
-    <Compile Include="ClientBase.cs" />
-    <Compile Include="ClientSetup.cs" />
+    <Compile Include="Client.cs" />
     <Compile Include="FailedConnectionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleApp.cs" />

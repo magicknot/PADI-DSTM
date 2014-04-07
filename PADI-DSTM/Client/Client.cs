@@ -8,24 +8,23 @@ using CommonTypes;
 
 namespace Client {
 
-    class ClientBase {
+    class Client {
 
-        private Random random;
-        private int nextUid;
+        private static Random random = new Random();
+        private static int nextUid = 0;
 
-        public ClientBase() {
-            random = new Random();
-            nextUid = random.Next();
-            Library.init();
+        public Client() {
+            //random = new Random();
+            //nextUid = random.Next();
         }
 
-        private int getNextUid() {
+        private static int getNextUid() {
             /* first arg of Next its the minimum and the second arg is the maximum */
             nextUid = random.Next(0, 100);
             return nextUid;
         }
 
-        public void testRandom() {
+        public static void testRandom() {
 
             Console.WriteLine("------Test random ------");
 
@@ -33,7 +32,7 @@ namespace Client {
                 Console.WriteLine("number = " + getNextUid());
         }
 
-        public void testSimpleRead() {
+        public static void testSimpleRead() {
 
             Console.WriteLine("------Test: Simple read ------");
 
@@ -63,7 +62,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public void testSimpleWrite() {
+        public static void testSimpleWrite() {
 
             Console.WriteLine("------Test: Simple write ------");
 
@@ -94,7 +93,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public void testSimpleAbort() {
+        public static void testSimpleAbort() {
 
             Console.WriteLine("------Test: Simple Abort ------");
 
@@ -141,7 +140,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public void testSimpleCommit() {
+        public static void testSimpleCommit() {
 
             Console.WriteLine("------Test: Simple Commit ------");
 
@@ -188,7 +187,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public void testMultipleRead() {
+        public static void testMultipleRead() {
 
             Console.WriteLine("------Test: Multiple read ------");
 
@@ -227,6 +226,57 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+        }
+
+        static void Main(string[] args) {
+            Console.Title = "Client";
+            Console.WriteLine("Client up and running..");
+
+            if(Library.init()) {
+
+                string input;
+
+                while(true) {
+
+                    Console.WriteLine("Please, insert the number of the test that you want to run:");
+                    Console.WriteLine("1- testRandom");
+                    Console.WriteLine("Tests with one client:");
+                    Console.WriteLine("2- Base: testSimpleRead");
+                    Console.WriteLine("3- Base: testSimpleWrite");
+                    Console.WriteLine("4- Base: testSimpleAbort");
+                    Console.WriteLine("5- Base: testSimpleCommit");
+                    Console.WriteLine("6- Base: testMultipleReads");
+
+                    input = Console.ReadLine();
+
+                    if(input.Equals("1")) {
+                        testRandom();
+                    }
+
+                    if(input.Equals("2")) {
+                        testSimpleRead();
+                    }
+
+                    if(input.Equals("3")) {
+                        testSimpleWrite();
+                    }
+
+                    if(input.Equals("4")) {
+                        testSimpleAbort();
+                    }
+
+                    if(input.Equals("5")) {
+                        testSimpleCommit();
+                    }
+
+                    if(input.Equals("6")) {
+                        testMultipleRead();
+                    }
+                }
+
+            } else {
+                Logger.log(new String[] { "There are no servers available" });
+            }
         }
     }
 }
