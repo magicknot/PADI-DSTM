@@ -16,17 +16,15 @@ namespace CommonTypes {
         bool confirmPadInt(int uid);
         int readPadInt(int tid, int uid);
         bool writePadInt(int tid, int uid, int value);
-        void attachPadInts(Dictionary<int, String> serverAddresses, Dictionary<int, IPadInt> sparedPadInts);
         bool commit(int tid, List<int> usedPadInts);
         bool abort(int tid, List<int> usedPadInts);
-        Dictionary<int, IPadInt> removeFromTail();
     }
 
     public interface IMaster {
-
         int getNextTID();
-        Tuple<int, int> registerServer(String address);
-        Tuple<Dictionary<int, string>, int> getServersInfo(bool increase);
+        int registerServer(String address);
+        string getPadIntServer(int uid);
+        string registerPadInt(int uid);
     }
 
     public interface ILog {
@@ -55,7 +53,7 @@ namespace CommonTypes {
     }
 
     public static class Logger {
-        static ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+        static ILog logServer = (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
 
         public static void log(String[] args) {
             logServer.log(args);

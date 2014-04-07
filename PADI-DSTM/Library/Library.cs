@@ -15,78 +15,48 @@ namespace ClientLibrary {
 
     public class Library {
 
-        private IMaster masterServer;
-        private Dictionary<int, String> serversList;
-        private int actualTID;
-        private List<int> writtenList;
-        private int maxServerCapacity;
-        private TcpChannel channel;
-
-        public Library() {
-
-            writtenList = new List<int>();
-        }
+        private static IMaster masterServer;
+        private static int actualTID;
+        private static List<int> writtenList;
+        private static Dictionary<int, string> padIntServers;
+        private static TcpChannel channel;
 
         //porque boolean?
-        public bool init() {
-
+        public static bool init() {
+            writtenList = new List<int>();
+            padIntServers = new Dictionary<int, string>();
             channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
-            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-
-
             Logger.log(new String[] { "Library", "init", "\r\n" });
-            bool result = updateServersInfo();
-            Logger.log(new String[] { " " });
-
-            return result;
-        }
-
-        public void closeChannel() {
-            ChannelServices.UnregisterChannel(channel);
-        }
-
-        private bool updateServersInfo() {
-            try {
-                Tuple<Dictionary<int, string>, int> serversInfo = masterServer.getServersInfo(false);
-                serversList = serversInfo.Item1;
-                maxServerCapacity = serversInfo.Item2;
-            } catch(SerializationException e) {
-                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-            } catch(IPadiException e) {
-                e.getMessage();
-                return false;
-            }
-
+            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
         }
 
-        public bool txBegin() {
+        public static bool txBegin() {
             Logger.log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.getNextTID();
             Logger.log(new String[] { " " });
             return true;
         }
 
-        public bool txCommit() {
+        public static bool txCommit() {
             Logger.log(new String[] { "Library", "txCommit" });
 
             if(writtenList.Count == 0) {
                 Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
             }
 
-            updateServersInfo();
             writtenList.Sort();
-            int serverID = getPadIntServerID(writtenList.First());
-            int tempServerID;
+            string serverID = padIntServers[writtenList.First()];
+            string tempServerID;
             List<int> toCommitList = new List<int>();
             bool result = false;
 
             foreach(int i in writtenList) {
-                tempServerID = getPadIntServerID(i);
+                tempServerID = padIntServers[i];
 
-                if(tempServerID != serverID) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
+                if(!tempServerID.Equals(serverID)) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serverID);
                     result = result && server.commit(actualTID, toCommitList);
                     serverID = tempServerID;
                     toCommitList = new List<int>();
@@ -98,89 +68,63 @@ namespace ClientLibrary {
             return result;
         }
 
-        public bool txAbort() {
+        public static bool txAbort() {
             Logger.log(new String[] { "Library", "txCommit" });
 
             if(writtenList.Count == 0) {
-                Logger.log(new String[] { "Library", "txCommit", "nothing to abort" });
+                Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
             }
 
-            updateServersInfo();
             writtenList.Sort();
-            int serverID = getPadIntServerID(writtenList.First());
-            int tempServerID;
-            List<int> toCommitList = new List<int>();
+            string serverID = padIntServers[writtenList.First()];
+            string tempServerID;
+            List<int> toAbortList = new List<int>();
             bool result = false;
 
             foreach(int i in writtenList) {
-                tempServerID = getPadIntServerID(i);
+                tempServerID = padIntServers[i];
 
-                if(tempServerID != serverID) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
-                    result = server.abort(actualTID, toCommitList) && result;
+                if(!tempServerID.Equals(serverID)) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serverID);
+                    result = result && server.abort(actualTID, toAbortList);
                     serverID = tempServerID;
-                    toCommitList = new List<int>();
+                    toAbortList = new List<int>();
                 }
-                toCommitList.Add(i);
+                toAbortList.Add(i);
             }
 
             Logger.log(new String[] { " " });
             return result;
         }
 
-        public PadIntStub createPadInt(int uid) {
+
+
+        public static PadIntStub createPadInt(int uid) {
             Logger.log(new String[] { "Library", "createPadInt", uid.ToString() });
 
-            String address = serversList[getPadIntServerID(uid)];
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-
-            bool possible = false;
             try {
-                possible = server.createPadInt(uid);
-            } catch(SerializationException e) {
-                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                string serverAddr = masterServer.registerPadInt(uid);
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
+                server.createPadInt(uid);
+                return new PadIntStub(uid, actualTID, serverAddr);
+            } catch(PadIntAlreadyExistsException) {
+                throw;
             }
-
-            Logger.log(new String[] { " " });
-
-            if(possible)
-                return new PadIntStub(uid, actualTID, address, this);
-            else
-                return null;
         }
 
-        public PadIntStub accessPadInt(int uid) {
+        public static PadIntStub accessPadInt(int uid) {
             Logger.log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
-            String address = serversList[getPadIntServerID(uid)];
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            bool accessible = server.confirmPadInt(uid);
-
-            Logger.log(new String[] { " " });
-
-            if(accessible)
-                return new PadIntStub(uid, actualTID, address, this);
-            else
-                return null;
-        }
-
-        public int getNServers() {
-            Logger.log(new String[] { "Library", "getNServers" });
-            return serversList.Count;
-        }
-
-        public int getPadIntServerID(int uid) {
-            Logger.log(new String[] { "Library", "getPadIntServerID", "uid", uid.ToString() });
-            int serverID = 0;
-            int nServers = getNServers();
-
-            for(int i = 0; i < nServers; i++) {
-                if(uid < (i + 1) * maxServerCapacity) {
-                    return serverID = i;
-                }
+            try {
+                string serverAddr = masterServer.getPadIntServer(uid);
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
+                server.confirmPadInt(uid);
+                return new PadIntStub(uid, actualTID, serverAddr);
+            } catch(PadIntNotFoundException) {
+                throw;
+            } catch(NoServersFoundException) {
+                throw;
             }
-
-            return serverID = nServers - 1;
         }
 
         public void registerUID(int uid) {

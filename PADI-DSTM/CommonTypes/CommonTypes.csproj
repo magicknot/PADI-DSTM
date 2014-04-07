@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonTypes.cs" />
-    <Compile Include="Exceptions\AlreadyRegisteredException.cs" />
+    <Compile Include="Exceptions\ServerAlreadyExistsException.cs" />
     <Compile Include="Exceptions\NoServersFoundException.cs" />
     <Compile Include="Exceptions\PadIntAlreadyExistsException.cs" />
     <Compile Include="Exceptions\PadIntNotFoundException.cs" />

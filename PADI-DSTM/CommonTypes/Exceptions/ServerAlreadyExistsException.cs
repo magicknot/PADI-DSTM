@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CommonTypes {
     [Serializable]
-    public class AlreadyRegisteredException : IPadiException {
+    public class ServerAlreadyExistsException : IPadiException {
         int serverID;
 
-        public AlreadyRegisteredException(int serverID) {
+        public ServerAlreadyExistsException(int serverID) {
             this.serverID = serverID;
         }
 
@@ -17,7 +17,7 @@ namespace CommonTypes {
             return serverID;
         }
 
-        public AlreadyRegisteredException(System.Runtime.Serialization.SerializationInfo info,
+        public ServerAlreadyExistsException(System.Runtime.Serialization.SerializationInfo info,
         System.Runtime.Serialization.StreamingContext context)
             : base(info, context) {
         }

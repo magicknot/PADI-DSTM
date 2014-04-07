@@ -10,11 +10,12 @@ namespace MasterServer {
 
         private int lastTID;
         private int nServers;
-        private Dictionary<int, string> registeredServers;
-        private int maxServerCapacity = 10;
+        private List<ServerRegistry> registeredServers;
+        private Dictionary<int, int> padIntServers;
 
         public Master() {
-            registeredServers = new Dictionary<int, string>();
+            registeredServers = new List<ServerRegistry>();
+            padIntServers = new Dictionary<int, int>();
             lastTID = 0;
             nServers = 0;
         }
@@ -24,28 +25,34 @@ namespace MasterServer {
             return lastTID++;
         }
 
-        public Tuple<int, int> registerServer(String address) {
-            Logger.log(new String[] { "Master", " registerServer", " address ", address.ToString() });
-
+        public int registerServer(String address) {
+            Logger.log(new String[] { "Master", " registerServer", "address", address.ToString() });
             try {
-                registeredServers.Add(nServers, address);
-                return new Tuple<int, int>(nServers++, maxServerCapacity);
+                registeredServers.Insert(nServers,new ServerRegistry(address));
+                return nServers++;
             } catch(ArgumentException) {
-                throw new AlreadyRegisteredException(nServers);
+                throw new ServerAlreadyExistsException(nServers);
             }
         }
 
-        public Tuple<Dictionary<int, string>, int> getServersInfo(bool increase) {
-            Logger.log(new String[] { "Master", "getNServers", registeredServers.Count.ToString() });
-
-            if(increase) {
-                maxServerCapacity = 2 * maxServerCapacity;
-            }
-
-            if(registeredServers.Count == 0) {
-                throw new NoServersFoundException();
+        public string getPadIntServer(int uid) {
+            Logger.log(new String[] { "Master", " getPadIntServer", "uid", uid.ToString() });
+            if(padIntServers.ContainsKey(uid)) {
+                return registeredServers[padIntServers[uid]].Address;
             } else {
-                return new Tuple<Dictionary<int, string>, int>(registeredServers, maxServerCapacity);
+                throw new NoServersFoundException();
+            }
+        }
+
+        public string registerPadInt(int uid) {
+            Logger.log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
+            try {
+                int serverID = Master_Server.LoadBalancer.getAvailableServer(registeredServers.Count);
+                padIntServers.Add(uid, serverID);
+                registeredServers[serverID].Hits+=1;
+                return registeredServers[serverID].Address;
+            } catch(ArgumentException) {
+                throw new PadIntAlreadyExistsException(uid, padIntServers[uid]);
             }
         }
     }

@@ -21,11 +21,10 @@ namespace ClientLibrary {
         /* Structure that maps UID to PadInt's actual value */
         private Dictionary<int, int> padIntDict;
 
-        public PadIntStub(int uid, int tid, string address, Library library) {
+        public PadIntStub(int uid, int tid, string address) {
             this.uid = uid;
             this.tid = tid;
             this.address = address;
-            this.library = library;
             this.readLocks = new List<int>();
             this.writeLocks = new List<int>();
             this.padIntDict = new Dictionary<int, int>();
