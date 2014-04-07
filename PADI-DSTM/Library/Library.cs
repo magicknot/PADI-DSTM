@@ -69,10 +69,10 @@ namespace ClientLibrary {
         }
 
         public static bool txAbort() {
-            Logger.log(new String[] { "Library", "txCommit" });
+            Logger.log(new String[] { "Library", "txAbort" });
 
             if(writtenList.Count == 0) {
-                Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
+                Logger.log(new String[] { "Library", "txAbort", "nothing to abort" });
             }
 
             writtenList.Sort();
@@ -127,7 +127,7 @@ namespace ClientLibrary {
             }
         }
 
-        public void registerUID(int uid) {
+        public static void registerUID(int uid) {
             Logger.log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
             writtenList.Add(uid);
         }

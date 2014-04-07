@@ -10,7 +10,6 @@ namespace ClientLibrary {
         private int uid;
         private string address;
         private int tid;
-        private Library library;
 
         /* Structure that stores PadInt's uid of the transaction read locks */
         private List<int> readLocks;
@@ -36,7 +35,7 @@ namespace ClientLibrary {
             try {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                 int result = server.readPadInt(tid, uid);
-                library.registerUID(uid);
+                Library.registerUID(uid);
                 return result;
             } catch(WrongServerRequestException) {
                 throw;
@@ -50,7 +49,7 @@ namespace ClientLibrary {
                 Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                 server.writePadInt(tid, uid, value);
-                library.registerUID(uid);
+                Library.registerUID(uid);
                 return true;
             } catch(WrongServerRequestException) {
                 throw;
