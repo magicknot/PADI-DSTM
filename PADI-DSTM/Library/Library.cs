@@ -17,14 +17,11 @@ namespace ClientLibrary {
 
         private static IMaster masterServer;
         private static int actualTID;
-        private static List<int> writtenList;
-        private static Dictionary<int, string> padIntServers;
+        private static List<PadIntRegistry> padIntsList;
         private static TcpChannel channel;
 
-        //porque boolean?
         public static bool init() {
-            writtenList = new List<int>();
-            padIntServers = new Dictionary<int, string>();
+            padIntsList = new List<PadIntRegistry>();
             channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             Logger.log(new String[] { "Library", "init", "\r\n" });
@@ -42,58 +39,38 @@ namespace ClientLibrary {
         public static bool txCommit() {
             Logger.log(new String[] { "Library", "txCommit" });
 
-            if(writtenList.Count == 0) {
+            if(padIntsList.Count == 0) {
                 Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
             }
 
-            writtenList.Sort();
-            string serverID = padIntServers[writtenList.First()];
-            string tempServerID;
-            List<int> toCommitList = new List<int>();
             bool result = false;
+            IServer server;
 
-            foreach(int i in writtenList) {
-                tempServerID = padIntServers[i];
-
-                if(!tempServerID.Equals(serverID)) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serverID);
-                    result = result && server.commit(actualTID, toCommitList);
-                    serverID = tempServerID;
-                    toCommitList = new List<int>();
-                }
-                toCommitList.Add(i);
+            foreach(PadIntRegistry pd in padIntsList) {
+                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                result = result && server.commit(actualTID, pd.PdInts);
             }
 
-            Logger.log(new String[] { " " });
+            padIntsList.Clear();
             return result;
         }
 
         public static bool txAbort() {
             Logger.log(new String[] { "Library", "txAbort" });
 
-            if(writtenList.Count == 0) {
+            if(padIntsList.Count == 0) {
                 Logger.log(new String[] { "Library", "txAbort", "nothing to abort" });
             }
 
-            writtenList.Sort();
-            string serverID = padIntServers[writtenList.First()];
-            string tempServerID;
-            List<int> toAbortList = new List<int>();
             bool result = false;
+            IServer server;
 
-            foreach(int i in writtenList) {
-                tempServerID = padIntServers[i];
-
-                if(!tempServerID.Equals(serverID)) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), serverID);
-                    result = result && server.abort(actualTID, toAbortList);
-                    serverID = tempServerID;
-                    toAbortList = new List<int>();
-                }
-                toAbortList.Add(i);
+            foreach(PadIntRegistry pd in padIntsList) {
+                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                result = result && server.abort(actualTID, pd.PdInts);
             }
 
-            Logger.log(new String[] { " " });
+            padIntsList.Clear();
             return result;
         }
 
@@ -103,10 +80,13 @@ namespace ClientLibrary {
             Logger.log(new String[] { "Library", "createPadInt", uid.ToString() });
 
             try {
-                string serverAddr = masterServer.registerPadInt(uid);
+                Tuple<int, string> serverInfo = masterServer.registerPadInt(uid);
+                string serverAddr = serverInfo.Item2;
+                int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.createPadInt(uid);
-                return new PadIntStub(uid, actualTID, serverAddr);
+                padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
+                return new PadIntStub(uid, actualTID, serverID, serverAddr);
             } catch(PadIntAlreadyExistsException) {
                 throw;
             }
@@ -116,10 +96,13 @@ namespace ClientLibrary {
             Logger.log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
             try {
-                string serverAddr = masterServer.getPadIntServer(uid);
+                Tuple<int, string> serverInfo = masterServer.getPadIntServer(uid);
+                string serverAddr = serverInfo.Item2;
+                int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.confirmPadInt(uid);
-                return new PadIntStub(uid, actualTID, serverAddr);
+                padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
+                return new PadIntStub(uid, actualTID, serverID, serverAddr);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(NoServersFoundException) {
@@ -127,9 +110,9 @@ namespace ClientLibrary {
             }
         }
 
-        public static void registerUID(int uid) {
+        public static void registerUID(int serverID, int uid) {
             Logger.log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
-            writtenList.Add(uid);
+            padIntsList[serverID].PdInts.Add(uid);
         }
     }
 }

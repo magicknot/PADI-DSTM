@@ -10,49 +10,33 @@ namespace ClientLibrary {
         private int uid;
         private string address;
         private int tid;
+        private int serverID;
 
-        /* Structure that stores PadInt's uid of the transaction read locks */
-        private List<int> readLocks;
-
-        /* Structure that stores PadInt's uid of the transaction writes locks */
-        private List<int> writeLocks;
-
-        /* Structure that maps UID to PadInt's actual value */
-        private Dictionary<int, int> padIntDict;
-
-        public PadIntStub(int uid, int tid, string address) {
+        public PadIntStub(int uid, int tid, int serverID, string address) {
             this.uid = uid;
             this.tid = tid;
             this.address = address;
-            this.readLocks = new List<int>();
-            this.writeLocks = new List<int>();
-            this.padIntDict = new Dictionary<int, int>();
+            this.serverID=serverID;
         }
 
         public int read() {
             Logger.log(new String[] { "PadIntStub", "read" });
-
             try {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                 int result = server.readPadInt(tid, uid);
-                Library.registerUID(uid);
+                Library.registerUID(serverID, uid);
                 return result;
-            } catch(WrongServerRequestException) {
-                throw;
             } catch(PadIntNotFoundException) {
                 throw;
             }
         }
         public bool write(int value) {
-
+            Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
             try {
-                Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                 server.writePadInt(tid, uid, value);
-                Library.registerUID(uid);
+                Library.registerUID(serverID, uid);
                 return true;
-            } catch(WrongServerRequestException) {
-                throw;
             } catch(PadIntNotFoundException) {
                 throw;
             }

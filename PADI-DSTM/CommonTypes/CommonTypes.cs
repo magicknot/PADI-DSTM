@@ -23,8 +23,8 @@ namespace CommonTypes {
     public interface IMaster {
         int getNextTID();
         int registerServer(String address);
-        string getPadIntServer(int uid);
-        string registerPadInt(int uid);
+        Tuple<int, string> getPadIntServer(int uid);
+        Tuple<int, string> registerPadInt(int uid);
     }
 
     public interface ILog {
@@ -53,7 +53,7 @@ namespace CommonTypes {
     }
 
     public static class Logger {
-        static ILog logServer = (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+        static ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
 
         public static void log(String[] args) {
             logServer.log(args);
