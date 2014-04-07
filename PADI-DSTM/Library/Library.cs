@@ -99,17 +99,17 @@ namespace ClientLibrary {
         }
 
         public bool txAbort() {
-            Logger.log(new String[] { "Library", "txCommit" });
+            Logger.log(new String[] { "Library", "txAbort" });
 
             if(writtenList.Count == 0) {
-                Logger.log(new String[] { "Library", "txCommit", "nothing to abort" });
+                Logger.log(new String[] { "Library", "txAbort", "nothing to abort" });
             }
 
             updateServersInfo();
             writtenList.Sort();
             int serverID = getPadIntServerID(writtenList.First());
             int tempServerID;
-            List<int> toCommitList = new List<int>();
+            List<int> toAbortList = new List<int>();
             bool result = false;
 
             foreach(int i in writtenList) {
@@ -117,11 +117,11 @@ namespace ClientLibrary {
 
                 if(tempServerID != serverID) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), serversList[serverID]);
-                    result = server.abort(actualTID, toCommitList) && result;
+                    result = server.abort(actualTID, toAbortList) && result;
                     serverID = tempServerID;
-                    toCommitList = new List<int>();
+                    toAbortList = new List<int>();
                 }
-                toCommitList.Add(i);
+                toAbortList.Add(i);
             }
 
             Logger.log(new String[] { " " });

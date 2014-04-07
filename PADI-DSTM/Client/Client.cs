@@ -258,11 +258,11 @@ namespace Client {
             Console.WriteLine("Client up and running..");
 
             //testRandom();
-            testSimpleRead();
-            testSimpleWrite();
+            //testSimpleRead();
+            //testSimpleWrite();
             testSimpleAbort();
-            testSimpleCommit();
-            testMultipleRead();
+            //testSimpleCommit();
+            //testMultipleRead();
 
             while(true)
                 ;
