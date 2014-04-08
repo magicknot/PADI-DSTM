@@ -20,6 +20,10 @@ namespace ClientLibrary {
         private static List<PadIntRegistry> padIntsList;
         private static TcpChannel channel;
 
+        public static TcpChannel Channel {
+            get { return channel; }
+        }
+
         public static bool init() {
             padIntsList = new List<PadIntRegistry>();
             channel = new TcpChannel();

@@ -11,53 +11,45 @@ using System.Runtime.Remoting;
 
 namespace Client {
 
-    class Client {
+    class Client : MarshalByRefObject {
 
-        private static Random random = new Random();
-        private static int nextUid = 0;
+        private Random random = new Random();
+        private int nextUid = 0;
         /* if true stops the loop */
-        private static bool stopLoop = true;
+        private bool stopLoop = true;
+
+        internal int NextUID {
+            set { this.nextUid = value; }
+            get { return nextUid; }
+
+        }
+
+        internal bool StopLoop {
+            set { this.stopLoop = value; }
+            get { return stopLoop; }
+
+        }
 
         public Client() {
             //random = new Random();
             //nextUid = random.Next();
         }
 
-        public static void init() {
-
-            try {
-                TcpChannel channel = new TcpChannel(6085);
-                ChannelServices.RegisterChannel(channel, true);
-                RemotingConfiguration.RegisterWellKnownServiceType(
-                    typeof(Client),
-                    "Client",
-                    WellKnownObjectMode.Singleton);
-            } catch(ServerAlreadyExistsException e) {
-                Console.WriteLine(e.getMessage());
-            }
-            Console.WriteLine("init done");
-        }
-
-        public static void setStopLoop(bool value) {
+        public void setStopLoop(bool value) {
             //TcpChannel channel = new TcpChannel();
             //ChannelServices.RegisterChannel(channel, true);
-            Client client;
-            client = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
-            client.StopLoop = value;
-            Console.WriteLine("client.StopLoop = " + stopLoop);
+            Client c = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
+            c.StopLoop = value;
+            Console.WriteLine("client.StopLoop = " + StopLoop);
         }
 
-        private static int getNextUid() {
+        public int getNextUid() {
             /* first arg of Next its the minimum and the second arg is the maximum */
             nextUid = random.Next(0, 100);
             return nextUid;
         }
 
-        internal bool StopLoop {
-            set { stopLoop = value; }
-        }
-
-        public static void testRandom() {
+        public void testRandom() {
 
             Console.WriteLine("------Test random ------");
 
@@ -65,7 +57,7 @@ namespace Client {
                 Console.WriteLine("number = " + getNextUid());
         }
 
-        public static void testSimpleRead(int uid0) {
+        public void testSimpleRead(int uid0) {
 
             Console.WriteLine("------Test: Simple read ------");
 
@@ -100,7 +92,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleWrite(int uid0) {
+        public void testSimpleWrite(int uid0) {
 
             Console.WriteLine("------Test: Simple write ------");
 
@@ -135,7 +127,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleAbort(int uid0) {
+        public void testSimpleAbort(int uid0) {
 
             Console.WriteLine("------Test: Simple Abort ------");
 
@@ -185,7 +177,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleCommit(int uid0) {
+        public void testSimpleCommit(int uid0) {
 
             Console.WriteLine("------Test: Simple Commit ------");
 
@@ -234,7 +226,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testMultipleRead(int uid0, int uid1, int uid2) {
+        public void testMultipleRead(int uid0, int uid1, int uid2) {
 
             Console.WriteLine("------Test: Multiple read ------");
 
@@ -281,7 +273,7 @@ namespace Client {
 
         //-----------------------------------------------------
         //client 2
-        public static void testSimpleReadClient2(int uid0) {
+        public void testSimpleReadClient2(int uid0) {
 
             Console.WriteLine("------Test: client2 Simple read ------");
 
@@ -311,7 +303,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleWriteClient2(int uid0) {
+        public void testSimpleWriteClient2(int uid0) {
 
             Console.WriteLine("------Test: client2 Simple write ------");
 
@@ -342,7 +334,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testMultipleReadClient2(int uid0, int uid1, int uid2) {
+        public void testMultipleReadClient2(int uid0, int uid1, int uid2) {
 
             Console.WriteLine("------Test: Client2 Multiple read ------");
 
@@ -383,108 +375,5 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        static void Main(string[] args) {
-            Console.Title = "Client";
-            Console.WriteLine("Client up and running..");
-
-            if(Library.init()) {
-
-                string input;
-
-                while(true) {
-                    Console.WriteLine("----------------------HELP-------------------------");
-                    Console.WriteLine("Please, insert the number of the test that you want to run:");
-                    Console.WriteLine("Tests with just one client");
-                    Console.WriteLine("1- testRandom");
-                    Console.WriteLine("Tests with one client:");
-                    Console.WriteLine("2- Base: testSimpleRead");
-                    Console.WriteLine("3- Base: testSimpleWrite");
-                    Console.WriteLine("4- Base: testSimpleAbort");
-                    Console.WriteLine("5- Base: testSimpleCommit");
-                    Console.WriteLine("6- Base: testMultipleReads");
-                    Console.WriteLine("------------------");
-                    Console.WriteLine("Tests with more than one client:");
-                    Console.WriteLine(" (you need 3 clients: c1 create the padInts; C2 tries to access them; C3 stops the loop of C1)");
-                    Console.WriteLine("13- YOU MUST DO THIS in c1 BEFORE TEST WITH MORE THAN ONE CLIENT (init)");
-                    Console.WriteLine("7- YOU MUST DO THIS in c3 BEFORE TEST WITH MORE THAN ONE CLIENT (create the loops)");
-                    Console.WriteLine("8- If you want that client1 stops the loop");
-                    Console.WriteLine("12- If you want to confirm the value of stopLoop");
-                    Console.WriteLine("---------");
-                    Console.WriteLine("2- If you want that client1 do a simple read");
-                    Console.WriteLine("3- If you want that client1 do a simple write");
-                    Console.WriteLine("6- If you want that client1 do multiple read");
-                    Console.WriteLine("9- If you want that client2 do a simple read");
-                    Console.WriteLine("10- If you want that client2 do a simple write");
-                    Console.WriteLine("11- If you want that client2 do a multiple read");
-
-                    input = Console.ReadLine();
-
-                    if(input.Equals("1")) {
-                        testRandom();
-                    }
-
-                    if(input.Equals("2")) {
-                        testSimpleRead(getNextUid());
-                    }
-
-                    if(input.Equals("3")) {
-                        testSimpleWrite(getNextUid());
-                    }
-
-                    if(input.Equals("4")) {
-                        testSimpleAbort(getNextUid());
-                    }
-
-                    if(input.Equals("5")) {
-                        testSimpleCommit(getNextUid());
-                    }
-
-                    if(input.Equals("6")) {
-                        testMultipleRead(getNextUid(), getNextUid(), getNextUid());
-                    }
-
-                    /* loop setup */
-                    if(input.Equals("7")) {
-                        //stopLoop = false;
-                        setStopLoop(false);
-                        Console.WriteLine("loop is activated stopLoop = " + stopLoop);
-                    }
-
-                    /* stops the loop */
-                    if(input.Equals("8")) {
-                        stopLoop = true;
-                        Console.WriteLine("loop is deactivated stopLoop = " + stopLoop);
-                    }
-
-                    /* client2 simple read */
-                    if(input.Equals("9")) {
-                        testSimpleReadClient2(getNextUid());
-                    }
-
-                    /* client2 simple write */
-                    if(input.Equals("10")) {
-                        testSimpleWriteClient2(getNextUid());
-                    }
-
-                    /* client2 multiple read */
-                    if(input.Equals("11")) {
-                        testMultipleReadClient2(getNextUid(), getNextUid(), getNextUid());
-                    }
-
-                    /* value of stopLoop */
-                    if(input.Equals("12")) {
-                        Console.WriteLine("stopLoop = " + stopLoop);
-                    }
-
-                    /* init */
-                    if(input.Equals("13")) {
-                        init();
-                    }
-                }
-
-            } else {
-                Logger.log(new String[] { "There are no servers available" });
-            }
-        }
     }
 }
