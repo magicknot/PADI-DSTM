@@ -58,9 +58,10 @@ namespace Client {
                 Console.WriteLine("padInt0 read: " + padInt0.read());
 
                 /* to test with more than one client */
-                while(!stopLoop)
-                    ;
-
+                while(!stopLoop) {
+                    Console.WriteLine("loop");
+                }
+                
                 Library.txCommit();
                 Console.WriteLine("txCommit Done");
 
@@ -378,7 +379,7 @@ namespace Client {
                     Console.WriteLine("Tests with more than one client:");
                     Console.WriteLine(" (you need 3 clients: c1 create the padInts; C2 tries to access them; C3 stops the loop of C1)");
                     Console.WriteLine("7- YOU MUST DO THIS BEFORE TEST WITH MORE THAN ONE CLIENT (create the loops)");
-                    Console.WriteLine("8- If you want that client1 release the locks");
+                    Console.WriteLine("8- If you want that client1 stops the loop");
                     Console.WriteLine("---------");
                     Console.WriteLine("2- If you want that client1 do a simple read");
                     Console.WriteLine("3- If you want that client1 do a simple write");
