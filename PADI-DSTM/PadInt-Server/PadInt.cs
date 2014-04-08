@@ -101,7 +101,7 @@ namespace PadIntServer {
                 pendingReaders.Add(tid);
 
                 while(pendingReaders.Contains(tid)) {
-                    Logger.log(new String[] { "espera read... writter: ", writer.ToString() });
+                    Logger.log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
                 }
             }
 
@@ -149,7 +149,7 @@ namespace PadIntServer {
                     if(writer != tid) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
-                            Logger.log(new String[] { "espera write 1... writer: ", writer.ToString() });
+                            Logger.log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
                         }
                     }
                 } else {
@@ -160,7 +160,7 @@ namespace PadIntServer {
                     if(!readers.Contains(tid)) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
-                            Logger.log(new String[] { "espera write 2...writer: ", writer.ToString() });
+                            Logger.log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
                         }
                     } else {
                         /* if there is only a
@@ -297,6 +297,7 @@ namespace PadIntServer {
 
             if(freeWriteLock(tid)) {
                 OriginalValue = ActualValue;
+                Logger.log(new String[] { "PadInt", "commit", " Cleaned writer= ", writer.ToString() });
             }
 
             /* this must be done in the end because if we do this before
@@ -334,6 +335,7 @@ namespace PadIntServer {
             /* only if exists a write lock we do the rollback of the PadInt's value */
             if(freeWriteLock(tid)) {
                 ActualValue = OriginalValue;
+                Logger.log(new String[] { "PadInt", "abort", " Cleaned writer= ", writer.ToString() });
             }
 
             return true;

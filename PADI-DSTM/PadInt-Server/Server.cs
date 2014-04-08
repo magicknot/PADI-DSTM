@@ -55,7 +55,7 @@ namespace PadIntServer {
 
 
         public bool createPadInt(int uid) {
-            Logger.log(new String[] { "server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+            Logger.log(new String[] { "Server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
                 PdInts.Add(uid, new PadInt(uid));
                 return true;
@@ -97,7 +97,7 @@ namespace PadIntServer {
         }
 
         public bool writePadInt(int tid, int uid, int value) {
-            Logger.log(new String[] { " Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+            Logger.log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             try {
                 /* Obtain the PadInt identified by uid */
