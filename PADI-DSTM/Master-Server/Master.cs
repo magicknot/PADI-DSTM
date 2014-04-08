@@ -60,6 +60,24 @@ namespace MasterServer {
             }
         }
 
+        public bool Status() {
+
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("This is master server and the last TID given was " + lastTID);
+            Console.WriteLine("Servers registered are:");
+            for(int i = 0; i < registeredServers.Count; i++) {
+                Console.WriteLine("Server " + i + " with address " + registeredServers[i].Address);
+            }
+
+            foreach(ServerRegistry registry in registeredServers) {
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), registry.Address);
+                server.Dump();
+            }
+            Console.WriteLine("-----------------------");
+
+            return true;
+        }
+
         private void verifyServerRegistry(int serverID) {
             if(registeredServers.ElementAtOrDefault(serverID)==null) {
                 throw new NoServersFoundException();

@@ -186,5 +186,16 @@ namespace PadIntServer {
                 throw new PadIntNotFoundException(uid, ID);
             }
         }
+
+        public bool Dump() {
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("This server has id " + ID);
+            Console.WriteLine("PadInts stored on this server are:");
+            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
+            }
+            Console.WriteLine("-----------------------");
+            return true;
+        }
     }
 }

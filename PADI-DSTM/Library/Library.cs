@@ -123,5 +123,10 @@ namespace ClientLibrary {
                 throw new WrongPadIntRequestException(uid, actualTID);
             }
         }
+
+        public static bool Status() {
+            masterServer.Status();
+            return true;
+        }
     }
 }

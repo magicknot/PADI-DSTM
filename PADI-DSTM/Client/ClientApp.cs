@@ -131,6 +131,7 @@ namespace Client {
 
                     /* client2 multiple read */
                     if(input.Equals("13")) {
+                        Library.Status();
                         //FIXME tem que guardar os uid que o test multiple read do c1 usou
                         //client.testMultipleReadClient2(client.getNextUid(), client.getNextUid(), client.getNextUid());
                     }

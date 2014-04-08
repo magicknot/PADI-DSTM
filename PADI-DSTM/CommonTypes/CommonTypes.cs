@@ -18,6 +18,7 @@ namespace CommonTypes {
         bool writePadInt(int tid, int uid, int value);
         bool commit(int tid, List<int> usedPadInts);
         bool abort(int tid, List<int> usedPadInts);
+        bool Dump();
     }
 
     public interface IMaster {
@@ -25,6 +26,7 @@ namespace CommonTypes {
         int registerServer(String address);
         Tuple<int, string> getPadIntServer(int uid);
         Tuple<int, string> registerPadInt(int uid);
+        bool Status();
     }
 
     public interface ILog {
