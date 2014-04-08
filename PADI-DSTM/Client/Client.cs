@@ -13,10 +13,16 @@ namespace Client {
 
     class Client : MarshalByRefObject {
 
-        private Random random = new Random();
-        private int nextUid = 0;
+        private Random random;
+        private int nextUid;
         /* if true stops the loop */
-        private bool stopLoop = true;
+        private bool stopLoop;
+
+        public Client() {
+            random = new Random();
+            nextUid = 0;
+            stopLoop = true;
+        }
 
         internal int NextUID {
             set { this.nextUid = value; }
@@ -28,11 +34,6 @@ namespace Client {
             set { this.stopLoop = value; }
             get { return stopLoop; }
 
-        }
-
-        public Client() {
-            //random = new Random();
-            //nextUid = random.Next();
         }
 
         public void setStop(bool value) {
