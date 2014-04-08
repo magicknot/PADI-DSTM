@@ -85,7 +85,7 @@ namespace Client {
 
                     /* stops the loop */
                     if(input.Equals("8")) {
-                        client.StopLoop = true;
+                        client.setStopLoop(true);
                         Console.WriteLine("loop is deactivated stopLoop = " + client.StopLoop);
                     }
 

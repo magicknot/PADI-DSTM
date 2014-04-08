@@ -35,11 +35,15 @@ namespace Client {
             //nextUid = random.Next();
         }
 
+        public void setStop(bool value) {
+            this.stopLoop = value;
+        }
+
         public void setStopLoop(bool value) {
             //TcpChannel channel = new TcpChannel();
             //ChannelServices.RegisterChannel(channel, true);
             Client c = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
-            c.StopLoop = value;
+            c.setStop(value);
             Console.WriteLine("client.StopLoop = " + StopLoop);
         }
 

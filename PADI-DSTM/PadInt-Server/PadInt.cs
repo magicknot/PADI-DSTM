@@ -101,7 +101,7 @@ namespace PadIntServer {
                 pendingReaders.Add(tid);
 
                 while(pendingReaders.Contains(tid)) {
-                    Logger.print("espera read...");
+                    Logger.log(new String[] { "espera read... writter: ", writer.ToString() });
                 }
             }
 
@@ -109,6 +109,7 @@ namespace PadIntServer {
              * 
              * VER COMO E HISTORIA DE FICAR PARADO `A ESPERA SE SO´ 
              * RESPONDER DEPOIS DE TER O LOCK. MESMO QUE ISSO SEJA NO
+             * 
              * SERVER TB TEM QUE SER VISTO AQUI DE ALGUMA FORMA
              */
 
@@ -148,7 +149,7 @@ namespace PadIntServer {
                     if(writer != tid) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
-                            Logger.print("espera write 1...");
+                            Logger.log(new String[] { "espera write 1... writer: ", writer.ToString() });
                         }
                     }
                 } else {
@@ -159,7 +160,7 @@ namespace PadIntServer {
                     if(!readers.Contains(tid)) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
-                            Logger.print("espera write 2...");
+                            Logger.log(new String[] { "espera write 2...writer: ", writer.ToString() });
                         }
                     } else {
                         /* if there is only a
