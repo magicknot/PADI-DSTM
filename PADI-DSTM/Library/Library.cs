@@ -112,7 +112,12 @@ namespace ClientLibrary {
 
         public static void registerUID(int serverID, int uid) {
             Logger.log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
-            padIntsList[serverID].PdInts.Add(uid);
+            PadIntRegistry registry = padIntsList.ElementAtOrDefault(serverID);
+            if(registry!=null) {
+                registry.PdInts.Add(uid);
+            } else {
+                throw new WrongPadIntRequestException(uid, actualTID);
+            }
         }
     }
 }

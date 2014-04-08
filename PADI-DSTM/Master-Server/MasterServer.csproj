@@ -7,7 +7,7 @@
     <ProjectGuid>{64D1E66A-1F9B-4EAB-B016-F3533D2C7D55}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Master_Server</RootNamespace>
+    <RootNamespace>MasterServer</RootNamespace>
     <AssemblyName>Master-Server</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

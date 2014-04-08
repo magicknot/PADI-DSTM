@@ -37,23 +37,32 @@ namespace MasterServer {
 
         public Tuple<int, string> getPadIntServer(int uid) {
             Logger.log(new String[] { "Master", " getPadIntServer", "uid", uid.ToString() });
-            if(padIntServers.ContainsKey(uid)) {
+            try {
                 int serverID = padIntServers[uid];
+                verifyServerRegistry(serverID);
                 return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
-            } else {
-                throw new NoServersFoundException();
+            } catch(NoServersFoundException) {
+                throw;
             }
         }
 
         public Tuple<int, string> registerPadInt(int uid) {
             Logger.log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
             try {
-                int serverID = Master_Server.LoadBalancer.getAvailableServer(registeredServers.Count);
+                int serverID = MasterServer.LoadBalancer.getAvailableServer(registeredServers);
                 padIntServers.Add(uid, serverID);
                 registeredServers[serverID].Hits+=1;
                 return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, padIntServers[uid]);
+            } catch(NoServersFoundException) {
+                throw;
+            }
+        }
+
+        private void verifyServerRegistry(int serverID) {
+            if(registeredServers.ElementAtOrDefault(serverID)==null) {
+                throw new NoServersFoundException();
             }
         }
     }
