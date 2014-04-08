@@ -47,12 +47,12 @@ namespace ClientLibrary {
                 Logger.log(new String[] { "Library", "txCommit", "nothing to commit" });
             }
 
-            bool result = false;
+            bool result = true;
             IServer server;
 
             foreach(PadIntRegistry pd in padIntsList) {
                 server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
-                result = result && server.commit(actualTID, pd.PdInts);
+                result = server.commit(actualTID, pd.PdInts) && result;
             }
 
             padIntsList.Clear();
@@ -66,12 +66,12 @@ namespace ClientLibrary {
                 Logger.log(new String[] { "Library", "txAbort", "nothing to abort" });
             }
 
-            bool result = false;
+            bool result = true;
             IServer server;
 
             foreach(PadIntRegistry pd in padIntsList) {
                 server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
-                result = result && server.abort(actualTID, pd.PdInts);
+                result = server.abort(actualTID, pd.PdInts) && result;
             }
 
             padIntsList.Clear();
