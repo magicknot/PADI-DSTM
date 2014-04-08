@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ClientLibrary;
 using CommonTypes;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting;
 
 namespace Client {
 
@@ -18,6 +21,30 @@ namespace Client {
         public Client() {
             //random = new Random();
             //nextUid = random.Next();
+        }
+
+        public static void init() {
+
+            try {
+                TcpChannel channel = new TcpChannel(6085);
+                ChannelServices.RegisterChannel(channel, true);
+                RemotingConfiguration.RegisterWellKnownServiceType(
+                    typeof(Client),
+                    "Client",
+                    WellKnownObjectMode.Singleton);
+            } catch(ServerAlreadyExistsException e) {
+                Console.WriteLine(e.getMessage());
+            }
+            Console.WriteLine("init done");
+        }
+
+        public static void setStopLoop(bool value) {
+            //TcpChannel channel = new TcpChannel();
+            //ChannelServices.RegisterChannel(channel, true);
+            Client client;
+            client = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
+            client.StopLoop = value;
+            Console.WriteLine("client.StopLoop = " + stopLoop);
         }
 
         private static int getNextUid() {
@@ -378,7 +405,8 @@ namespace Client {
                     Console.WriteLine("------------------");
                     Console.WriteLine("Tests with more than one client:");
                     Console.WriteLine(" (you need 3 clients: c1 create the padInts; C2 tries to access them; C3 stops the loop of C1)");
-                    Console.WriteLine("7- YOU MUST DO THIS BEFORE TEST WITH MORE THAN ONE CLIENT (create the loops)");
+                    Console.WriteLine("13- YOU MUST DO THIS in c1 BEFORE TEST WITH MORE THAN ONE CLIENT (init)");
+                    Console.WriteLine("7- YOU MUST DO THIS in c3 BEFORE TEST WITH MORE THAN ONE CLIENT (create the loops)");
                     Console.WriteLine("8- If you want that client1 stops the loop");
                     Console.WriteLine("12- If you want to confirm the value of stopLoop");
                     Console.WriteLine("---------");
@@ -417,7 +445,8 @@ namespace Client {
 
                     /* loop setup */
                     if(input.Equals("7")) {
-                        stopLoop = false;
+                        //stopLoop = false;
+                        setStopLoop(false);
                         Console.WriteLine("loop is activated stopLoop = " + stopLoop);
                     }
 
@@ -445,6 +474,11 @@ namespace Client {
                     /* value of stopLoop */
                     if(input.Equals("12")) {
                         Console.WriteLine("stopLoop = " + stopLoop);
+                    }
+
+                    /* init */
+                    if(input.Equals("13")) {
+                        init();
                     }
                 }
 
