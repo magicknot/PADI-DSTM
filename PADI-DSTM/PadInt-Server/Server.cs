@@ -46,9 +46,8 @@ namespace PadIntServer {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
                 ID = Master.registerServer("tcp://localhost:" + (8000 + port) + "/PadIntServer");
-            } catch(ServerAlreadyExistsException e) {
-                Console.WriteLine(e.getMessage());
-                return false;
+            } catch(ServerAlreadyExistsException) {
+                throw;
             }
             return true;
         }

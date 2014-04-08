@@ -100,8 +100,9 @@ namespace PadIntServer {
             } else {
                 pendingReaders.Add(tid);
 
-                while(pendingReaders.Contains(tid))
-                    Console.WriteLine("espera read...");
+                while(pendingReaders.Contains(tid)) {
+                    Logger.print("espera read...");
+                }
             }
 
             /* TODO !!!!!
@@ -146,8 +147,9 @@ namespace PadIntServer {
                      *  identified by tid */
                     if(writer != tid) {
                         pendingWriters.Add(tid);
-                        while(pendingWriters.Contains(tid))
-                            Console.WriteLine("espera write 1...");
+                        while(pendingWriters.Contains(tid)) {
+                            Logger.print("espera write 1...");
+                        }
                     }
                 } else {
                     /* if the locks are read locks */
@@ -156,8 +158,9 @@ namespace PadIntServer {
                      *  does not have a read lock */
                     if(!readers.Contains(tid)) {
                         pendingWriters.Add(tid);
-                        while(pendingWriters.Contains(tid))
-                            Console.WriteLine("espera write 2...");
+                        while(pendingWriters.Contains(tid)) {
+                            Logger.print("espera write 2...");
+                        }
                     } else {
                         /* if there is only a
                          *  reader (transaction identified by tid) */

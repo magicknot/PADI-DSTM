@@ -22,9 +22,12 @@ namespace PadIntServer {
             TcpChannel channel = new TcpChannel(8000 + randomNumber);
             ChannelServices.RegisterChannel(channel, true);
 
-            if(padIntServer.init(randomNumber)) {
+            try {
+                padIntServer.init(randomNumber);
                 RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
                 Console.WriteLine("Server up and running on port " + (8000 + randomNumber));
+            } catch(ServerAlreadyExistsException e) {
+                Console.WriteLine(e.getMessage());
             }
 
             while(true)
