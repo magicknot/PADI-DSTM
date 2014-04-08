@@ -59,9 +59,9 @@ namespace Client {
 
                 /* to test with more than one client */
                 while(!stopLoop) {
-                    Console.WriteLine("loop");
+                    Console.WriteLine("loop stopLoop = " + stopLoop);
                 }
-                
+
                 Library.txCommit();
                 Console.WriteLine("txCommit Done");
 
@@ -380,6 +380,7 @@ namespace Client {
                     Console.WriteLine(" (you need 3 clients: c1 create the padInts; C2 tries to access them; C3 stops the loop of C1)");
                     Console.WriteLine("7- YOU MUST DO THIS BEFORE TEST WITH MORE THAN ONE CLIENT (create the loops)");
                     Console.WriteLine("8- If you want that client1 stops the loop");
+                    Console.WriteLine("12- If you want to confirm the value of stopLoop");
                     Console.WriteLine("---------");
                     Console.WriteLine("2- If you want that client1 do a simple read");
                     Console.WriteLine("3- If you want that client1 do a simple write");
@@ -417,13 +418,13 @@ namespace Client {
                     /* loop setup */
                     if(input.Equals("7")) {
                         stopLoop = false;
-                        Console.WriteLine("loop is activated");
+                        Console.WriteLine("loop is activated stopLoop = " + stopLoop);
                     }
 
                     /* stops the loop */
                     if(input.Equals("8")) {
                         stopLoop = true;
-                        Console.WriteLine("loop is deactivated");
+                        Console.WriteLine("loop is deactivated stopLoop = " + stopLoop);
                     }
 
                     /* client2 simple read */
@@ -439,6 +440,11 @@ namespace Client {
                     /* client2 multiple read */
                     if(input.Equals("11")) {
                         testMultipleReadClient2(getNextUid(), getNextUid(), getNextUid());
+                    }
+
+                    /* value of stopLoop */
+                    if(input.Equals("12")) {
+                        Console.WriteLine("stopLoop = " + stopLoop);
                     }
                 }
 
