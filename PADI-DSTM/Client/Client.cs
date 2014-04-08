@@ -32,7 +32,7 @@ namespace Client {
                 Console.WriteLine("number = " + getNextUid());
         }
 
-        public static void testSimpleRead() {
+        public static void testSimpleRead(int uid0) {
 
             Console.WriteLine("------Test: Simple read ------");
 
@@ -46,8 +46,8 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt0 created with uid: " + nextUid);
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 Console.WriteLine("padInt0 read: " + padInt0.read());
 
@@ -62,7 +62,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleWrite() {
+        public static void testSimpleWrite(int uid0) {
 
             Console.WriteLine("------Test: Simple write ------");
 
@@ -75,8 +75,8 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt0 created with uid: " + nextUid);
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.write(20)) {
                     Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
@@ -93,7 +93,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleAbort() {
+        public static void testSimpleAbort(int uid0) {
 
             Console.WriteLine("------Test: Simple Abort ------");
 
@@ -106,8 +106,8 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt0 created with uid: " + nextUid);
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.write(20)) {
                     Console.WriteLine("padInt0 write done with value (20) : " + padInt0.read());
@@ -122,8 +122,11 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
+                PadIntStub padInt0A = Library.accessPadInt(uid0);
+
                 /* the padInt's value must be equal to initialization value */
-                int value = padInt0.read();
+                int value = padInt0A.read();
+
                 if(value == 0) {
                     Console.WriteLine("it's OK");
                 } else {
@@ -140,7 +143,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testSimpleCommit() {
+        public static void testSimpleCommit(int uid0) {
 
             Console.WriteLine("------Test: Simple Commit ------");
 
@@ -153,8 +156,8 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt0 created with uid: " + nextUid);
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.write(21)) {
                     Console.WriteLine("padInt0 write done with value (21) : " + padInt0.read());
@@ -170,7 +173,9 @@ namespace Client {
                 Console.WriteLine("txBegin Done");
 
                 /* the padInt's value must be equal to initialization value */
-                if(padInt0.read() == 21) {
+                PadIntStub padInt0A = Library.accessPadInt(uid0);
+
+                if(padInt0A.read() == 21) {
                     Console.WriteLine("it's OK");
                 } else {
                     Console.WriteLine("BUG!!!!!: commit was not successful...");
@@ -187,7 +192,7 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
-        public static void testMultipleRead() {
+        public static void testMultipleRead(int uid0, int uid1, int uid2) {
 
             Console.WriteLine("------Test: Multiple read ------");
 
@@ -200,12 +205,12 @@ namespace Client {
                 Library.txBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt0 created with uid: " + nextUid);
-                PadIntStub padInt1 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt1 created with uid: " + nextUid);
-                PadIntStub padInt2 = Library.createPadInt(getNextUid());
-                Console.WriteLine("padInt2 created with uid: " + nextUid);
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+                PadIntStub padInt1 = Library.createPadInt(uid1);
+                Console.WriteLine("padInt1 created with uid: " + uid1);
+                PadIntStub padInt2 = Library.createPadInt(uid2);
+                Console.WriteLine("padInt2 created with uid: " + uid2);
 
                 bool result = padInt0.read() == 0;
                 result = (padInt0.read() == padInt1.read());
@@ -254,23 +259,23 @@ namespace Client {
                     }
 
                     if(input.Equals("2")) {
-                        testSimpleRead();
+                        testSimpleRead(getNextUid());
                     }
 
                     if(input.Equals("3")) {
-                        testSimpleWrite();
+                        testSimpleWrite(getNextUid());
                     }
 
                     if(input.Equals("4")) {
-                        testSimpleAbort();
+                        testSimpleAbort(getNextUid());
                     }
 
                     if(input.Equals("5")) {
-                        testSimpleCommit();
+                        testSimpleCommit(getNextUid());
                     }
 
                     if(input.Equals("6")) {
-                        testMultipleRead();
+                        testMultipleRead(getNextUid(), getNextUid(), getNextUid());
                     }
                 }
 
