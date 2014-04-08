@@ -28,6 +28,7 @@ namespace Client {
                     Console.WriteLine("----------------------HELP-------------------------");
                     Console.WriteLine("Please, insert the number of the test that you want to run:");
                     Console.WriteLine("Tests with just one client");
+                    Console.WriteLine("0- Sample App");
                     Console.WriteLine("1- testRandom");
                     Console.WriteLine("Tests with one client:");
                     Console.WriteLine("2- Base: testSimpleRead");
@@ -49,9 +50,16 @@ namespace Client {
                     Console.WriteLine("11- If you want that client2 do a simple read");
                     Console.WriteLine("12- If you want that client2 do a simple write");
                     // Console.WriteLine("13- If you want that client2 do a multiple read");
+
+
                     Console.WriteLine(">");
 
                     input = Console.ReadLine();
+
+                    /* sample app */
+                    if(input.Equals("0")) {
+                        client.testSampleApp();
+                    }
 
                     if(input.Equals("1")) {
                         client.testRandom();

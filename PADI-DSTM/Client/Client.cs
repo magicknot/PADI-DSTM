@@ -293,6 +293,30 @@ namespace Client {
             Console.WriteLine("------------");
         }
 
+        public void testSampleApp() {
+            bool res;
+            res = Library.txBegin();
+            PadIntStub pi_a = Library.createPadInt(0);
+            PadIntStub pi_b = Library.createPadInt(1);
+            res = Library.txCommit();
+
+            res = Library.txBegin();
+            pi_a = Library.accessPadInt(0);
+            pi_b = Library.accessPadInt(1);
+            pi_a.write(36);
+            pi_b.write(37);
+            Console.WriteLine("a = " + pi_a.read());
+            Console.WriteLine("b = " + pi_b.read());
+            //Library.status();
+
+            // The following 3 lines assume we have 2 servers: one at port 2001 and another at port 2002
+            /*res = PadiDstm.Freeze("tcp://localhost:2001/Server");
+            res = PadiDstm.Recover("tcp://localhost:2001/Server");
+            res = PadiDstm.Fail("tcp://localhost:2002/Server");*/
+
+            res = Library.txCommit();
+        }
+
         //-----------------------------------------------------
         //client 2
         public void testSimpleReadClient2(int uid0) {
