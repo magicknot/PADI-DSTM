@@ -89,6 +89,8 @@ namespace PadIntServer {
          * Returns true if successful */
         internal bool getReadLock(int tid) {
 
+            Logger.log(new String[] { "PadInt", "getReadLock" });
+
             /* ve se não há algum escritor 
              *  se nao existir mete nos leitores
                se existir escritor mete na fila de espera dos leitores
@@ -129,6 +131,8 @@ namespace PadIntServer {
          * 
          * Returns true if successful */
         internal bool getWriteLock(int tid) {
+
+            Logger.log(new String[] { "PadInt", "getWriteLock" });
 
             /* TODO
              * 
@@ -191,6 +195,8 @@ namespace PadIntServer {
         *
         * Returns true if successful */
         internal bool freeReadLock(int tid) {
+            Logger.log(new String[] { "PadInt", "freeReadLock" });
+
             if(readers.Remove(tid)) {
                 dequeueReadLock();
                 return true;
@@ -204,6 +210,8 @@ namespace PadIntServer {
         *
         * Returns true if successful */
         internal bool freeWriteLock(int tid) {
+            Logger.log(new String[] { "PadInt", "freeWriteLock" });
+
             /* "frees" writer variable */
             if(writer != INITIALIZATION) {
                 writer = INITIALIZATION;
@@ -221,6 +229,8 @@ namespace PadIntServer {
          *  the first one.
          */
         internal void dequeueReadLock() {
+            Logger.log(new String[] { "PadInt", "dequeueReadLock" });
+
             int temp = INITIALIZATION;
 
             if(readers.Count == 0) {
@@ -248,6 +258,8 @@ namespace PadIntServer {
          *  first one.
          */
         internal void dequeueWriteLock() {
+            Logger.log(new String[] { "PadInt", "dequeueWriteLock" });
+
             int temp = INITIALIZATION;
 
             if(promotion != INITIALIZATION) {
@@ -282,6 +294,7 @@ namespace PadIntServer {
          * Returns true if successful.
          */
         internal bool commit(int tid) {
+            Logger.log(new String[] { "PadInt", "commit" });
 
             bool commitSuccessful = true;
 
@@ -322,6 +335,7 @@ namespace PadIntServer {
          * Returns true if successful.
          */
         internal bool abort(int tid) {
+            Logger.log(new String[] { "PadInt", "abort" });
 
             pendingReaders.Remove(tid);
             pendingWriters.Remove(tid);
