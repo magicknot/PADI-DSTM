@@ -48,6 +48,17 @@ namespace Client {
             Console.WriteLine("client.StopLoop = " + StopLoop);
         }
 
+        public int lastUid() {
+            return nextUid;
+        }
+
+        public int getLastUid() {
+            //TcpChannel channel = new TcpChannel();
+            //ChannelServices.RegisterChannel(channel, true);
+            Client c = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
+            return c.lastUid();
+        }
+
         public int getNextUid() {
             /* first arg of Next its the minimum and the second arg is the maximum */
             nextUid = random.Next(0, 100);

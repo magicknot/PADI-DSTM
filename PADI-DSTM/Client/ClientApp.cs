@@ -48,7 +48,8 @@ namespace Client {
                     Console.WriteLine("6- If you want that client1 do multiple read");
                     Console.WriteLine("11- If you want that client2 do a simple read");
                     Console.WriteLine("12- If you want that client2 do a simple write");
-                    Console.WriteLine("13- If you want that client2 do a multiple read");
+                    // Console.WriteLine("13- If you want that client2 do a multiple read");
+                    Console.WriteLine(">");
 
                     input = Console.ReadLine();
 
@@ -112,17 +113,18 @@ namespace Client {
 
                     /* client2 simple read */
                     if(input.Equals("11")) {
-                        client.testSimpleReadClient2(client.getNextUid());
+                        client.testSimpleReadClient2(client.getLastUid());
                     }
 
                     /* client2 simple write */
                     if(input.Equals("12")) {
-                        client.testSimpleWriteClient2(client.getNextUid());
+                        client.testSimpleWriteClient2(client.getLastUid());
                     }
 
                     /* client2 multiple read */
                     if(input.Equals("13")) {
-                        client.testMultipleReadClient2(client.getNextUid(), client.getNextUid(), client.getNextUid());
+                        //FIXME tem que guardar os uid que o test multiple read do c1 usou
+                        //client.testMultipleReadClient2(client.getNextUid(), client.getNextUid(), client.getNextUid());
                     }
                 }
 
