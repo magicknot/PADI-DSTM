@@ -52,6 +52,7 @@ namespace Client {
         public void testRandom() {
 
             Console.WriteLine("------Test random ------");
+            Logger.log(new String[] { "Client", "------Test random ------" });
 
             for(int i = 0; i < 20; i++)
                 Console.WriteLine("number = " + getNextUid());
@@ -59,7 +60,8 @@ namespace Client {
 
         public void testSimpleRead(int uid0) {
 
-            Console.WriteLine("------Test: Simple read ------");
+            Console.WriteLine("------ Test: Simple read ------");
+            Logger.log(new String[] { "Client", "------ Test: Simple read ------" });
 
             Library library = new Library();
 
@@ -94,7 +96,8 @@ namespace Client {
 
         public void testSimpleWrite(int uid0) {
 
-            Console.WriteLine("------Test: Simple write ------");
+            Console.WriteLine("------ Test: Simple write ------");
+            Logger.log(new String[] { "Client", "------ Test: Simple write ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
@@ -129,7 +132,8 @@ namespace Client {
 
         public void testSimpleAbort(int uid0) {
 
-            Console.WriteLine("------Test: Simple Abort ------");
+            Console.WriteLine("------ Test: Simple Abort ------");
+            Logger.log(new String[] { "Client", "------ Test: Simple Abort ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
@@ -179,7 +183,8 @@ namespace Client {
 
         public void testSimpleCommit(int uid0) {
 
-            Console.WriteLine("------Test: Simple Commit ------");
+            Console.WriteLine("------ Test: Simple Commit ------");
+            Logger.log(new String[] { "Client", "------ Test: Simple Commit ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
@@ -228,7 +233,8 @@ namespace Client {
 
         public void testMultipleRead(int uid0, int uid1, int uid2) {
 
-            Console.WriteLine("------Test: Multiple read ------");
+            Console.WriteLine("------ Test: Multiple read ------");
+            Logger.log(new String[] { "Client", "------ Test: Multiple read ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
@@ -275,7 +281,8 @@ namespace Client {
         //client 2
         public void testSimpleReadClient2(int uid0) {
 
-            Console.WriteLine("------Test: client2 Simple read ------");
+            Console.WriteLine("------ Test: client2 Simple read ------");
+            Logger.log(new String[] { "Client", "------ Test: client2 Simple read ------" });
 
             Library library = new Library();
 
@@ -305,7 +312,8 @@ namespace Client {
 
         public void testSimpleWriteClient2(int uid0) {
 
-            Console.WriteLine("------Test: client2 Simple write ------");
+            Console.WriteLine("------ Test: client2 Simple write ------");
+            Logger.log(new String[] { "Client", "------ Test: client2 Simple write ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
@@ -336,7 +344,8 @@ namespace Client {
 
         public void testMultipleReadClient2(int uid0, int uid1, int uid2) {
 
-            Console.WriteLine("------Test: Client2 Multiple read ------");
+            Console.WriteLine("------ Test: Client2 Multiple read ------");
+            Logger.log(new String[] { "Client", "------ Test: Client2 Multiple read ------" });
 
             Library library = new Library();
             Console.WriteLine("library created");
