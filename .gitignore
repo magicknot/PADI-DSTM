@@ -107,6 +107,10 @@ _UpgradeReport_Files/
 Backup*/
 UpgradeLog*.XM
 
+# Xamarim
+*.userprefs
+
+
 # LaTeX
 *.aux
 *.synctex.gz
