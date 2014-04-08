@@ -68,16 +68,18 @@ namespace Client {
         public void testRandom() {
 
             Console.WriteLine("------Test random ------");
-            Logger.log(new String[] { "Client", "------Test random ------" });
+            Logger.log(new String[] { "Client", "------Test random begin------" });
 
             for(int i = 0; i < 20; i++)
                 Console.WriteLine("number = " + getNextUid());
+
+            Logger.log(new String[] { "-------------Test random end------------------" });
         }
 
         public void testSimpleRead(int uid0) {
 
             Console.WriteLine("------ Test: Simple read ------");
-            Logger.log(new String[] { "Client", "------ Test: Simple read ------" });
+            Logger.log(new String[] { "Client", "------ Test: Simple read begin ------" });
 
             Library library = new Library();
 
@@ -108,6 +110,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Simple read end----------" });
         }
 
         public void testSimpleWrite(int uid0) {
@@ -144,6 +147,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Simple write end----------" });
         }
 
         public void testSimpleAbort(int uid0) {
@@ -195,6 +199,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Simple abort end----------" });
         }
 
         public void testSimpleCommit(int uid0) {
@@ -245,6 +250,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Simple commit end----------" });
         }
 
         public void testMultipleRead(int uid0, int uid1, int uid2) {
@@ -291,9 +297,13 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------multiple read end----------" });
         }
 
         public void testSampleApp() {
+            Console.WriteLine("------ Test: Sample App ------");
+            Logger.log(new String[] { "Client", "------ Test: Sample App ------" });
+
             bool res;
             res = Library.txBegin();
             PadIntStub pi_a = Library.createPadInt(0);
@@ -315,6 +325,7 @@ namespace Client {
             res = PadiDstm.Fail("tcp://localhost:2002/Server");*/
 
             res = Library.txCommit();
+            Logger.log(new String[] { "---------Sample App end----------" });
         }
 
         //-----------------------------------------------------
@@ -348,6 +359,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Client2 Simple read end----------" });
         }
 
         public void testSimpleWriteClient2(int uid0) {
@@ -380,6 +392,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Client2 Simple write end----------" });
         }
 
         public void testMultipleReadClient2(int uid0, int uid1, int uid2) {
@@ -422,6 +435,7 @@ namespace Client {
             }
 
             Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Client2 Multiple read end----------" });
         }
 
     }
