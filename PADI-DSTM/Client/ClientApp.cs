@@ -79,7 +79,7 @@ namespace Client {
                     /* loop setup */
                     if(input.Equals("7")) {
                         //stopLoop = false;
-                        client.StopLoop =false;
+                        client.setStopLoop(false);
                         Console.WriteLine("loop is activated stopLoop = " + client.StopLoop);
                     }
 
@@ -113,7 +113,7 @@ namespace Client {
                     if(input.Equals("13")) {
 
                         try {
-                            channel= new TcpChannel(6085);
+                            channel = new TcpChannel(6085);
                             ChannelServices.UnregisterChannel(Library.Channel);
                             ChannelServices.RegisterChannel(channel, true);
                             RemotingServices.Marshal(client, "Client",
@@ -129,8 +129,6 @@ namespace Client {
             } else {
                 Logger.log(new String[] { "There are no servers available" });
             }
-
         }
-
     }
 }
