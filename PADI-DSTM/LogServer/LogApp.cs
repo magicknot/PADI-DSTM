@@ -14,7 +14,7 @@ namespace LogServer {
             Console.Title = "Log";
 
             TcpChannel channel = new TcpChannel(7002);
-            ChannelServices.RegisterChannel(channel, true);
+            ChannelServices.RegisterChannel(channel, false);
             Log logServer = new Log();
 
             RemotingServices.Marshal(logServer, "LogServer", typeof(Log));

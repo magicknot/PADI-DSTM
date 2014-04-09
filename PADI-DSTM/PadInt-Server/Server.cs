@@ -18,13 +18,13 @@ namespace PadIntServer {
         //private List<Request> requestList = new List<Request>();
 
         /* Structure that maps UID to PadInt */
-        private Dictionary<int, IPadInt> padIntDictionary;
+        private Dictionary<int, PadInt> padIntDictionary;
         private int identifier;
         IMaster masterServerReference;
 
 
         public Server() {
-            PdInts = new Dictionary<int, IPadInt>();
+            PdInts = new Dictionary<int, PadInt>();
         }
 
         internal int ID {
@@ -37,7 +37,7 @@ namespace PadIntServer {
             get { return masterServerReference; }
         }
 
-        internal Dictionary<int, IPadInt> PdInts {
+        internal Dictionary<int, PadInt> PdInts {
             set { this.padIntDictionary = value; }
             get { return this.padIntDictionary; }
         }
@@ -83,7 +83,7 @@ namespace PadIntServer {
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = (PadInt) getPadInt(uid);
+                PadInt padInt = getPadInt(uid);
 
                 while(true) {
                     if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
@@ -101,7 +101,7 @@ namespace PadIntServer {
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = (PadInt) getPadInt(uid);
+                PadInt padInt = getPadInt(uid);
 
                 while(true) {
                     if(padInt.getWriteLock(tid)) {
@@ -132,7 +132,7 @@ namespace PadIntServer {
                 verifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = (PadInt) getPadInt(padIntUid);
+                    PadInt padInt = getPadInt(padIntUid);
                     resultCommit = padInt.commit(tid) && resultCommit;
                 }
 
@@ -159,7 +159,7 @@ namespace PadIntServer {
                 verifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = (PadInt) getPadInt(padIntUid);
+                    PadInt padInt = getPadInt(padIntUid);
                     resultAbort = padInt.abort(tid) && resultAbort;
                 }
             } catch(PadIntNotFoundException) {
@@ -179,7 +179,7 @@ namespace PadIntServer {
             }
         }
 
-        private IPadInt getPadInt(int uid) {
+        private PadInt getPadInt(int uid) {
             if(PdInts.ContainsKey(uid)) {
                 return PdInts[uid];
             } else {
@@ -191,8 +191,8 @@ namespace PadIntServer {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");
-            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
+            foreach(KeyValuePair<int, PadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " +  pd.Value.ActualValue);
             }
             Console.WriteLine("-----------------------");
             return true;

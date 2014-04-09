@@ -7,7 +7,7 @@ using CommonTypes;
 
 namespace PadIntServer {
     [Serializable]
-    class PadInt : IPadInt {
+    class PadInt {
 
         /* constante used in the initialization of int variables */
         private const int INITIALIZATION = -1;

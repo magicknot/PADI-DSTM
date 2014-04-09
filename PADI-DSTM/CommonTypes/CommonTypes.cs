@@ -8,9 +8,6 @@ namespace CommonTypes {
     public interface IClient {
     }
 
-    public interface IPadInt {
-    }
-
     public interface IServer {
         bool createPadInt(int uid);
         bool confirmPadInt(int uid);
