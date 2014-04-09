@@ -20,7 +20,7 @@ namespace PadIntServer {
 
             Server padIntServer = new Server();
             TcpChannel channel = new TcpChannel(8000 + randomNumber);
-            ChannelServices.RegisterChannel(channel, true);
+            ChannelServices.RegisterChannel(channel, false);
 
             if(padIntServer.init(randomNumber)) {
                 RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));

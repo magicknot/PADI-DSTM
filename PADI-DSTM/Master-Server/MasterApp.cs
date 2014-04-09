@@ -18,7 +18,7 @@ namespace MasterServer {
             Console.Title = "Master";
 
             TcpChannel channel = new TcpChannel(MASTERADDRESS);
-            ChannelServices.RegisterChannel(channel, true);
+            ChannelServices.RegisterChannel(channel, false);
             Master masterServer = new Master();
             RemotingServices.Marshal(masterServer, "MasterServer", typeof(Master));
 

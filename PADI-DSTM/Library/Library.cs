@@ -27,7 +27,7 @@ namespace ClientLibrary {
         public static bool init() {
             padIntsList = new List<PadIntRegistry>();
             channel = new TcpChannel();
-            ChannelServices.RegisterChannel(channel, true);
+            ChannelServices.RegisterChannel(channel, false);
             Logger.log(new String[] { "Library", "init", "\r\n" });
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
