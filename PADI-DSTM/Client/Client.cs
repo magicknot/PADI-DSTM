@@ -328,6 +328,54 @@ namespace Client {
             Logger.log(new String[] { "---------Sample App end----------" });
         }
 
+        public void testReadWrite(int uid0) {
+
+            Console.WriteLine("------ Test: Read write ------");
+            Logger.log(new String[] { "Client", "------ Test: Read write ------" });
+
+            Library library = new Library();
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.txBegin();
+                Console.WriteLine("txBegin Done");
+
+                PadIntStub padInt0 = Library.createPadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+
+                //read
+                Console.WriteLine("padInt0 read: " + padInt0.read());
+
+                //Library.txCommit();
+                //Console.WriteLine("txCommit Done");
+
+                // write
+                Console.WriteLine("now I will do a write...");
+
+                Library.txBegin();
+                Console.WriteLine("txBegin Done");
+
+                /* the padInt's value must be equal to initialization value */
+                PadIntStub padInt0A = Library.accessPadInt(uid0);
+
+                if(padInt0.write(211)) {
+                    Console.WriteLine("padInt0 write done with value (211) : " + padInt0.read());
+                }
+
+                Library.txCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.log(new String[] { "---------Read write end----------" });
+        }
+
         //-----------------------------------------------------
         //client 2
         public void testSimpleReadClient2(int uid0) {
