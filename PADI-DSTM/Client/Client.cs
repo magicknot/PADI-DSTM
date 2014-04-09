@@ -317,7 +317,7 @@ namespace Client {
             pi_b.write(37);
             Console.WriteLine("a = " + pi_a.read());
             Console.WriteLine("b = " + pi_b.read());
-            //Library.status();
+            Library.Status();
 
             // The following 3 lines assume we have 2 servers: one at port 2001 and another at port 2002
             /*res = PadiDstm.Freeze("tcp://localhost:2001/Server");
