@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CommonTypes {
-    public interface IClient {
-    }
-
+ 
+    /// <summary>
+    /// Remote PadInt server interface
+    /// </summary>
     public interface IServer {
         bool createPadInt(int uid);
         bool confirmPadInt(int uid);
@@ -18,6 +19,9 @@ namespace CommonTypes {
         bool Dump();
     }
 
+    /// <summary>
+    /// Remote Master server interface
+    /// </summary>
     public interface IMaster {
         int getNextTID();
         int registerServer(String address);
@@ -26,10 +30,16 @@ namespace CommonTypes {
         bool Status();
     }
 
+    /// <summary>
+    /// Remote Log server interface
+    /// </summary>
     public interface ILog {
         void log(String[] logs);
     }
 
+    /// <summary>
+    /// Remote PadInt Exception interface
+    /// </summary>
     [Serializable]
     public abstract class IPadiException : System.Exception {
         public abstract string getMessage();
@@ -47,11 +57,28 @@ namespace CommonTypes {
         }
     }
 
+    /// <summary>
+    /// Logger class which redirects log messages to LogServer
+    /// </summary>
     public static class Logger {
+
+        /// <summary>
+        /// The log message
+        /// </summary>
         private static string message = DateTime.Now + " ";
+        /// <summary>
+        /// Predicate that defines if debug mode is one
+        /// </summary>
         private static bool debugOn = true;
+        /// <summary>
+        /// Predicate that defines where the log messages are printed
+        /// </summary>
         private static bool isLocal = false;
 
+        /// <summary>
+        /// Redirects the log message according to predicates
+        /// </summary>
+        /// <param name="args">The log message arguments</param>
         public static void log(String[] args) {
             if(debugOn) {
                 if(isLocal) {
@@ -63,12 +90,6 @@ namespace CommonTypes {
                     ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
                     logServer.log(args);
                 }
-            }
-        }
-
-        public static void print(String s) {
-            if(debugOn) {
-                Console.WriteLine(s);
             }
         }
     }

@@ -14,16 +14,23 @@ using System.Runtime.Serialization;
 namespace ClientLibrary {
 
     public class Library {
-
+        /*Master Server reference*/
         private static IMaster masterServer;
+        /*Identifier of the current transaction*/
         private static int actualTID;
+        /*List of PadInts stored on each server*/
         private static List<PadIntRegistry> padIntsList;
+        /*Tcp Channel in use*/
         private static TcpChannel channel;
 
         public static TcpChannel Channel {
             get { return channel; }
         }
 
+        /// <summary>
+        /// Creates Tcp channel, and gets a reference to master server
+        /// </summary>
+        /// <returns> a predicate confirming the sucess of the operations</returns>
         public static bool init() {
             padIntsList = new List<PadIntRegistry>();
             channel = new TcpChannel();
@@ -33,6 +40,10 @@ namespace ClientLibrary {
             return true;
         }
 
+        /// <summary>
+        /// Starts a new transactions by requesting master server of a new TID
+        /// </summary>
+        /// <returns>a predicate confirming the sucess of the operations</returns>
         public static bool txBegin() {
             Logger.log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.getNextTID();
@@ -40,6 +51,10 @@ namespace ClientLibrary {
             return true;
         }
 
+        /// <summary>
+        /// Commits a transaction on every involved server
+        /// </summary>
+        /// <returns>A predicate confirming the sucess of the operations</returns>
         public static bool txCommit() {
             Logger.log(new String[] { "Library", "txCommit" });
 
@@ -59,6 +74,10 @@ namespace ClientLibrary {
             return result;
         }
 
+        /// <summary>
+        /// Aborts a transaction on every involved server
+        /// </summary>
+        /// <returns>a predicate confirming the sucess of the operations</returns>
         public static bool txAbort() {
             Logger.log(new String[] { "Library", "txAbort" });
 
@@ -79,7 +98,11 @@ namespace ClientLibrary {
         }
 
 
-
+        /// <summary>
+        /// Requests the creation of a PadInt on a remote server
+        /// </summary>
+        /// <param name="uid"> PadInt identifier</param>
+        /// <returns>A stub of created padInt</returns>
         public static PadIntStub createPadInt(int uid) {
             Logger.log(new String[] { "Library", "createPadInt", uid.ToString() });
 
@@ -96,6 +119,11 @@ namespace ClientLibrary {
             }
         }
 
+        /// <summary>
+        /// Requests a PadInt on a remote server
+        /// </summary>
+        /// <param name="uid">PadInt identifier</param>
+        /// <returns>A stub of request padInt</returns>
         public static PadIntStub accessPadInt(int uid) {
             Logger.log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
@@ -114,6 +142,11 @@ namespace ClientLibrary {
             }
         }
 
+        /// <summary>
+        /// Associates an uid, to a server and a transaction, so it is later involved in commit or abort
+        /// </summary>
+        /// <param name="serverID">Server identifier</param>
+        /// <param name="uid">PadInt identifier</</param>
         public static void registerUID(int serverID, int uid) {
             Logger.log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
             PadIntRegistry registry = padIntsList.ElementAtOrDefault(serverID);
@@ -124,6 +157,10 @@ namespace ClientLibrary {
             }
         }
 
+        /// <summary>
+        /// A request is send to Master server, asking for all nodes to be dumped.
+        /// </summary>
+        /// <returns>A predicate confirming the sucess of the operations</returns>
         public static bool Status() {
             masterServer.Status();
             return true;

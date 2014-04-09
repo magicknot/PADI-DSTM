@@ -11,7 +11,9 @@ using System.Collections;
 
 
 namespace PadIntServer {
-
+    /// <summary>
+    /// This class represents the PadInt server
+    /// </summary>
     class Server : MarshalByRefObject, IServer {
 
         /* Pending request list */
@@ -115,7 +117,12 @@ namespace PadIntServer {
             }
         }
 
-        /* usedPadInts sao os uid usados pela transacao tid */
+        /// <summary>
+        /// Commits a transaction on this server
+        /// </summary>
+        /// <param name="tid">transaction identifier</param>
+        /// <param name="usedPadInts">Identifiers of PadInts involved</param>
+        /// <returns>A predicate confirming the sucess of the operations</returns>
         public bool commit(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "Server", ID.ToString(), "commit", "tid", tid.ToString() });
             /* TODO !!!!!
@@ -142,7 +149,12 @@ namespace PadIntServer {
             return resultCommit;
         }
 
-        /* usedPadInts sao os uid usados pela transacao tid */
+        /// <summary>
+        /// Aborts a transaction on this server
+        /// </summary>
+        /// <param name="tid">transaction identifier</param>
+        /// <param name="usedPadInts">Identifiers of PadInts involved</param>
+        /// <returns>A predicate confirming the sucess of the operations</returns>
         public bool abort(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "Server", ID.ToString(), "abort", "tid", tid.ToString() });
             /* TODO !!!!!

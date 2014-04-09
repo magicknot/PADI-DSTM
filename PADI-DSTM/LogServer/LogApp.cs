@@ -8,6 +8,9 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
 namespace LogServer {
+    /// <summary>
+    /// Log server Application
+    /// </summary>
     class LogApp {
         static void Main(string[] args) {
 

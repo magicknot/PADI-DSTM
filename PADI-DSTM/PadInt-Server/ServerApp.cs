@@ -9,6 +9,9 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
 namespace PadIntServer {
+    /// <summary>
+    /// This class represents the PadInt server application
+    /// </summary>
     class ServerApp {
         private const int MASTERADDRESS = 8001;
 

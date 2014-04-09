@@ -9,8 +9,10 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
 namespace MasterServer {
+    /// <summary>
+    /// This class represents the master server application
+    /// </summary>
     class MasterApp {
-
         private const int MASTERADDRESS = 8086;
 
         static void Main(string[] args) {

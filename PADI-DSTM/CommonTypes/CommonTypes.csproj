@@ -46,7 +46,6 @@
     <Compile Include="Exceptions\PadIntAlreadyExistsException.cs" />
     <Compile Include="Exceptions\PadIntNotFoundException.cs" />
     <Compile Include="Exceptions\WrongPadIntRequestException.cs" />
-    <Compile Include="Exceptions\WrongServerRequestException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

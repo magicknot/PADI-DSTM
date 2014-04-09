@@ -52,7 +52,7 @@ namespace Client {
                     // Console.WriteLine("13- If you want that client2 do a multiple read");
 
 
-                    Console.WriteLine(">");
+                    Console.Write(">");
 
                     input = Console.ReadLine();
 
