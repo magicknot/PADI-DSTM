@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CommonTypes {
- 
+
     /// <summary>
     /// Remote PadInt server interface
     /// </summary>
@@ -73,13 +73,14 @@ namespace CommonTypes {
         /// <summary>
         /// Predicate that defines where the log messages are printed
         /// </summary>
-        private static bool isLocal = false;
+        private static bool isLocal = true;
 
         /// <summary>
         /// Redirects the log message according to predicates
         /// </summary>
         /// <param name="args">The log message arguments</param>
         public static void log(String[] args) {
+            message = "";
             if(debugOn) {
                 if(isLocal) {
                     foreach(String s in args) {
