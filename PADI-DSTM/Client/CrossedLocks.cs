@@ -3,7 +3,7 @@
 using ClientLibrary;
 
 class CrossedLocks {
-    static void Main(string[] args) {
+    /*static void Main(string[] args) {
         bool res;
         PadIntStub pi_a, pi_b;
         Library.init();
@@ -75,5 +75,5 @@ class CrossedLocks {
         Console.WriteLine("commit = " + res + " . Press enter for exit.");
         Console.WriteLine("####################################################################");
         Console.ReadLine();
-    }
+    }*/
 }
