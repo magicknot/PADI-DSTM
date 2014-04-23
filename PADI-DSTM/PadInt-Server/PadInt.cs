@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommonTypes;
+using System.Timers;
 
 namespace PadIntServer {
     [Serializable]
@@ -22,7 +23,7 @@ namespace PadIntServer {
         private int originalValue;
 
         /* Timer used in deadlock detection */
-        //timer...
+        private System.Timers.Timer deadLockTimer;
 
         /* uid of the next transaction to be promoted.
          *
@@ -53,7 +54,11 @@ namespace PadIntServer {
             this.uid = uid;
             this.actualValue = 0;
             this.originalValue = 0;
-            //this.timer = ...
+
+            // Create a timer with a ten second interval.
+            deadLockTimer = new System.Timers.Timer(10000);
+            deadLockTimer.Elapsed += new ElapsedEventHandler(DeadLockEvent);
+
             this.promotion = INITIALIZATION;
             this.readers = new List<int>();
             this.writer = INITIALIZATION;
@@ -76,11 +81,24 @@ namespace PadIntServer {
             set { this.originalValue = value; }
         }
 
-        /* public int Timer
-        {
-            get { return timer; }
-            set { this.timer = value; }
-        }*/
+        private void DeadLockEvent(object source, ElapsedEventArgs e) {
+            Logger.log(new String[] { "PadInt", "DeadLockEvent" });
+
+            deadLockTimer.Close();
+
+            if(writer != INITIALIZATION) {
+                //abort
+                //TODO
+                freeWriteLock(writer);
+            } else {
+                for(int index = readers.Count - 1; index >= 0; index--) {
+                    int abortTid = readers[index];
+                    //TODO abort
+                    readers.RemoveAt(index);
+                    dequeueReadLock();
+                }
+            }
+        }
 
         /* Assigns to the transaction identified by tid
          * a read lock over the PadInt identified by uid,
@@ -102,8 +120,13 @@ namespace PadIntServer {
             } else {
                 pendingReaders.Add(tid);
 
+                Logger.log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
                 while(pendingReaders.Contains(tid)) {
-                    Logger.log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
+
+                    //activates the deadLock detection if it is not already started
+                    if(!deadLockTimer.Enabled) {
+                        deadLockTimer.Start();
+                    }
                 }
             }
 
@@ -153,6 +176,12 @@ namespace PadIntServer {
                     if(writer != tid) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
+
+                            //activates the deadLock detection if it is not already started
+                            if(!deadLockTimer.Enabled) {
+                                deadLockTimer.Start();
+                            }
+
                             Logger.log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
                         }
                     }
@@ -164,6 +193,12 @@ namespace PadIntServer {
                     if(!readers.Contains(tid)) {
                         pendingWriters.Add(tid);
                         while(pendingWriters.Contains(tid)) {
+
+                            //activates the deadLock detection if it is not already started
+                            if(!deadLockTimer.Enabled) {
+                                deadLockTimer.Start();
+                            }
+
                             Logger.log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
                         }
                     } else {
