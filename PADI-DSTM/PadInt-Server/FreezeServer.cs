@@ -16,15 +16,15 @@ namespace PadIntServer {
         internal override bool createPadInt(int uid) {
             Logger.log(new String[] { "FreezeServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
 
-            //TODO
-            throw new NotImplementedException();
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
 
         internal override bool confirmPadInt(int uid) {
             Logger.log(new String[] { "FreezeServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
 
-            //TODO
-            throw new NotImplementedException();
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
 
         /* Returns the value of the PadInt when the transaction
@@ -34,15 +34,15 @@ namespace PadIntServer {
         internal override int readPadInt(int tid, int uid) {
             Logger.log(new String[] { "FreezeServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
-            //TODO
-            throw new NotImplementedException();
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
 
         internal override bool writePadInt(int tid, int uid, int value) {
             Logger.log(new String[] { "Server ", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
-            //TODO
-            throw new NotImplementedException();
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
 
         /// <summary>
@@ -53,17 +53,9 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool commit(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "FreezeServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
 
-            //TODO
-            throw new NotImplementedException();
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
 
         /// <summary>
@@ -74,16 +66,9 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool abort(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "FreezeServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
-            //TODO
-            throw new NotImplementedException();
+
+            //TODO cria o pedido e guarda-o
+            throw new ServerDoesNotReplyException(Server.ID);
         }
     }
 }

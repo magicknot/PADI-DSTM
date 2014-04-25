@@ -65,14 +65,14 @@ namespace PadIntServer {
                 /* Obtain the PadInt identified by uid */
                 PadInt padInt = getPadInt(uid);
 
-                while(true) {
-                    if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
-                        return padInt.ActualValue;
-                    }
+                if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
+                    return padInt.ActualValue;
                 }
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
+            return -1;
         }
 
         internal override bool writePadInt(int tid, int uid, int value) {
@@ -82,15 +82,15 @@ namespace PadIntServer {
                 /* Obtain the PadInt identified by uid */
                 PadInt padInt = getPadInt(uid);
 
-                while(true) {
-                    if(padInt.getWriteLock(tid)) {
-                        padInt.ActualValue = value;
-                        return true;
-                    }
+                if(padInt.getWriteLock(tid)) {
+                    padInt.ActualValue = value;
+                    return true;
                 }
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -101,14 +101,7 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool commit(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+
             bool resultCommit = true;
 
             try {
@@ -122,6 +115,7 @@ namespace PadIntServer {
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
             return resultCommit;
         }
 
@@ -133,14 +127,7 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool abort(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+
             bool resultAbort = true;
 
             try {
@@ -153,6 +140,7 @@ namespace PadIntServer {
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
             return resultAbort;
         }
     }

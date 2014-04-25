@@ -50,24 +50,6 @@ namespace PadIntServer {
             get { return this.padIntDictionary; }
         }
 
-        private PadInt getPadInt(int uid) {
-            if(PdInts.ContainsKey(uid)) {
-                return PdInts[uid];
-            } else {
-                throw new PadIntNotFoundException(uid, ID);
-            }
-        }
-
-        public void verifyPadInts(List<int> padInts) {
-            try {
-                foreach(int uid in padInts) {
-                    getPadInt(uid);
-                }
-            } catch(PadIntNotFoundException) {
-                throw;
-            }
-        }
-
         public bool init(int port) {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
@@ -92,6 +74,8 @@ namespace PadIntServer {
                 return serverState.createPadInt(uid);
             } catch(PadIntAlreadyExistsException) {
                 throw;
+            } catch(ServerDoesNotReplyException) {
+                throw;
             }
         }
 
@@ -100,6 +84,8 @@ namespace PadIntServer {
             try {
                 return serverState.confirmPadInt(uid);
             } catch(PadIntNotFoundException) {
+                throw;
+            } catch(ServerDoesNotReplyException) {
                 throw;
             }
         }
@@ -115,6 +101,8 @@ namespace PadIntServer {
                 return serverState.readPadInt(tid, uid);
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(ServerDoesNotReplyException) {
+                throw;
             }
         }
 
@@ -124,6 +112,8 @@ namespace PadIntServer {
             try {
                 return serverState.writePadInt(tid, uid, value);
             } catch(PadIntNotFoundException) {
+                throw;
+            } catch(ServerDoesNotReplyException) {
                 throw;
             }
         }
@@ -149,6 +139,8 @@ namespace PadIntServer {
 
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(ServerDoesNotReplyException) {
+                throw;
             }
         }
 
@@ -173,6 +165,8 @@ namespace PadIntServer {
                 return serverState.abort(tid, usedPadInts);
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(ServerDoesNotReplyException) {
+                throw;
             }
         }
 
@@ -189,6 +183,10 @@ namespace PadIntServer {
         }
         public bool Recover() {
             serverState = oldState;
+
+            //TODO
+            //Trata os pedidos que tinha pendentes
+
             return true;
         }
 

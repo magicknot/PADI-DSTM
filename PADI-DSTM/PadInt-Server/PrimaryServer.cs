@@ -101,14 +101,7 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool commit(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+
             bool resultCommit = true;
 
             try {
@@ -133,14 +126,7 @@ namespace PadIntServer {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         internal override bool abort(int tid, List<int> usedPadInts) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+
             bool resultAbort = true;
 
             try {
