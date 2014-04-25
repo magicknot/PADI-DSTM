@@ -10,6 +10,8 @@ namespace CommonTypes {
     /// Remote PadInt server interface
     /// </summary>
     public interface IServer {
+        void createPrimaryServer(string backupAddress);
+        void createBackupServer(string primaryAddress);
         bool createPadInt(int uid);
         bool confirmPadInt(int uid);
         int readPadInt(int tid, int uid);

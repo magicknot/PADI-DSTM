@@ -38,6 +38,7 @@ namespace PadIntServer {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
                 Server.PdInts.Add(uid, new PadInt(uid));
+                //TODO actualiza o backup
                 return true;
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, Server.ID);
@@ -48,6 +49,7 @@ namespace PadIntServer {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             try {
                 getPadInt(uid);
+                //TODO actualiza o backup
                 return true;
             } catch(PadIntNotFoundException) {
                 throw;
@@ -67,6 +69,7 @@ namespace PadIntServer {
 
                 while(true) {
                     if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
+                        //TODO actualiza o backup
                         return padInt.ActualValue;
                     }
                 }
@@ -85,6 +88,7 @@ namespace PadIntServer {
                 while(true) {
                     if(padInt.getWriteLock(tid)) {
                         padInt.ActualValue = value;
+                        //TODO actualiza o backup
                         return true;
                     }
                 }
@@ -115,6 +119,9 @@ namespace PadIntServer {
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
+            //TODO actualiza o backup
+
             return resultCommit;
         }
 
@@ -139,6 +146,9 @@ namespace PadIntServer {
             } catch(PadIntNotFoundException) {
                 throw;
             }
+
+            //TODO actualiza o backup
+
             return resultAbort;
         }
     }

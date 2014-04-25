@@ -16,18 +16,35 @@ namespace PadIntServer {
     /// </summary>
     class Server : MarshalByRefObject, IServer {
 
-        /* the server's state */
+        /// <summary>
+        /// Server's state
+        /// </summary>
         private ServerState serverState;
+        /// <summary>
+        /// Server's old state
+        /// </summary>
         private ServerState oldState;
-
-        /* Structure that maps UID to PadInt */
+        /// <summary>
+        /// Structure that maps UID to PadInt
+        /// </summary>
         internal Dictionary<int, PadInt> padIntDictionary;
-
-        /* Pending request list */
+        /// <summary>
+        /// Pending request list
+        /// </summary>
         //private List<Request> requestList = new List<Request>();
-
+        /// <summary>
+        /// Server identifier
+        /// </summary>
         private int identifier;
+        /// <summary>
+        /// Reference to master server
+        /// </summary>
         IMaster masterServerReference;
+        /// <summary>
+        /// Address of the primary/backup server
+        ///  (backup address if this server is the primary server, primary address otherwise)
+        /// </summary>
+        private string replicationServerAddress;
 
         public Server() {
             serverState = (ServerState) new PrimaryServer(this);
@@ -60,12 +77,22 @@ namespace PadIntServer {
             return true;
         }
 
-        public void createPrimaryServer() {
+        /// <summary>
+        /// Changes the server's role to primary role.
+        /// </summary>
+        /// <param name="backupAddress">Backup server address</param>
+        public void createPrimaryServer(string backupAddress) {
             serverState = new PrimaryServer(this);
+            replicationServerAddress = backupAddress;
         }
 
-        public void createBackupServer() {
+        /// <summary>
+        /// Changes the server's role to backup role.
+        /// </summary>
+        /// <param name="primaryAddress">Primary server address</param>
+        public void createBackupServer(string primaryAddress) {
             serverState = new BackupServer(this);
+            replicationServerAddress = primaryAddress;
         }
 
         public bool createPadInt(int uid) {
@@ -172,13 +199,13 @@ namespace PadIntServer {
 
         public bool Freeze() {
             oldState = serverState;
-            serverState = new FreezeServer(this);
+            serverState = new FreezedServer(this);
             return true;
         }
 
         public bool Fail() {
             oldState = serverState;
-            serverState = new FailServer(this);
+            serverState = new FailedServer(this);
             return true;
         }
         public bool Recover() {

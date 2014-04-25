@@ -24,8 +24,8 @@ namespace MasterServer {
         /// </summary>
         /// <param name="serverAddress">Server address</param>
         public ServerRegistry(string serverAddress) {
-            this.serverAddress=serverAddress;
-            numberOfHits=0;
+            this.serverAddress = serverAddress;
+            numberOfHits = 0;
         }
 
         internal int Hits {
