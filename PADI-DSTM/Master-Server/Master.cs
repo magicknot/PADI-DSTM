@@ -12,13 +12,13 @@ namespace MasterServer {
     class Master : MarshalByRefObject, IMaster {
 
         /// <summary>
-        /// constant used to represent non atributed server identifier
+        /// Constant used to represent non atributed server identifier
         /// </summary>
         private const int NO_SERVER_ID = -1;
         /// <summary>
-        /// constant used to represent non atributed server address
+        /// Constant used to represent non atributed server address
         /// </summary>
-        private const string NO_SERVER = "";
+        private const string NO_SERVER_ADDRESS = "";
         /// <summary>
         /// Identifier of the last transaction started
         /// </summary>
@@ -63,7 +63,7 @@ namespace MasterServer {
             registeredServers = new List<string>();
             padIntServers = new Dictionary<int, Tuple<int, bool>>();
             pendingServerID = NO_SERVER_ID;
-            pendingServerAddress = NO_SERVER;
+            pendingServerAddress = NO_SERVER_ADDRESS;
             LastTID = 0;
             NServers = 0;
         }
@@ -78,14 +78,29 @@ namespace MasterServer {
         }
 
         /// <summary>
+        /// Obtains the identifier for a given server's address
+        /// </summary>
+        /// <param name="address">Server address</param>
+        private int getServerId(string address) {
+            for(int index = 0; index < registeredServers.Count; index++) {
+                if(registeredServers[index] == address) {
+                    return index;
+                }
+            }
+
+            throw new ServerNotFoundException(address);
+        }
+
+        /// <summary>
         /// Assigns primary role to a server
         /// </summary>
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="backupAddress">Backup server address</param>
-        public void createPrimaryServer(string primaryAddress, string backupAddress) {
+        /// <param name="id">Primary server identifier</param>
+        private void createPrimaryServer(string primaryAddress, string backupAddress, int id) {
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
-            server.createPrimaryServer(backupAddress);
+            server.createPrimaryServer(backupAddress, id);
         }
 
         /// <summary>
@@ -93,10 +108,72 @@ namespace MasterServer {
         /// </summary>
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="backupAddress">Backup server address</param>
-        public void createBackupServer(string primaryAddress, string backupAddress) {
+        /// <param name="id">Backup server identifier</param>
+        private void createBackupServer(string primaryAddress, string backupAddress, int id) {
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
-            server.createBackupServer(primaryAddress);
+            server.createBackupServer(primaryAddress, id);
+        }
+
+        /// <summary>
+        /// If possible assign a new backup server, redistribute PadInts otherwise
+        /// </summary>
+        /// <param name="primaryId">Primary server identifier</param>
+        /// <param name="backupAddress">Backup server address</param>
+        public void createNewReplica(int primaryId, string backupAddress) {
+            Logger.log(new String[] { "Master", "createNewReplica", "primaryId", primaryId.ToString(), "backupAddress", backupAddress.ToString() });
+            try {
+                /* verify if the primary server exists */
+                verifyServerRegistry(primaryId);
+
+                /* if a server is available to be the new backup server */
+                if(pendingServerID != NO_SERVER_ID) {
+                    string primaryAddress = registeredServers[primaryId];
+                    createPrimaryServer(primaryAddress, pendingServerAddress, primaryId);
+                    createBackupServer(primaryAddress, pendingServerAddress, primaryId);
+
+                    /* cleans pending server variables */
+                    pendingServerID = NO_SERVER_ID;
+                    pendingServerAddress = NO_SERVER_ADDRESS;
+                } else {
+                    /* redistribute server's PadInts */
+
+                    //TODO
+                    throw new NotImplementedException();
+                }
+            } catch(ServerNotFoundException) {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// If possible backup server becames primary server, redistribute PadInts otherwise
+        /// </summary>
+        /// <param name="primaryAddress">Primary server address</param>
+        /// <param name="backupAddress">Backup server address</param>
+        public void becomePrimary(int primaryId, string backupAddress) {
+            Logger.log(new String[] { "Master", "becomePrimary", "primaryId", primaryId.ToString(), "backupAddress", backupAddress.ToString() });
+            try {
+                /* verify if the primary server exists */
+                verifyServerRegistry(primaryId);
+
+                /* if a server is available to be the new backup server */
+                if(pendingServerID != NO_SERVER_ID) {
+                    createPrimaryServer(backupAddress, pendingServerAddress, primaryId);
+                    createBackupServer(backupAddress, pendingServerAddress, primaryId);
+
+                    /* cleans pending server variables */
+                    pendingServerID = NO_SERVER_ID;
+                    pendingServerAddress = NO_SERVER_ADDRESS;
+                } else {
+                    /* redistribute server's PadInts */
+
+                    //TODO
+                    throw new NotImplementedException();
+                }
+            } catch(ServerNotFoundException) {
+                throw;
+            }
         }
 
         /// <summary>
@@ -105,7 +182,7 @@ namespace MasterServer {
         /// <param name="address">Server Address</param>
         /// <returns>Server identifier</returns>
         public int registerServer(String address) {
-            Logger.log(new String[] { "Master", " registerServer", "address", address.ToString() });
+            Logger.log(new String[] { "Master", "registerServer", "address", address.ToString() });
             try {
                 /* assign roles to the servers if exists a possible (primary,backup) pair */
                 if(pendingServerID == NO_SERVER_ID) {
@@ -114,14 +191,14 @@ namespace MasterServer {
                     return NServers++;
                 } else {
                     /* assign primary role to the pending server and backup role to the new server */
-                    createPrimaryServer(pendingServerAddress, address);
+                    createPrimaryServer(pendingServerAddress, address, pendingServerID);
                     registeredServers.Insert(pendingServerID, pendingServerAddress);
-                    createBackupServer(pendingServerAddress, address);
+                    createBackupServer(pendingServerAddress, address, pendingServerID);
 
                     /* cleans pending server variables */
                     int temp = pendingServerID;
                     pendingServerID = NO_SERVER_ID;
-                    pendingServerAddress = NO_SERVER;
+                    pendingServerAddress = NO_SERVER_ADDRESS;
                     return temp;
                 }
             } catch(ArgumentException) {
@@ -141,7 +218,7 @@ namespace MasterServer {
                 int serverID = padIntServers[uid].Item1;
                 verifyServerRegistry(serverID);
                 return new Tuple<int, string>(serverID, registeredServers[serverID]);
-            } catch(NoServersFoundException) {
+            } catch(ServerNotFoundException) {
                 throw;
             }
         }
@@ -191,10 +268,9 @@ namespace MasterServer {
         /// Verifies if a server is already registered on master server
         /// </summary>
         /// <param name="serverID">server identifier</param>
-        /*FIXME exception used is  the wrong one */
         private void verifyServerRegistry(int serverID) {
             if(registeredServers.ElementAtOrDefault(serverID) == null) {
-                throw new NoServersFoundException();
+                throw new ServerNotFoundException(serverID);
             }
         }
     }

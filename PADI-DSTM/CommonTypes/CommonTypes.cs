@@ -10,8 +10,9 @@ namespace CommonTypes {
     /// Remote PadInt server interface
     /// </summary>
     public interface IServer {
-        void createPrimaryServer(string backupAddress);
-        void createBackupServer(string primaryAddress);
+        void ImAlive();
+        void createPrimaryServer(string backupAddress, int id);
+        void createBackupServer(string primaryAddress, int id);
         bool createPadInt(int uid);
         bool confirmPadInt(int uid);
         int readPadInt(int tid, int uid);
@@ -30,6 +31,8 @@ namespace CommonTypes {
     public interface IMaster {
         int getNextTID();
         int registerServer(String address);
+        void becomePrimary(int primaryId, string backupAddress);
+        void createNewReplica(int primaryId, string backupAddress);
         Tuple<int, string> getPadIntServer(int uid);
         Tuple<int, string> registerPadInt(int uid);
         bool Status();

@@ -41,13 +41,19 @@ namespace PadIntServer {
         /// </summary>
         IMaster masterServerReference;
         /// <summary>
-        /// Address of the primary/backup server
-        ///  (backup address if this server is the primary server, primary address otherwise)
+        /// Primary/backup server
+        ///  (backup if this server is the primary server, primary otherwise)
+        /// </summary>
+        private IServer replicationServer;
+        /// <summary>
+        /// Primary/backup server's address
+        ///  (backup server's address if this server is the primary server,
+        ///   primary server's address otherwise)
         /// </summary>
         private string replicationServerAddress;
 
         public Server() {
-            serverState = (ServerState) new PrimaryServer(this);
+            serverState = (ServerState) new FailedServer(this);
             oldState = (ServerState) new PrimaryServer(this);
             padIntDictionary = new Dictionary<int, PadInt>();
         }
@@ -60,6 +66,16 @@ namespace PadIntServer {
         internal IMaster Master {
             set { this.masterServerReference = value; }
             get { return masterServerReference; }
+        }
+
+        internal IServer ReplicationServer {
+            set { this.replicationServer = value; }
+            get { return replicationServer; }
+        }
+
+        internal string ReplicationServerAddr {
+            set { this.replicationServerAddress = value; }
+            get { return replicationServerAddress; }
         }
 
         internal Dictionary<int, PadInt> PdInts {
@@ -81,18 +97,28 @@ namespace PadIntServer {
         /// Changes the server's role to primary role.
         /// </summary>
         /// <param name="backupAddress">Backup server address</param>
-        public void createPrimaryServer(string backupAddress) {
+        /// <param name="id">Server identifier</param>
+        public void createPrimaryServer(string backupAddress, int id) {
             serverState = new PrimaryServer(this);
-            replicationServerAddress = backupAddress;
+            ReplicationServerAddr = backupAddress;
+            ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
+            ID = id;
         }
 
         /// <summary>
         /// Changes the server's role to backup role.
         /// </summary>
         /// <param name="primaryAddress">Primary server address</param>
-        public void createBackupServer(string primaryAddress) {
+        /// <param name="id">Server identifier</param>
+        public void createBackupServer(string primaryAddress, int id) {
             serverState = new BackupServer(this);
-            replicationServerAddress = primaryAddress;
+            ReplicationServerAddr = primaryAddress;
+            ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
+            ID = id;
+        }
+
+        public void ImAlive() {
+            serverState.ImAlive();
         }
 
         public bool createPadInt(int uid) {

@@ -13,6 +13,13 @@ namespace PadIntServer {
             // Nothing to do here
         }
 
+        /// <summary>
+        /// Frailed servers do nothing when this method is called
+        /// </summary>
+        internal override void ImAlive() {
+            //Nothing to do here
+        }
+
         internal override bool createPadInt(int uid) {
             Logger.log(new String[] { "FailedServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
 

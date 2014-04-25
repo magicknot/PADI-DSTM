@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommonTypes;
+using System.Timers;
 
 namespace PadIntServer {
     /// <summary>
@@ -11,9 +12,34 @@ namespace PadIntServer {
     /// </summary>
     class BackupServer : ServerState {
 
+        /// <summary>
+        /// Constant used to represent the interval after which
+        ///  backup server tries to be a primary server
+        /// </summary>
+        private const int IM_ALIVE_INTERVAL = 25;
+        /// <summary>
+        /// Timer used in I'm Alive mechanism
+        /// </summary>
+        private System.Timers.Timer imAliveTimer;
+
         internal BackupServer(Server server)
             : base(server) {
-            // Nothing to do here
+            // Create a timer with inAliveInterval second interval.
+            imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
+            imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
+        }
+
+        /// <summary>
+        /// Receives I'm alive from primary server
+        /// </summary>
+        internal override void ImAlive() {
+            //re-starts the timer
+            imAliveTimer.Stop();
+            imAliveTimer.Start();
+        }
+
+        private void ImAliveEvent(object source, ElapsedEventArgs e) {
+            Server.Master.becomePrimary(Server.ID, Server.ReplicationServerAddr);
         }
 
         private PadInt getPadInt(int uid) {
@@ -24,7 +50,7 @@ namespace PadIntServer {
             }
         }
 
-        internal void verifyPadInts(List<int> padInts) {
+        private void verifyPadInts(List<int> padInts) {
             try {
                 foreach(int uid in padInts) {
                     getPadInt(uid);

@@ -10,45 +10,55 @@ namespace PadIntServer {
     [Serializable]
     class PadInt {
 
-        /* constante used in the initialization of int variables */
+        /// <summary>
+        /// constante used in the initialization of int variables
+        /// </summary>
         private const int INITIALIZATION = -1;
-
-        /* PadInt's uid */
+        /// <summary>
+        /// PadInt identifier
+        /// </summary>
         private int uid;
-
-        /* PadInt's value during the transaction */
+        /// <summary>
+        /// PadInt's value during the transaction
+        /// </summary>
         private int actualValue;
-
-        /* PadInt's value in the begining of the transaction */
+        /// <summary>
+        /// PadInt's value in the begining of the transaction
+        /// </summary>
         private int originalValue;
-
-        /* Timer used in deadlock detection */
+        /// <summary>
+        /// Timer used in deadlock detection
+        /// </summary>
         private System.Timers.Timer deadLockTimer;
-
-        /* uid of the next transaction to be promoted.
-         *
-         * Value INITIALIZATION means that there is no transaction,
-         *  identified by tid, waiting for promotion. 
-         */
+        /// <summary>
+        /// identifier (tid) of the next transaction to be promoted.
+        /// Value INITIALIZATION means that there is no transaction, 
+        ///   identified by tid, waiting for promotion. 
+        /// </summary>
         private int promotion;
-
-        /* Queue with transactions' tid with atributed read locks */
+        /// <summary>
+        /// Queue with transactions' tid with atributed read locks
+        /// </summary>
         private List<int> readers;
-
-        /* Transaction' tid with atributed write lock.
-         * 
-         * Value INITIALIZATION means that there is no transaction,
-         *  identified by tid, writing. 
-         */
+        /// <summary>
+        /// Transaction' tid with atributed write lock.
+        /// Value INITIALIZATION means that there is no transaction,
+        ///  identified by tid, writing. 
+        /// </summary>
         private int writer;
-
-        /* Queue with transactions' tid with pending read locks */
+        /// <summary>
+        /// Queue with transactions' tid with pending read locks
+        /// </summary>
         private List<int> pendingReaders;
-
-        /* Queue with transactions' tid with pending write locks */
+        /// <summary>
+        /// Queue with transactions' tid with pending write locks
+        /// </summary>
         private List<int> pendingWriters;
 
-        /* uid represetns the PadInt's uid */
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="uid">PadInt identifier</param>
         internal PadInt(int uid) {
 
             this.uid = uid;
@@ -81,6 +91,11 @@ namespace PadIntServer {
             set { this.originalValue = value; }
         }
 
+        /// <summary>
+        /// Deals with deadLock events
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void DeadLockEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "PadInt", "DeadLockEvent" });
 
@@ -100,11 +115,13 @@ namespace PadIntServer {
             }
         }
 
-        /* Assigns to the transaction identified by tid
-         * a read lock over the PadInt identified by uid,
-         * as soon as possible.
-         * 
-         * Returns true if successful */
+        /// <summary>
+        /// Assigns to the transaction identified by tid
+        ///  a read lock over the PadInt identified by uid,
+        ///  as soon as possible.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool getReadLock(int tid) {
 
             Logger.log(new String[] { "PadInt", "getReadLock" });
@@ -142,17 +159,23 @@ namespace PadIntServer {
             /* retorna false caso abort??? depois com os timer? */
         }
 
-        /* Returns true if the transaction identified by tid
-         *  has a write lock over the PadInt identified by uid */
+        /// <summary>
+        /// Returns true if the transaction identified by tid
+        ///  has a write lock over the PadInt identified by uid
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>bool</returns>
         internal bool hasWriteLock(int tid) {
             return writer == tid;
         }
 
-        /* Assigns to the transaction identified by tid
-         * a write lock over the PadInt identified by uid,
-         * as soon as possible.
-         * 
-         * Returns true if successful */
+        /// <summary>
+        /// Assigns to the transaction identified by tid
+        ///  a write lock over the PadInt identified by uid,
+        ///  as soon as possible.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool getWriteLock(int tid) {
 
             Logger.log(new String[] { "PadInt", "getWriteLock" });
@@ -225,10 +248,12 @@ namespace PadIntServer {
             return true;
         }
 
-        /* Frees a read lock over the PadInt, identified by uid,
-        * owned by a transaction identified by tid.
-        *
-        * Returns true if successful */
+        /// <summary>
+        /// Frees a read lock over the PadInt, identified by uid,
+        ///  owned by a transaction identified by tid.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool freeReadLock(int tid) {
             Logger.log(new String[] { "PadInt", "freeReadLock" });
 
@@ -240,10 +265,12 @@ namespace PadIntServer {
             }
         }
 
-        /* Frees a write lock over the PadInt, identified by uid,
-        * owned by a transaction identified with tid.
-        *
-        * Returns true if successful */
+        /// <summary>
+        /// Frees a write lock over the PadInt, identified by uid,
+        ///  owned by a transaction identified with tid.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool freeWriteLock(int tid) {
             Logger.log(new String[] { "PadInt", "freeWriteLock" });
 
@@ -257,12 +284,13 @@ namespace PadIntServer {
             }
         }
 
-        /* If called when does not exist any reader,
-         *  see if exists any transaction waiting for
-         *  a promotion then do the promotion. If only
-         *  exists pending writers, assigns the lock to
-         *  the first one.
-         */
+        /// <summary>
+        /// If called when does not exist any reader,
+        ///  see if exists any transaction waiting for
+        ///  a promotion then do the promotion. If only
+        ///  exists pending writers, assigns the lock to
+        ///  the first one.
+        /// </summary>
         internal void dequeueReadLock() {
             Logger.log(new String[] { "PadInt", "dequeueReadLock" });
 
@@ -285,13 +313,14 @@ namespace PadIntServer {
             }
         }
 
-        /* If exists any transaction waiting for a promotion
-         *  then do the promotion. Otherwise if exists pending
-         *  writers, assigns the lock to the first one.
-         * If none of the last cenarios was true see if exists
-         *  any pending reader and assigns the lock to the
-         *  first one.
-         */
+        /// <summary>
+        /// If exists any transaction waiting for a promotion
+        ///  then do the promotion. Otherwise if exists pending
+        ///  writers, assigns the lock to the first one.
+        /// If none of the last cenarios was true see if exists
+        ///  any pending reader and assigns the lock to the
+        ///  first one.
+        /// </summary>
         internal void dequeueWriteLock() {
             Logger.log(new String[] { "PadInt", "dequeueWriteLock" });
 
@@ -318,16 +347,17 @@ namespace PadIntServer {
             }
         }
 
-        /* Receives the identifier of a transaction and does a commit.
-         * 
-         * Free promotion variable, removes all read/write locks atributed
-         *  to this transaction and removes all possible pending locks.
-         * 
-         * Finally, updates PadInt's originalValue because we do a successful
-         *  commit.
-         * 
-         * Returns true if successful.
-         */
+        /// <summary>
+        /// Receives the identifier of a transaction and does a commit.
+        /// 
+        /// Free promotion variable, removes all read/write locks atributed
+        ///  to this transaction and removes all possible pending locks.
+        ///  
+        /// Finally, updates PadInt's originalValue because we do a successful
+        ///  commit.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool commit(int tid) {
             Logger.log(new String[] { "PadInt", "commit" });
 
@@ -360,15 +390,16 @@ namespace PadIntServer {
             return commitSuccessful;
         }
 
-        /* Receives the identifier of a transaction and does an abort.
-         * 
-         * Free promotion variable, removes all read/write locks atributed
-         *  to this transaction and removes all possible pending locks.
-         * 
-         * Finally, does the rollback of the PadInt's value.
-         * 
-         * Returns true if successful.
-         */
+        /// <summary>
+        /// Receives the identifier of a transaction and does an abort.
+        /// 
+        /// Free promotion variable, removes all read/write locks atributed
+        ///  to this transaction and removes all possible pending locks.
+        ///  
+        /// Finally, does the rollback of the PadInt's value.
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <returns>Returns true if successful</returns>
         internal bool abort(int tid) {
             Logger.log(new String[] { "PadInt", "abort" });
 

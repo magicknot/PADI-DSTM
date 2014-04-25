@@ -40,6 +40,5 @@ namespace ClientLibrary {
             set { this.serverAddress = value; }
             get { return serverAddress; }
         }
-
     }
 }
