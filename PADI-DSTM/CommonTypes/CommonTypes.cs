@@ -17,6 +17,9 @@ namespace CommonTypes {
         bool commit(int tid, List<int> usedPadInts);
         bool abort(int tid, List<int> usedPadInts);
         bool Dump();
+        bool Freeze();
+        bool Fail();
+        bool Recover();
     }
 
     /// <summary>

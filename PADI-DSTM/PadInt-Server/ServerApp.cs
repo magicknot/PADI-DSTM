@@ -22,6 +22,15 @@ namespace PadIntServer {
             int randomNumber = random.Next(0, 100);
 
             Server padIntServer = new Server();
+            /* if the argument received is P then create a primary server.
+             * if the argument received is B then create a backup server.
+             */
+            /*if((args.Length > 0) && (args[0].Equals("P"))) {
+                padIntServer.createPrimaryServer();
+            } else if((args.Length > 0) && (args[0].Equals("B"))) {
+                padIntServer.createBackupServer();
+            }*/
+
             TcpChannel channel = new TcpChannel(8000 + randomNumber);
             ChannelServices.RegisterChannel(channel, false);
 

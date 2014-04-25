@@ -43,7 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackupServer.cs" />
+    <Compile Include="FailServer.cs" />
+    <Compile Include="FreezeServer.cs" />
     <Compile Include="PadInt.cs" />
+    <Compile Include="ServerState.cs" />
+    <Compile Include="PrimaryServer.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -16,17 +16,23 @@ namespace PadIntServer {
     /// </summary>
     class Server : MarshalByRefObject, IServer {
 
+        /* the server's state */
+        private ServerState serverState;
+        private ServerState oldState;
+
+        /* Structure that maps UID to PadInt */
+        internal Dictionary<int, PadInt> padIntDictionary;
+
         /* Pending request list */
         //private List<Request> requestList = new List<Request>();
 
-        /* Structure that maps UID to PadInt */
-        private Dictionary<int, PadInt> padIntDictionary;
         private int identifier;
         IMaster masterServerReference;
 
-
         public Server() {
-            PdInts = new Dictionary<int, PadInt>();
+            serverState = (ServerState) new PrimaryServer(this);
+            oldState = (ServerState) new PrimaryServer(this);
+            padIntDictionary = new Dictionary<int, PadInt>();
         }
 
         internal int ID {
@@ -44,6 +50,24 @@ namespace PadIntServer {
             get { return this.padIntDictionary; }
         }
 
+        private PadInt getPadInt(int uid) {
+            if(PdInts.ContainsKey(uid)) {
+                return PdInts[uid];
+            } else {
+                throw new PadIntNotFoundException(uid, ID);
+            }
+        }
+
+        public void verifyPadInts(List<int> padInts) {
+            try {
+                foreach(int uid in padInts) {
+                    getPadInt(uid);
+                }
+            } catch(PadIntNotFoundException) {
+                throw;
+            }
+        }
+
         public bool init(int port) {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
@@ -54,23 +78,27 @@ namespace PadIntServer {
             return true;
         }
 
+        public void createPrimaryServer() {
+            serverState = new PrimaryServer(this);
+        }
 
+        public void createBackupServer() {
+            serverState = new BackupServer(this);
+        }
 
         public bool createPadInt(int uid) {
             Logger.log(new String[] { "Server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
-                PdInts.Add(uid, new PadInt(uid));
-                return true;
-            } catch(ArgumentException) {
-                throw new PadIntAlreadyExistsException(uid, ID);
+                return serverState.createPadInt(uid);
+            } catch(PadIntAlreadyExistsException) {
+                throw;
             }
         }
 
         public bool confirmPadInt(int uid) {
             Logger.log(new String[] { "Server", ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             try {
-                getPadInt(uid);
-                return true;
+                return serverState.confirmPadInt(uid);
             } catch(PadIntNotFoundException) {
                 throw;
             }
@@ -84,15 +112,7 @@ namespace PadIntServer {
             Logger.log(new String[] { "Server", ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
             try {
-                /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
-
-                while(true) {
-                    if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
-                        return padInt.ActualValue;
-                    }
-                }
-
+                return serverState.readPadInt(tid, uid);
             } catch(PadIntNotFoundException) {
                 throw;
             }
@@ -102,16 +122,7 @@ namespace PadIntServer {
             Logger.log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             try {
-                /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
-
-                while(true) {
-                    if(padInt.getWriteLock(tid)) {
-                        padInt.ActualValue = value;
-                        return true;
-                    }
-                }
-
+                return serverState.writePadInt(tid, uid, value);
             } catch(PadIntNotFoundException) {
                 throw;
             }
@@ -133,20 +144,12 @@ namespace PadIntServer {
              *  primeiro os writes para todos os PadInt que escreveu para assim
              *  actualizar no server.
              */
-            bool resultCommit = true;
-
             try {
-                verifyPadInts(usedPadInts);
-
-                foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultCommit = padInt.commit(tid) && resultCommit;
-                }
+                return serverState.commit(tid, usedPadInts);
 
             } catch(PadIntNotFoundException) {
                 throw;
             }
-            return resultCommit;
         }
 
         /// <summary>
@@ -165,38 +168,28 @@ namespace PadIntServer {
              *  primeiro os writes para todos os PadInt que escreveu para assim
              *  actualizar no server.
              */
-            bool resultAbort = true;
 
             try {
-                verifyPadInts(usedPadInts);
-
-                foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultAbort = padInt.abort(tid) && resultAbort;
-                }
-            } catch(PadIntNotFoundException) {
-                throw;
-            }
-            return resultAbort;
-        }
-
-
-        public void verifyPadInts(List<int> padInts) {
-            try {
-                foreach(int uid in padInts) {
-                    getPadInt(uid);
-                }
+                return serverState.abort(tid, usedPadInts);
             } catch(PadIntNotFoundException) {
                 throw;
             }
         }
 
-        private PadInt getPadInt(int uid) {
-            if(PdInts.ContainsKey(uid)) {
-                return PdInts[uid];
-            } else {
-                throw new PadIntNotFoundException(uid, ID);
-            }
+        public bool Freeze() {
+            oldState = serverState;
+            serverState = new FreezeServer(this);
+            return true;
+        }
+
+        public bool Fail() {
+            oldState = serverState;
+            serverState = new FailServer(this);
+            return true;
+        }
+        public bool Recover() {
+            serverState = oldState;
+            return true;
         }
 
         public bool Dump() {
@@ -204,7 +197,7 @@ namespace PadIntServer {
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");
             foreach(KeyValuePair<int, PadInt> pd in padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " +  pd.Value.ActualValue);
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + pd.Value.ActualValue);
             }
             Console.WriteLine("-----------------------");
             return true;
