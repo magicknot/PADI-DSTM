@@ -14,9 +14,9 @@ namespace PadIntServer {
 
         /// <summary>
         /// Constant used to represent the interval after which
-        ///  backup server tries to be a primary server
+        ///  backup server tries to be a primary server (1000 = 1s)
         /// </summary>
-        private const int IM_ALIVE_INTERVAL = 25;
+        private const int IM_ALIVE_INTERVAL = 35000;
         /// <summary>
         /// Timer used in I'm Alive mechanism
         /// </summary>
@@ -27,18 +27,23 @@ namespace PadIntServer {
             // Create a timer with inAliveInterval second interval.
             imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
             imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
+
+            //starts im alive timer
+            imAliveTimer.Start();
         }
 
         /// <summary>
         /// Receives I'm alive from primary server
         /// </summary>
         internal override void ImAlive() {
+            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "ImAlive" });
             //re-starts the timer
             imAliveTimer.Stop();
             imAliveTimer.Start();
         }
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
+            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
             Server.Master.becomePrimary(Server.ID, Server.ReplicationServerAddr);
         }
 

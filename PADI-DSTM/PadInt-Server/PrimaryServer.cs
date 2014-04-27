@@ -14,23 +14,23 @@ namespace PadIntServer {
 
         /// <summary>
         /// Constant used to represent the interval after which primary server
-        ///  sends I'm alive
+        ///  sends I'm alive (1000 = 1s)
         /// </summary>
-        private const int IM_ALIVE_INTERVAL = 15;
+        private const int IM_ALIVE_INTERVAL = 20000;
         /// <summary>
         /// Timer used in I'm Alive mechanism
         /// </summary>
         private System.Timers.Timer imAliveTimer;
         /// <summary>
         /// Constant used to represent the interval after which primary server
-        ///  requires a new backup server
+        ///  requires a new backup server (1000 = 1s)
         /// </summary>
-        private const int BACKUP_REPLY_INTERVAL = 25;
+        private const int BACKUP_REPLY_INTERVAL = 35000;
         /// <summary>
         /// Timer used to detect that primary server does not receive a reply
         ///  from backup server
         /// </summary>
-        private System.Timers.Timer BackupReplyTimer;
+        private System.Timers.Timer backupReplyTimer;
 
         internal PrimaryServer(Server server)
             : base(server) {
@@ -39,8 +39,11 @@ namespace PadIntServer {
             imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
 
             // Create a timer with BACKUP_REPLY_INTERVAL second interval.
-            imAliveTimer = new System.Timers.Timer(BACKUP_REPLY_INTERVAL);
-            imAliveTimer.Elapsed += new ElapsedEventHandler(BackupReplyEvent);
+            backupReplyTimer = new System.Timers.Timer(BACKUP_REPLY_INTERVAL);
+            backupReplyTimer.Elapsed += new ElapsedEventHandler(BackupReplyEvent);
+
+            //starts im alive timer
+            imAliveTimer.Start();
         }
 
         /// <summary>
@@ -60,7 +63,6 @@ namespace PadIntServer {
         /// </summary>
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAliveEvent" });
-
             ImAlive();
         }
 
@@ -112,7 +114,9 @@ namespace PadIntServer {
             try {
                 Server.PdInts.Add(uid, new PadInt(uid));
                 /* updates the backup server */
+                backupReplyTimer.Start();
                 Server.ReplicationServer.createPadInt(uid);
+                backupReplyTimer.Stop();
                 return true;
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, Server.ID);
@@ -146,7 +150,9 @@ namespace PadIntServer {
                 while(true) {
                     if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
                         /* updates the backup server */
+                        backupReplyTimer.Start();
                         Server.ReplicationServer.readPadInt(tid, uid);
+                        backupReplyTimer.Stop();
                         return padInt.ActualValue;
                     }
                 }
@@ -173,7 +179,9 @@ namespace PadIntServer {
                     if(padInt.getWriteLock(tid)) {
                         padInt.ActualValue = value;
                         /* updates the backup server */
+                        backupReplyTimer.Start();
                         Server.ReplicationServer.writePadInt(tid, uid, value);
+                        backupReplyTimer.Stop();
                         return true;
                     }
                 }
@@ -205,7 +213,9 @@ namespace PadIntServer {
             }
 
             /* updates the backup server */
+            backupReplyTimer.Start();
             Server.ReplicationServer.commit(tid, usedPadInts);
+            backupReplyTimer.Stop();
 
             return resultCommit;
         }
@@ -233,7 +243,9 @@ namespace PadIntServer {
             }
 
             /* updates the backup server */
+            backupReplyTimer.Start();
             Server.ReplicationServer.abort(tid, usedPadInts);
+            backupReplyTimer.Stop();
 
             return resultAbort;
         }

@@ -15,6 +15,11 @@ namespace PadIntServer {
         /// </summary>
         private const int INITIALIZATION = -1;
         /// <summary>
+        /// Constant used to represent the interval after which the
+        ///  deadlock detection occurs (1000 = 1s)
+        /// </summary>
+        private const int DEADLOCK_INTERVAL = 10000;
+        /// <summary>
         /// PadInt identifier
         /// </summary>
         private int uid;
@@ -65,8 +70,8 @@ namespace PadIntServer {
             this.actualValue = 0;
             this.originalValue = 0;
 
-            // Create a timer with a ten second interval.
-            deadLockTimer = new System.Timers.Timer(10000);
+            // Create a timer with a DEADLOCK_INTERVAL interval.
+            deadLockTimer = new System.Timers.Timer(DEADLOCK_INTERVAL);
             deadLockTimer.Elapsed += new ElapsedEventHandler(DeadLockEvent);
 
             this.promotion = INITIALIZATION;
