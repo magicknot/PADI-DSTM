@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonTypes.cs" />
+    <Compile Include="Exceptions\AbortException.cs" />
     <Compile Include="Exceptions\ServerNotFoundException.cs" />
     <Compile Include="Exceptions\ServerDoesNotReplyException.cs" />
     <Compile Include="Exceptions\ServerAlreadyExistsException.cs" />

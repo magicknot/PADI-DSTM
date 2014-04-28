@@ -11,7 +11,7 @@ namespace PadIntServer {
     class PadInt : IPadInt {
 
         /// <summary>
-        /// constante used in the initialization of int variables
+        /// Constant used in the initialization of int variables
         /// </summary>
         private const int INITIALIZATION = -1;
         /// <summary>
@@ -35,6 +35,10 @@ namespace PadIntServer {
         /// Timer used in deadlock detection
         /// </summary>
         private System.Timers.Timer deadLockTimer;
+        /// <summary>
+        /// Variable used to indicate who (pending write/read) starts the deadlocks timer
+        /// </summary>
+        private bool isWaitingWrite;
         /// <summary>
         /// identifier (tid) of the next transaction to be promoted.
         /// Value INITIALIZATION means that there is no transaction, 
@@ -104,20 +108,23 @@ namespace PadIntServer {
         private void DeadLockEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "PadInt", "DeadLockEvent" });
 
+            /* stops the timer */
             deadLockTimer.Close();
 
-            if(writer != INITIALIZATION) {
-                //abort
-                //TODO
-                freeWriteLock(writer);
+            /* if was a write request that starts the timer */
+            if(isWaitingWrite) {
+                pendingWriters.RemoveAt(0);
             } else {
-                for(int index = readers.Count - 1; index >= 0; index--) {
-                    int abortTid = readers[index];
-                    //TODO abort
-                    readers.RemoveAt(index);
-                    dequeueReadLock();
-                }
+                pendingReaders.RemoveAt(0);
             }
+
+            /* restart the timer if exists other pending requests because
+             *  the timer is only activated by the first one */
+            if(pendingWriters.Count > 0 || pendingReaders.Count > 0) {
+                deadLockTimer.Start();
+            }
+
+            throw new AbortException(uid);
         }
 
         /// <summary>
@@ -131,11 +138,6 @@ namespace PadIntServer {
 
             Logger.log(new String[] { "PadInt", "getReadLock" });
 
-            /* ve se não há algum escritor 
-             *  se nao existir mete nos leitores
-               se existir escritor mete na fila de espera dos leitores
-             */
-
             /* if there is no writer */
             if(writer == INITIALIZATION) {
                 readers.Add(tid);
@@ -148,20 +150,12 @@ namespace PadIntServer {
                     //activates the deadLock detection if it is not already started
                     if(!deadLockTimer.Enabled) {
                         deadLockTimer.Start();
+                        isWaitingWrite = false;
                     }
                 }
             }
 
-            /* TODO !!!!!
-             * 
-             * VER COMO E HISTORIA DE FICAR PARADO `A ESPERA SE SO´ 
-             * RESPONDER DEPOIS DE TER O LOCK. MESMO QUE ISSO SEJA NO
-             * 
-             * SERVER TB TEM QUE SER VISTO AQUI DE ALGUMA FORMA
-             */
-
             return true;
-            /* retorna false caso abort??? depois com os timer? */
         }
 
         /// <summary>
@@ -208,6 +202,7 @@ namespace PadIntServer {
                             //activates the deadLock detection if it is not already started
                             if(!deadLockTimer.Enabled) {
                                 deadLockTimer.Start();
+                                isWaitingWrite = true;
                             }
 
                             Logger.log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
@@ -225,6 +220,7 @@ namespace PadIntServer {
                             //activates the deadLock detection if it is not already started
                             if(!deadLockTimer.Enabled) {
                                 deadLockTimer.Start();
+                                isWaitingWrite = true;
                             }
 
                             Logger.log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
@@ -242,7 +238,6 @@ namespace PadIntServer {
                                 promotion = tid;
                             } else {
                                 /* abort */
-                                //TODO confirmar se basta retornar falso
                                 return false;
                             }
                         }
@@ -389,7 +384,6 @@ namespace PadIntServer {
             if(promotion == tid) {
                 promotion = INITIALIZATION;
                 commitSuccessful = false;
-                //lanca excepcao NaoFezAindaEscrita
             }
 
             return commitSuccessful;

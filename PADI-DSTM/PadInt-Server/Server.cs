@@ -100,7 +100,7 @@ namespace PadIntServer {
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
         public void createPrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.ToString() });
+            Logger.log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new PrimaryServer(this);
             ReplicationServerAddr = backupAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
@@ -115,7 +115,7 @@ namespace PadIntServer {
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
         public void createBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.ToString() });
+            Logger.log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new BackupServer(this);
             ReplicationServerAddr = primaryAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
