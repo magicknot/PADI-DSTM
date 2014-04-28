@@ -44,12 +44,12 @@ namespace PadIntServer {
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            Server.Master.becomePrimary(Server.ID, Server.ReplicationServerAddr);
+            Server.Master.becomePrimary(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
         }
 
         private PadInt getPadInt(int uid) {
             if(Server.PdInts.ContainsKey(uid)) {
-                return Server.PdInts[uid];
+                return (PadInt)Server.PdInts[uid];
             } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }
@@ -68,7 +68,7 @@ namespace PadIntServer {
         internal override bool createPadInt(int uid) {
             Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
-                Server.PdInts.Add(uid, new PadInt(uid));
+                Server.PdInts.Add(uid, (IPadInt) new PadInt(uid));
                 return true;
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, Server.ID);

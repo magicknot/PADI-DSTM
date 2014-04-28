@@ -27,7 +27,7 @@ namespace PadIntServer {
         /// <summary>
         /// Structure that maps UID to PadInt
         /// </summary>
-        internal Dictionary<int, PadInt> padIntDictionary;
+        internal Dictionary<int, IPadInt> padIntDictionary;
         /// <summary>
         /// Pending request list
         /// </summary>
@@ -54,8 +54,8 @@ namespace PadIntServer {
 
         public Server() {
             serverState = (ServerState) new FailedServer(this);
-            oldState = (ServerState) new PrimaryServer(this);
-            padIntDictionary = new Dictionary<int, PadInt>();
+            oldState = (ServerState) new FailedServer(this);
+            padIntDictionary = new Dictionary<int, IPadInt>();
         }
 
         internal int ID {
@@ -78,7 +78,7 @@ namespace PadIntServer {
             get { return replicationServerAddress; }
         }
 
-        internal Dictionary<int, PadInt> PdInts {
+        internal Dictionary<int, IPadInt> PdInts {
             set { this.padIntDictionary = value; }
             get { return this.padIntDictionary; }
         }
@@ -98,11 +98,14 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="backupAddress">Backup server address</param>
         /// <param name="id">Server identifier</param>
-        public void createPrimaryServer(string backupAddress, int id) {
+        /// <param name="padInts">Structure that maps UID to PadInt</param>
+        public void createPrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
+            Logger.log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.ToString() });
             serverState = new PrimaryServer(this);
             ReplicationServerAddr = backupAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
             ID = id;
+            padIntDictionary = padInts;
         }
 
         /// <summary>
@@ -110,14 +113,18 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="id">Server identifier</param>
-        public void createBackupServer(string primaryAddress, int id) {
+        /// <param name="padInts">Structure that maps UID to PadInt</param>
+        public void createBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts) {
+            Logger.log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.ToString() });
             serverState = new BackupServer(this);
             ReplicationServerAddr = primaryAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
             ID = id;
+            padIntDictionary = padInts;
         }
 
         public void ImAlive() {
+            Logger.log(new String[] { "Server", ID.ToString(), "ImAlive" });
             serverState.ImAlive();
         }
 
@@ -189,7 +196,6 @@ namespace PadIntServer {
              */
             try {
                 return serverState.commit(tid, usedPadInts);
-
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(ServerDoesNotReplyException) {
@@ -247,8 +253,8 @@ namespace PadIntServer {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");
-            foreach(KeyValuePair<int, PadInt> pd in padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + pd.Value.ActualValue);
+            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
             }
             Console.WriteLine("-----------------------");
             return true;

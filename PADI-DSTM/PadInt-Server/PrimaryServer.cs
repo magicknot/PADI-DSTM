@@ -72,7 +72,7 @@ namespace PadIntServer {
         private void BackupReplyEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
 
-            Server.Master.createNewReplica(Server.ID, Server.ReplicationServerAddr);
+            Server.Master.createNewReplica(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace PadIntServer {
         private PadInt getPadInt(int uid) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
             if(Server.PdInts.ContainsKey(uid)) {
-                return Server.PdInts[uid];
+                return (PadInt) Server.PdInts[uid];
             } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }

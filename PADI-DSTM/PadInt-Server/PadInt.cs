@@ -8,7 +8,7 @@ using System.Timers;
 
 namespace PadIntServer {
     [Serializable]
-    class PadInt {
+    class PadInt : IPadInt {
 
         /// <summary>
         /// constante used in the initialization of int variables
