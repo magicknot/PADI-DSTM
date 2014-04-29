@@ -149,8 +149,13 @@ namespace PadIntServer {
 
                     //activates the deadLock detection if it is not already started
                     if(!deadLockTimer.Enabled) {
-                        deadLockTimer.Start();
-                        isWaitingWrite = false;
+                        try {
+                            isWaitingWrite = false;
+                            deadLockTimer.Start();
+                        } catch(AbortException) {
+                            throw;
+                        }
+
                     }
                 }
             }
@@ -201,8 +206,12 @@ namespace PadIntServer {
 
                             //activates the deadLock detection if it is not already started
                             if(!deadLockTimer.Enabled) {
-                                deadLockTimer.Start();
-                                isWaitingWrite = true;
+                                try {
+                                    isWaitingWrite = true;
+                                    deadLockTimer.Start();
+                                } catch(AbortException) {
+                                    throw;
+                                }
                             }
 
                             Logger.log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
@@ -219,8 +228,12 @@ namespace PadIntServer {
 
                             //activates the deadLock detection if it is not already started
                             if(!deadLockTimer.Enabled) {
-                                deadLockTimer.Start();
-                                isWaitingWrite = true;
+                                try {
+                                    isWaitingWrite = true;
+                                    deadLockTimer.Start();
+                                } catch(AbortException) {
+                                    throw;
+                                }
                             }
 
                             Logger.log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });

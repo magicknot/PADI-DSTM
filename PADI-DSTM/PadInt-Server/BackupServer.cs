@@ -8,7 +8,10 @@ using System.Timers;
 
 namespace PadIntServer {
     /// <summary>
-    /// This class represents the PadInt backup server
+    /// This class represents the PadInt backup server.
+    /// Note that the loops (pending queue) in PadInt class do not occur when the backup server
+    ///  is called because the primary server only calls this server when it
+    ///  obtains the read/write locks
     /// </summary>
     class BackupServer : ServerState {
 
@@ -49,7 +52,7 @@ namespace PadIntServer {
 
         private PadInt getPadInt(int uid) {
             if(Server.PdInts.ContainsKey(uid)) {
-                return (PadInt)Server.PdInts[uid];
+                return (PadInt) Server.PdInts[uid];
             } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }
@@ -101,6 +104,8 @@ namespace PadIntServer {
                 }
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(AbortException) {
+                throw;
             }
 
             return -1;
@@ -118,6 +123,8 @@ namespace PadIntServer {
                     return true;
                 }
             } catch(PadIntNotFoundException) {
+                throw;
+            } catch(AbortException) {
                 throw;
             }
 

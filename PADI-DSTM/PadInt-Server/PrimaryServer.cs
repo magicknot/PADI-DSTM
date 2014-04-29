@@ -158,6 +158,8 @@ namespace PadIntServer {
                 }
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(AbortException) {
+                throw;
             }
         }
 
@@ -186,6 +188,8 @@ namespace PadIntServer {
                     }
                 }
             } catch(PadIntNotFoundException) {
+                throw;
+            } catch(AbortException) {
                 throw;
             }
         }

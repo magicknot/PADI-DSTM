@@ -161,6 +161,8 @@ namespace PadIntServer {
                 return serverState.readPadInt(tid, uid);
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(AbortException) {
+                throw;
             } catch(ServerDoesNotReplyException) {
                 throw;
             }
@@ -172,6 +174,8 @@ namespace PadIntServer {
             try {
                 return serverState.writePadInt(tid, uid, value);
             } catch(PadIntNotFoundException) {
+                throw;
+            } catch(AbortException) {
                 throw;
             } catch(ServerDoesNotReplyException) {
                 throw;
