@@ -20,15 +20,15 @@ namespace PadIntServer {
             //Nothing to do here
         }
 
-        internal override bool createPadInt(int uid) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+        internal override bool CreatePadInt(int uid) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
         }
 
-        internal override bool confirmPadInt(int uid) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+        internal override bool ConfirmPadInt(int uid) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
@@ -38,15 +38,15 @@ namespace PadIntServer {
          *  has the read/write lock.
          * Throw an exception if PadInt not found. 
          */
-        internal override int readPadInt(int tid, int uid) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
+        internal override int ReadPadInt(int tid, int uid) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
         }
 
-        internal override bool writePadInt(int tid, int uid, int value) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+        internal override bool WritePadInt(int tid, int uid, int value) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
@@ -58,8 +58,8 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool commit(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
+        internal override bool Commit(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
@@ -71,8 +71,8 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool abort(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "FreezedServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
+        internal override bool Abort(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "FreezedServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);

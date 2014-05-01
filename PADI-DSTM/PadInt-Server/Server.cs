@@ -83,10 +83,10 @@ namespace PadIntServer {
             get { return this.padIntDictionary; }
         }
 
-        public bool init(int port) {
+        public bool Init(int port) {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-                ID = Master.registerServer("tcp://localhost:" + (8000 + port) + "/PadIntServer");
+                ID = Master.RegisterServer("tcp://localhost:" + (8000 + port) + "/PadIntServer");
             } catch(ServerAlreadyExistsException) {
                 throw;
             }
@@ -99,8 +99,8 @@ namespace PadIntServer {
         /// <param name="backupAddress">Backup server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void createPrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
+        public void CreatePrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new PrimaryServer(this);
             ReplicationServerAddr = backupAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
@@ -114,8 +114,8 @@ namespace PadIntServer {
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void createBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
+        public void CreateBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new BackupServer(this);
             ReplicationServerAddr = primaryAddress;
             ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
@@ -124,14 +124,14 @@ namespace PadIntServer {
         }
 
         public void ImAlive() {
-            Logger.log(new String[] { "Server", ID.ToString(), "ImAlive" });
+            Logger.Log(new String[] { "Server", ID.ToString(), "ImAlive" });
             serverState.ImAlive();
         }
 
-        public bool createPadInt(int uid) {
-            Logger.log(new String[] { "Server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+        public bool CreatePadInt(int uid) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
-                return serverState.createPadInt(uid);
+                return serverState.CreatePadInt(uid);
             } catch(PadIntAlreadyExistsException) {
                 throw;
             } catch(ServerDoesNotReplyException) {
@@ -139,10 +139,10 @@ namespace PadIntServer {
             }
         }
 
-        public bool confirmPadInt(int uid) {
-            Logger.log(new String[] { "Server", ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+        public bool ConfirmPadInt(int uid) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             try {
-                return serverState.confirmPadInt(uid);
+                return serverState.ConfirmPadInt(uid);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(ServerDoesNotReplyException) {
@@ -154,11 +154,11 @@ namespace PadIntServer {
          *  has the read/write lock.
          * Throw an exception if PadInt not found. 
          */
-        public int readPadInt(int tid, int uid) {
-            Logger.log(new String[] { "Server", ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
+        public int ReadPadInt(int tid, int uid) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
             try {
-                return serverState.readPadInt(tid, uid);
+                return serverState.ReadPadInt(tid, uid);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(AbortException) {
@@ -168,11 +168,11 @@ namespace PadIntServer {
             }
         }
 
-        public bool writePadInt(int tid, int uid, int value) {
-            Logger.log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+        public bool WritePadInt(int tid, int uid, int value) {
+            Logger.Log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             try {
-                return serverState.writePadInt(tid, uid, value);
+                return serverState.WritePadInt(tid, uid, value);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(AbortException) {
@@ -188,8 +188,8 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        public bool commit(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "commit", "tid", tid.ToString() });
+        public bool Commit(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "commit", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -199,7 +199,7 @@ namespace PadIntServer {
              *  actualizar no server.
              */
             try {
-                return serverState.commit(tid, usedPadInts);
+                return serverState.Commit(tid, usedPadInts);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(ServerDoesNotReplyException) {
@@ -213,8 +213,8 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        public bool abort(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "Server", ID.ToString(), "abort", "tid", tid.ToString() });
+        public bool Abort(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "abort", "tid", tid.ToString() });
             /* TODO !!!!!
              * 
              * se por acaso usarmos o tab no cliente para guardar valores para
@@ -225,7 +225,7 @@ namespace PadIntServer {
              */
 
             try {
-                return serverState.abort(tid, usedPadInts);
+                return serverState.Abort(tid, usedPadInts);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(ServerDoesNotReplyException) {

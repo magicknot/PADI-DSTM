@@ -22,7 +22,7 @@ namespace ClientLibrary {
         /// <param name="serverAddress">Server Address</param>
         public PadIntRegistry(string serverAddress) {
             padIntsList = new List<int>();
-            this.serverAddress=serverAddress;
+            this.serverAddress = serverAddress;
         }
 
         /// <summary>

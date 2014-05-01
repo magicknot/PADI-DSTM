@@ -16,26 +16,26 @@ namespace PadIntServer {
 
         static void testeWrite1() {
             /* write */
-            if(padInt.getWriteLock(tid0)) {
+            if(padInt.GetWriteLock(tid0)) {
                 Console.WriteLine("tid0: obtive lock write");
             }
 
             /* read */
-            if(padInt.getReadLock(tid1)) {
+            if(padInt.GetReadLock(tid1)) {
                 Console.WriteLine("tid1: obtive lock read");
             }
 
             /* liberta write */
-            padInt.freeWriteLock(tid0);
+            padInt.FreeWriteLock(tid0);
             Console.WriteLine("tid0: libertei lock write");
 
             /* read */
-            if(padInt.getReadLock(tid2)) {
+            if(padInt.GetReadLock(tid2)) {
                 Console.WriteLine("tid2: obtive lock read");
             }
         }
 
-        public static void main(String[] args) {
+        public static void MainTeste(String[] args) {
 
             /*bool getReadLock(int tid, int uid)
 bool getWriteLock(int tid, int uid)

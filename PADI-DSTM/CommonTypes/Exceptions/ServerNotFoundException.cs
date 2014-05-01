@@ -69,7 +69,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override string getMessage() {
+        public override string GetMessage() {
             if(serverID != NO_SERVER_ID) {
                 return "Master server doesn't have server with identifier " + serverID + " registered";
             } else {

@@ -28,10 +28,10 @@ namespace PadIntServer {
 
             try {
                 RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
-                padIntServer.init(randomNumber);
+                padIntServer.Init(randomNumber);
                 Console.WriteLine("Server up and running on port " + (8000 + randomNumber));
             } catch(ServerAlreadyExistsException e) {
-                Console.WriteLine(e.getMessage());
+                Console.WriteLine(e.GetMessage());
             }
 
             while(true)

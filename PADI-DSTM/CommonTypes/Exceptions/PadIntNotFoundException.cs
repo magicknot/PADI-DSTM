@@ -63,7 +63,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override String getMessage() {
+        public override String GetMessage() {
             return "The PadInt with uid " + uid + " was not found on server " + serverID;
         }
 

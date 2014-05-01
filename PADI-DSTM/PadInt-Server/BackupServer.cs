@@ -39,18 +39,18 @@ namespace PadIntServer {
         /// Receives I'm alive from primary server
         /// </summary>
         internal override void ImAlive() {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "ImAlive" });
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAlive" });
             //re-starts the timer
             imAliveTimer.Stop();
             imAliveTimer.Start();
         }
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            Server.Master.becomePrimary(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
+            Server.Master.BecomePrimary(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
         }
 
-        private PadInt getPadInt(int uid) {
+        private PadInt GetPadInt(int uid) {
             if(Server.PdInts.ContainsKey(uid)) {
                 return (PadInt) Server.PdInts[uid];
             } else {
@@ -58,18 +58,18 @@ namespace PadIntServer {
             }
         }
 
-        private void verifyPadInts(List<int> padInts) {
+        private void VerifyPadInts(List<int> padInts) {
             try {
                 foreach(int uid in padInts) {
-                    getPadInt(uid);
+                    GetPadInt(uid);
                 }
             } catch(PadIntNotFoundException) {
                 throw;
             }
         }
 
-        internal override bool createPadInt(int uid) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+        internal override bool CreatePadInt(int uid) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
                 Server.PdInts.Add(uid, (IPadInt) new PadInt(uid));
                 return true;
@@ -78,10 +78,10 @@ namespace PadIntServer {
             }
         }
 
-        internal override bool confirmPadInt(int uid) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+        internal override bool ConfirmPadInt(int uid) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             try {
-                getPadInt(uid);
+                GetPadInt(uid);
                 return true;
             } catch(PadIntNotFoundException) {
                 throw;
@@ -92,14 +92,14 @@ namespace PadIntServer {
          *  has the read/write lock.
          * Throw an exception if PadInt not found. 
          */
-        internal override int readPadInt(int tid, int uid) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
+        internal override int ReadPadInt(int tid, int uid) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
+                PadInt padInt = GetPadInt(uid);
 
-                if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
+                if(padInt.HasWriteLock(tid) || padInt.GetReadLock(tid)) {
                     return padInt.ActualValue;
                 }
             } catch(PadIntNotFoundException) {
@@ -111,14 +111,14 @@ namespace PadIntServer {
             return -1;
         }
 
-        internal override bool writePadInt(int tid, int uid, int value) {
-            Logger.log(new String[] { "Server ", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+        internal override bool WritePadInt(int tid, int uid, int value) {
+            Logger.Log(new String[] { "Server ", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
+                PadInt padInt = GetPadInt(uid);
 
-                if(padInt.getWriteLock(tid)) {
+                if(padInt.GetWriteLock(tid)) {
                     padInt.ActualValue = value;
                     return true;
                 }
@@ -137,17 +137,17 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool commit(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
+        internal override bool Commit(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
 
             bool resultCommit = true;
 
             try {
-                verifyPadInts(usedPadInts);
+                VerifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultCommit = padInt.commit(tid) && resultCommit;
+                    PadInt padInt = GetPadInt(padIntUid);
+                    resultCommit = padInt.Commit(tid) && resultCommit;
                 }
 
             } catch(PadIntNotFoundException) {
@@ -163,17 +163,17 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool abort(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "BackupServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
+        internal override bool Abort(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
 
             bool resultAbort = true;
 
             try {
-                verifyPadInts(usedPadInts);
+                VerifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultAbort = padInt.abort(tid) && resultAbort;
+                    PadInt padInt = GetPadInt(padIntUid);
+                    resultAbort = padInt.Abort(tid) && resultAbort;
                 }
             } catch(PadIntNotFoundException) {
                 throw;

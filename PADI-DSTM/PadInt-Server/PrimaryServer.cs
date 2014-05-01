@@ -50,7 +50,7 @@ namespace PadIntServer {
         /// Sends I'm alive to backup server
         /// </summary>
         internal override void ImAlive() {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAlive" });
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAlive" });
 
             imAliveTimer.Stop();
             Server.ReplicationServer.ImAlive();
@@ -62,7 +62,7 @@ namespace PadIntServer {
         /// Deals with I'm alive timer events
         /// </summary>
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAliveEvent" });
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAliveEvent" });
             ImAlive();
         }
 
@@ -70,9 +70,9 @@ namespace PadIntServer {
         /// Deals with backup reply timer events
         /// </summary>
         private void BackupReplyEvent(object source, ElapsedEventArgs e) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
             backupReplyTimer.Stop();
-            Server.Master.createNewReplica(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
+            Server.Master.CreateNewReplica(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
-        private PadInt getPadInt(int uid) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
+        private PadInt GetPadInt(int uid) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
             if(Server.PdInts.ContainsKey(uid)) {
                 return (PadInt) Server.PdInts[uid];
             } else {
@@ -93,11 +93,11 @@ namespace PadIntServer {
         /// Verifies if each PadInt in padInts exist
         /// </summary>
         /// <param name="padInts">List with PadInts' identifiers</param>
-        private void verifyPadInts(List<int> padInts) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "verifyPadInts" });
+        private void VerifyPadInts(List<int> padInts) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "verifyPadInts" });
             try {
                 foreach(int uid in padInts) {
-                    getPadInt(uid);
+                    GetPadInt(uid);
                 }
             } catch(PadIntNotFoundException) {
                 throw;
@@ -109,13 +109,13 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
-        internal override bool createPadInt(int uid) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+        internal override bool CreatePadInt(int uid) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
                 Server.PdInts.Add(uid, new PadInt(uid));
                 /* updates the backup server */
                 backupReplyTimer.Start();
-                Server.ReplicationServer.createPadInt(uid);
+                Server.ReplicationServer.CreatePadInt(uid);
                 backupReplyTimer.Stop();
                 return true;
             } catch(ArgumentException) {
@@ -123,10 +123,10 @@ namespace PadIntServer {
             }
         }
 
-        internal override bool confirmPadInt(int uid) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+        internal override bool ConfirmPadInt(int uid) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
             try {
-                getPadInt(uid);
+                GetPadInt(uid);
                 return true;
             } catch(PadIntNotFoundException) {
                 throw;
@@ -140,18 +140,18 @@ namespace PadIntServer {
         /// <param name="tid">Transaction identifier</param>
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
-        internal override int readPadInt(int tid, int uid) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
+        internal override int ReadPadInt(int tid, int uid) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
+                PadInt padInt = GetPadInt(uid);
 
                 while(true) {
-                    if(padInt.hasWriteLock(tid) || padInt.getReadLock(tid)) {
+                    if(padInt.HasWriteLock(tid) || padInt.GetReadLock(tid)) {
                         /* updates the backup server */
                         backupReplyTimer.Start();
-                        Server.ReplicationServer.readPadInt(tid, uid);
+                        Server.ReplicationServer.ReadPadInt(tid, uid);
                         backupReplyTimer.Stop();
                         return padInt.ActualValue;
                     }
@@ -170,19 +170,19 @@ namespace PadIntServer {
         /// <param name="uid">PadInt identifier</param>
         /// <param name="value">Value of the write</param>
         /// <returns>True if successful</returns>
-        internal override bool writePadInt(int tid, int uid, int value) {
-            Logger.log(new String[] { "Server ", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+        internal override bool WritePadInt(int tid, int uid, int value) {
+            Logger.Log(new String[] { "Server ", Server.ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
 
             try {
                 /* Obtain the PadInt identified by uid */
-                PadInt padInt = getPadInt(uid);
+                PadInt padInt = GetPadInt(uid);
 
                 while(true) {
-                    if(padInt.getWriteLock(tid)) {
+                    if(padInt.GetWriteLock(tid)) {
                         padInt.ActualValue = value;
                         /* updates the backup server */
                         backupReplyTimer.Start();
-                        Server.ReplicationServer.writePadInt(tid, uid, value);
+                        Server.ReplicationServer.WritePadInt(tid, uid, value);
                         backupReplyTimer.Stop();
                         return true;
                     }
@@ -200,17 +200,17 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool commit(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
+        internal override bool Commit(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "commit", "tid", tid.ToString() });
 
             bool resultCommit = true;
 
             try {
-                verifyPadInts(usedPadInts);
+                VerifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultCommit = padInt.commit(tid) && resultCommit;
+                    PadInt padInt = GetPadInt(padIntUid);
+                    resultCommit = padInt.Commit(tid) && resultCommit;
                 }
             } catch(PadIntNotFoundException) {
                 throw;
@@ -218,7 +218,7 @@ namespace PadIntServer {
 
             /* updates the backup server */
             backupReplyTimer.Start();
-            Server.ReplicationServer.commit(tid, usedPadInts);
+            Server.ReplicationServer.Commit(tid, usedPadInts);
             backupReplyTimer.Stop();
 
             return resultCommit;
@@ -230,17 +230,17 @@ namespace PadIntServer {
         /// <param name="tid">transaction identifier</param>
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        internal override bool abort(int tid, List<int> usedPadInts) {
-            Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
+        internal override bool Abort(int tid, List<int> usedPadInts) {
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
 
             bool resultAbort = true;
 
             try {
-                verifyPadInts(usedPadInts);
+                VerifyPadInts(usedPadInts);
 
                 foreach(int padIntUid in usedPadInts) {
-                    PadInt padInt = getPadInt(padIntUid);
-                    resultAbort = padInt.abort(tid) && resultAbort;
+                    PadInt padInt = GetPadInt(padIntUid);
+                    resultAbort = padInt.Abort(tid) && resultAbort;
                 }
             } catch(PadIntNotFoundException) {
                 throw;
@@ -248,7 +248,7 @@ namespace PadIntServer {
 
             /* updates the backup server */
             backupReplyTimer.Start();
-            Server.ReplicationServer.abort(tid, usedPadInts);
+            Server.ReplicationServer.Abort(tid, usedPadInts);
             backupReplyTimer.Stop();
 
             return resultAbort;

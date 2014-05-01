@@ -11,14 +11,14 @@ namespace CommonTypes {
     /// </summary>
     public interface IServer {
         void ImAlive();
-        void createPrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts);
-        void createBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts);
-        bool createPadInt(int uid);
-        bool confirmPadInt(int uid);
-        int readPadInt(int tid, int uid);
-        bool writePadInt(int tid, int uid, int value);
-        bool commit(int tid, List<int> usedPadInts);
-        bool abort(int tid, List<int> usedPadInts);
+        void CreatePrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts);
+        void CreateBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts);
+        bool CreatePadInt(int uid);
+        bool ConfirmPadInt(int uid);
+        int ReadPadInt(int tid, int uid);
+        bool WritePadInt(int tid, int uid, int value);
+        bool Commit(int tid, List<int> usedPadInts);
+        bool Abort(int tid, List<int> usedPadInts);
         bool Dump();
         bool Freeze();
         bool Fail();
@@ -29,12 +29,12 @@ namespace CommonTypes {
     /// Remote Master server interface
     /// </summary>
     public interface IMaster {
-        int getNextTID();
-        int registerServer(String address);
-        void becomePrimary(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
-        void createNewReplica(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
-        Tuple<int, string> getPadIntServer(int uid);
-        Tuple<int, string> registerPadInt(int uid);
+        int GetNextTID();
+        int RegisterServer(String address);
+        void BecomePrimary(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
+        void CreateNewReplica(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
+        Tuple<int, string> GetPadIntServer(int uid);
+        Tuple<int, string> RegisterPadInt(int uid);
         bool Status();
     }
 
@@ -57,7 +57,7 @@ namespace CommonTypes {
     /// </summary>
     [Serializable]
     public abstract class IPadiException : System.Exception {
-        public abstract string getMessage();
+        public abstract string GetMessage();
 
         public IPadiException() {
         }
@@ -94,7 +94,7 @@ namespace CommonTypes {
         /// Redirects the log message according to predicates
         /// </summary>
         /// <param name="args">The log message arguments</param>
-        public static void log(String[] args) {
+        public static void Log(String[] args) {
             message = "";
             if(debugOn) {
                 if(isLocal) {

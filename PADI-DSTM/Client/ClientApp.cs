@@ -20,7 +20,7 @@ namespace Client {
             Console.WriteLine("Client up and running..");
             TcpChannel channel;
 
-            if(Library.init()) {
+            if(Library.Init()) {
 
                 string input;
 
@@ -61,31 +61,31 @@ namespace Client {
 
                     /* sample app */
                     if(input.Equals("0")) {
-                        client.testSampleApp();
+                        client.TestSampleApp();
                     }
 
                     if(input.Equals("1")) {
-                        client.testRandom();
+                        client.TestRandom();
                     }
 
                     if(input.Equals("2")) {
-                        client.testSimpleRead(client.getNextUid());
+                        client.TestSimpleRead(client.GetNextUid());
                     }
 
                     if(input.Equals("3")) {
-                        client.testSimpleWrite(client.getNextUid());
+                        client.TestSimpleWrite(client.GetNextUid());
                     }
 
                     if(input.Equals("4")) {
-                        client.testSimpleAbort(client.getNextUid());
+                        client.TestSimpleAbort(client.GetNextUid());
                     }
 
                     if(input.Equals("5")) {
-                        client.testSimpleCommit(client.getNextUid());
+                        client.TestSimpleCommit(client.GetNextUid());
                     }
 
                     if(input.Equals("6")) {
-                        client.testMultipleRead(client.getNextUid(), client.getNextUid(), client.getNextUid());
+                        client.TestMultipleRead(client.GetNextUid(), client.GetNextUid(), client.GetNextUid());
                     }
 
                     /* init */
@@ -99,7 +99,7 @@ namespace Client {
                                 typeof(Client)
                                 );
                         } catch(ServerAlreadyExistsException e) {
-                            Console.WriteLine(e.getMessage());
+                            Console.WriteLine(e.GetMessage());
                         }
                         Console.WriteLine("init done");
                     }
@@ -107,13 +107,13 @@ namespace Client {
                     /* loop setup */
                     if(input.Equals("8")) {
                         //stopLoop = false;
-                        client.setStopLoop(false);
+                        client.SetStopLoop(false);
                         Console.WriteLine("loop is activated stopLoop = " + client.StopLoop);
                     }
 
                     /* stops the loop */
                     if(input.Equals("9")) {
-                        client.setStopLoop(true);
+                        client.SetStopLoop(true);
                         Console.WriteLine("loop is deactivated stopLoop = " + client.StopLoop);
                     }
 
@@ -124,12 +124,12 @@ namespace Client {
 
                     /* client2 simple read */
                     if(input.Equals("11")) {
-                        client.testSimpleReadClient2(client.getLastUid());
+                        client.TestSimpleReadClient2(client.GetLastUid());
                     }
 
                     /* client2 simple write */
                     if(input.Equals("12")) {
-                        client.testSimpleWriteClient2(client.getLastUid());
+                        client.TestSimpleWriteClient2(client.GetLastUid());
                     }
 
                     /* client2 multiple read */
@@ -145,12 +145,12 @@ namespace Client {
 
                     /* read write */
                     if(input.Equals("15")) {
-                        client.testReadWrite(client.getNextUid());
+                        client.TestReadWrite(client.GetNextUid());
                     }
                 }
 
             } else {
-                Logger.log(new String[] { "There are no servers available" });
+                Logger.Log(new String[] { "There are no servers available" });
             }
         }
     }

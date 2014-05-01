@@ -52,7 +52,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override String getMessage() {
+        public override String GetMessage() {
             return "Abort in PadInt with identifier " + uid;
         }
     }

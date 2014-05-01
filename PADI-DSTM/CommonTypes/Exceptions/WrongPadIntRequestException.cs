@@ -66,7 +66,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override String getMessage() {
+        public override String GetMessage() {
             return "The padInt with uid " + uid + " was not accessed nor created on the context of transaction with tid " + tid;
         }
 

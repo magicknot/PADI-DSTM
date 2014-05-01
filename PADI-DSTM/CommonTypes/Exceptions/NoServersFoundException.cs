@@ -42,7 +42,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override string getMessage() {
+        public override string GetMessage() {
             return "Master server doesn't have any server registered";
         }
     }

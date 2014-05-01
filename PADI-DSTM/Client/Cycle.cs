@@ -12,37 +12,37 @@ namespace Client {
 
             bool res;
 
-            Library.init();
+            Library.Init();
 
             // if((args.Length > 0) && (args[0].Equals("C"))) {
-            res = Library.txBegin();
-            PadIntStub pi_a = Library.createPadInt(2);
-            PadIntStub pi_b = Library.createPadInt(2000000001);
-            PadIntStub pi_c = Library.createPadInt(1000000000);
-            pi_a.write(0);
-            pi_b.write(0);
-            res = Library.txCommit();
+            res = Library.TxBegin();
+            PadIntStub pi_a = Library.CreatePadInt(2);
+            PadIntStub pi_b = Library.CreatePadInt(2000000001);
+            PadIntStub pi_c = Library.CreatePadInt(1000000000);
+            pi_a.Write(0);
+            pi_b.Write(0);
+            res = Library.TxCommit();
             //}
             Console.WriteLine("####################################################################");
             Console.WriteLine("Finished creating PadInts. Press enter for 300 R/W transaction cycle.");
             Console.WriteLine("####################################################################");
             Console.ReadLine();
             for(int i = 0; i < 300; i++) {
-                res = Library.txBegin();
-                PadIntStub pi_d = Library.accessPadInt(2);
-                PadIntStub pi_e = Library.accessPadInt(2000000001);
-                PadIntStub pi_f = Library.accessPadInt(1000000000);
-                int d = pi_d.read();
+                res = Library.TxBegin();
+                PadIntStub pi_d = Library.AccessPadInt(2);
+                PadIntStub pi_e = Library.AccessPadInt(2000000001);
+                PadIntStub pi_f = Library.AccessPadInt(1000000000);
+                int d = pi_d.Read();
                 d++;
-                pi_d.write(d);
-                int e = pi_e.read();
+                pi_d.Write(d);
+                int e = pi_e.Read();
                 e++;
-                pi_e.write(e);
-                int f = pi_f.read();
+                pi_e.Write(e);
+                int f = pi_f.Read();
                 f++;
-                pi_f.write(f);
+                pi_f.Write(f);
                 Console.Write(".");
-                res = Library.txCommit();
+                res = Library.TxCommit();
                 if(!res)
                     Console.WriteLine("$$$$$$$$$$$$$$ ABORT $$$$$$$$$$$$$$$$$");
             }
@@ -51,14 +51,14 @@ namespace Client {
             Console.WriteLine("####################################################################");
             Library.Status();
             Console.ReadLine();
-            res = Library.txBegin();
-            PadIntStub pi_g = Library.accessPadInt(2);
-            PadIntStub pi_h = Library.accessPadInt(2000000001);
-            PadIntStub pi_j = Library.accessPadInt(1000000000);
-            int g = pi_g.read();
-            int h = pi_h.read();
-            int j = pi_j.read();
-            res = Library.txCommit();
+            res = Library.TxBegin();
+            PadIntStub pi_g = Library.AccessPadInt(2);
+            PadIntStub pi_h = Library.AccessPadInt(2000000001);
+            PadIntStub pi_j = Library.AccessPadInt(1000000000);
+            int g = pi_g.Read();
+            int h = pi_h.Read();
+            int j = pi_j.Read();
+            res = Library.TxCommit();
             Console.WriteLine("####################################################################");
             Console.WriteLine("2 = " + g);
             Console.WriteLine("2000000001 = " + h);
@@ -68,6 +68,5 @@ namespace Client {
             Library.Status();
             Console.ReadLine();
         }*/
-
     }
 }

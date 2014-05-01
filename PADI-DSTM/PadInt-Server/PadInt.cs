@@ -106,7 +106,7 @@ namespace PadIntServer {
         /// <param name="source"></param>
         /// <param name="e"></param>
         private void DeadLockEvent(object source, ElapsedEventArgs e) {
-            Logger.log(new String[] { "PadInt", "DeadLockEvent" });
+            Logger.Log(new String[] { "PadInt", "DeadLockEvent" });
 
             /* stops the timer */
             deadLockTimer.Close();
@@ -134,9 +134,9 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool getReadLock(int tid) {
+        internal bool GetReadLock(int tid) {
 
-            Logger.log(new String[] { "PadInt", "getReadLock" });
+            Logger.Log(new String[] { "PadInt", "getReadLock" });
 
             /* if there is no writer */
             if(writer == INITIALIZATION) {
@@ -144,7 +144,7 @@ namespace PadIntServer {
             } else {
                 pendingReaders.Add(tid);
 
-                Logger.log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
+                Logger.Log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
                 while(pendingReaders.Contains(tid)) {
 
                     //activates the deadLock detection if it is not already started
@@ -169,7 +169,7 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>bool</returns>
-        internal bool hasWriteLock(int tid) {
+        internal bool HasWriteLock(int tid) {
             return writer == tid;
         }
 
@@ -180,9 +180,9 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool getWriteLock(int tid) {
+        internal bool GetWriteLock(int tid) {
 
-            Logger.log(new String[] { "PadInt", "getWriteLock" });
+            Logger.Log(new String[] { "PadInt", "getWriteLock" });
 
             /* TODO
              * 
@@ -214,7 +214,7 @@ namespace PadIntServer {
                                 }
                             }
 
-                            Logger.log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
+                            Logger.Log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
                         }
                     }
                 } else {
@@ -236,7 +236,7 @@ namespace PadIntServer {
                                 }
                             }
 
-                            Logger.log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
+                            Logger.Log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
                         }
                     } else {
                         /* if there is only a
@@ -267,11 +267,11 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool freeReadLock(int tid) {
-            Logger.log(new String[] { "PadInt", "freeReadLock" });
+        internal bool FreeReadLock(int tid) {
+            Logger.Log(new String[] { "PadInt", "freeReadLock" });
 
             if(readers.Remove(tid)) {
-                dequeueReadLock();
+                DequeueReadLock();
                 return true;
             } else {
                 return false;
@@ -284,13 +284,13 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool freeWriteLock(int tid) {
-            Logger.log(new String[] { "PadInt", "freeWriteLock" });
+        internal bool FreeWriteLock(int tid) {
+            Logger.Log(new String[] { "PadInt", "freeWriteLock" });
 
             /* "frees" writer variable */
             if(writer != INITIALIZATION) {
                 writer = INITIALIZATION;
-                dequeueWriteLock();
+                DequeueWriteLock();
                 return true;
             } else {
                 return false;
@@ -304,8 +304,8 @@ namespace PadIntServer {
         ///  exists pending writers, assigns the lock to
         ///  the first one.
         /// </summary>
-        internal void dequeueReadLock() {
-            Logger.log(new String[] { "PadInt", "dequeueReadLock" });
+        internal void DequeueReadLock() {
+            Logger.Log(new String[] { "PadInt", "dequeueReadLock" });
 
             int temp = INITIALIZATION;
 
@@ -314,13 +314,13 @@ namespace PadIntServer {
                     /* "frees" promotion variable */
                     temp = promotion;
                     promotion = INITIALIZATION;
-                    getWriteLock(temp);
+                    GetWriteLock(temp);
                 } else {
                     if(pendingWriters.Count > 0) {
                         /* removes the first writer in the queue */
                         temp = pendingWriters[0];
                         pendingWriters.RemoveAt(0);
-                        getWriteLock(temp);
+                        GetWriteLock(temp);
                     }
                 }
             }
@@ -334,27 +334,27 @@ namespace PadIntServer {
         ///  any pending reader and assigns the lock to the
         ///  first one.
         /// </summary>
-        internal void dequeueWriteLock() {
-            Logger.log(new String[] { "PadInt", "dequeueWriteLock" });
+        internal void DequeueWriteLock() {
+            Logger.Log(new String[] { "PadInt", "dequeueWriteLock" });
 
             int temp = INITIALIZATION;
 
             if(promotion != INITIALIZATION) {
                 temp = promotion;
                 promotion = INITIALIZATION;
-                getWriteLock(temp);
+                GetWriteLock(temp);
             } else {
                 if(pendingWriters.Count > 0) {
                     /* removes the first writer in the queue */
                     temp = pendingWriters[0];
                     pendingWriters.RemoveAt(0);
-                    getWriteLock(temp);
+                    GetWriteLock(temp);
                 } else {
                     if(pendingReaders.Count > 0) {
                         /* removes the first reader in the queue */
                         temp = pendingReaders[0];
                         pendingReaders.RemoveAt(0);
-                        getReadLock(temp);
+                        GetReadLock(temp);
                     }
                 }
             }
@@ -371,8 +371,8 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool commit(int tid) {
-            Logger.log(new String[] { "PadInt", "commit" });
+        internal bool Commit(int tid) {
+            Logger.Log(new String[] { "PadInt", "commit" });
 
             bool commitSuccessful = true;
 
@@ -384,11 +384,11 @@ namespace PadIntServer {
                 commitSuccessful = false;
             }
 
-            freeReadLock(tid);
+            FreeReadLock(tid);
 
-            if(freeWriteLock(tid)) {
+            if(FreeWriteLock(tid)) {
                 OriginalValue = ActualValue;
-                Logger.log(new String[] { "PadInt", "commit", " Cleaned writer= ", writer.ToString() });
+                Logger.Log(new String[] { "PadInt", "commit", " Cleaned writer= ", writer.ToString() });
             }
 
             /* this must be done in the end because if we do this before
@@ -412,8 +412,8 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
-        internal bool abort(int tid) {
-            Logger.log(new String[] { "PadInt", "abort" });
+        internal bool Abort(int tid) {
+            Logger.Log(new String[] { "PadInt", "abort" });
 
             pendingReaders.Remove(tid);
             pendingWriters.Remove(tid);
@@ -422,12 +422,12 @@ namespace PadIntServer {
                 promotion = INITIALIZATION;
             }
 
-            freeReadLock(tid);
+            FreeReadLock(tid);
 
             /* only if exists a write lock we do the rollback of the PadInt's value */
-            if(freeWriteLock(tid)) {
+            if(FreeWriteLock(tid)) {
                 ActualValue = OriginalValue;
-                Logger.log(new String[] { "PadInt", "abort", " Cleaned writer= ", writer.ToString() });
+                Logger.Log(new String[] { "PadInt", "abort", " Cleaned writer= ", writer.ToString() });
             }
 
             return true;

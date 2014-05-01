@@ -53,7 +53,7 @@ namespace CommonTypes {
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
-        public override string getMessage() {
+        public override string GetMessage() {
             return "The server with id " + serverID + " is already registered on master server";
         }
 

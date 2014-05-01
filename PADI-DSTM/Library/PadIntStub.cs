@@ -36,19 +36,19 @@ namespace ClientLibrary {
             this.uid = uid;
             this.tid = tid;
             this.address = address;
-            this.serverID=serverID;
+            this.serverID = serverID;
         }
 
         /// <summary>
         /// Reads the value of remote PadInt
         /// </summary>
         /// <returns>The value of the remote PadInt</returns>
-        public int read() {
-            Logger.log(new String[] { "PadIntStub", "read" });
+        public int Read() {
+            Logger.Log(new String[] { "PadIntStub", "read" });
             try {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-                int result = server.readPadInt(tid, uid);
-                Library.registerUID(serverID, uid);
+                int result = server.ReadPadInt(tid, uid);
+                Library.RegisterUID(serverID, uid);
                 return result;
             } catch(PadIntNotFoundException) {
                 throw;
@@ -60,17 +60,16 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="value">The value to write</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
-        public bool write(int value) {
-            Logger.log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
+        public bool Write(int value) {
+            Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
             try {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-                server.writePadInt(tid, uid, value);
-                Library.registerUID(serverID, uid);
+                server.WritePadInt(tid, uid, value);
+                Library.RegisterUID(serverID, uid);
                 return true;
             } catch(PadIntNotFoundException) {
                 throw;
             }
         }
-
     }
 }

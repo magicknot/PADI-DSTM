@@ -23,11 +23,11 @@ namespace PadIntServer {
         }
 
         internal abstract void ImAlive();
-        internal abstract bool createPadInt(int uid);
-        internal abstract bool confirmPadInt(int uid);
-        internal abstract int readPadInt(int tid, int uid);
-        internal abstract bool writePadInt(int tid, int uid, int value);
-        internal abstract bool commit(int tid, List<int> usedPadInts);
-        internal abstract bool abort(int tid, List<int> usedPadInts);
+        internal abstract bool CreatePadInt(int uid);
+        internal abstract bool ConfirmPadInt(int uid);
+        internal abstract int ReadPadInt(int tid, int uid);
+        internal abstract bool WritePadInt(int tid, int uid, int value);
+        internal abstract bool Commit(int tid, List<int> usedPadInts);
+        internal abstract bool Abort(int tid, List<int> usedPadInts);
     }
 }
