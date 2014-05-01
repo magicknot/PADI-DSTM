@@ -71,7 +71,7 @@ namespace PadIntServer {
         /// </summary>
         private void BackupReplyEvent(object source, ElapsedEventArgs e) {
             Logger.log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
-
+            backupReplyTimer.Stop();
             Server.Master.createNewReplica(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
         }
 
