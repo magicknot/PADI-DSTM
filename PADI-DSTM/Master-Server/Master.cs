@@ -12,33 +12,14 @@ namespace MasterServer {
     class Master : MarshalByRefObject, IMaster {
 
         /// <summary>
-        /// Constant used to represent non atributed server identifier
-        /// </summary>
-        private const int NO_SERVER_ID = -1;
-        /// <summary>
-        /// Constant used to represent non atributed server address
-        /// </summary>
-        private const string NO_SERVER_ADDRESS = "";
-        /// <summary>
         /// Identifier of the last transaction started
         /// </summary>
         private int lastTransactionIdentifier;
         /// <summary>
-        /// Number of servers registed on Master server
-        /// </summary>
-        private int numberOfRegisteredServers;
-        /// <summary>
         /// List of registered servers indexed by server identifier
         /// </summary>
         private List<string> registeredServers;
-        /// <summary>
-        /// Identifier of the server waiting for role assignment
-        /// </summary>
-        private int pendingServerID;
-        /// <summary>
-        /// Address of the server waiting for role assignment
-        /// </summary>
-        private string pendingServerAddress;
+        private bool serverIsPrimary;
         /// <summary>
         /// Dictionary storing tuple(server identifier, predicate identifying if padInt was already stored) 
         /// indexed by PadInt identifier. The predicate is relevant because it may be allocated 20 PadInts on 
@@ -51,21 +32,13 @@ namespace MasterServer {
             set { this.lastTransactionIdentifier = value; }
         }
 
-        internal int NServers {
-            get { return this.numberOfRegisteredServers; }
-            set { this.numberOfRegisteredServers = value; }
-        }
-
         /// <summary>
         /// Constructor
         /// </summary>
         public Master() {
             registeredServers = new List<string>();
             padIntServers = new Dictionary<int, Tuple<int, bool>>();
-            pendingServerID = NO_SERVER_ID;
-            pendingServerAddress = NO_SERVER_ADDRESS;
             LastTID = 0;
-            NServers = 0;
         }
 
         /// <summary>
@@ -78,43 +51,16 @@ namespace MasterServer {
         }
 
         /// <summary>
-        /// Obtains the identifier for a given server's address
-        /// </summary>
-        /// <param name="address">Server address</param>
-        private int GetServerId(string address) {
-            for(int index = 0; index < registeredServers.Count; index++) {
-                if(registeredServers[index] == address) {
-                    return index;
-                }
-            }
-
-            throw new ServerNotFoundException(address);
-        }
-
-        /// <summary>
         /// Assigns primary role to a server
         /// </summary>
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="backupAddress">Backup server address</param>
         /// <param name="id">Primary server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        private void CreatePrimaryServer(string primaryAddress, string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
+        private void CreateServer(string primaryAddress, string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
 
             IServer server = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
             server.CreatePrimaryServer(backupAddress, id, padInts);
-        }
-
-        /// <summary>
-        /// Assigns backup role to a server
-        /// </summary>
-        /// <param name="primaryAddress">Primary server address</param>
-        /// <param name="backupAddress">Backup server address</param>
-        /// <param name="id">Backup server identifier</param>
-        /// <param name="padInts">Structure that maps UID to PadInt</param>
-        private void CreateBackupServer(string primaryAddress, string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
-
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
-            server.CreateBackupServer(primaryAddress, id, padInts);
         }
 
         /// <summary>
@@ -196,33 +142,21 @@ namespace MasterServer {
         /// </summary>
         /// <param name="address">Server Address</param>
         /// <returns>Server identifier</returns>
-        public int RegisterServer(String address) {
+        public Tuple<int, bool> RegisterServer(String address) {
             Logger.Log(new String[] { "Master", "registerServer", "address", address.ToString() });
             try {
-                /* assign roles to the servers if exists a possible (primary,backup) pair */
-                if(pendingServerID == NO_SERVER_ID) {
-                    pendingServerID = NServers;
-                    pendingServerAddress = address;
-                    return NServers++;
+                if(serverIsPrimary) {
+                    registeredServers.Insert(registeredServers.Count, address);
+                    serverIsPrimary=false;
+                    return new Tuple<int, bool>(registeredServers.Count-1, !serverIsPrimary);
                 } else {
-                    /* assign primary role to the pending server and backup role to the new server */
-                    /* both servers start with a new padInt dictionary */
-                    CreatePrimaryServer(pendingServerAddress, address, pendingServerID, new Dictionary<int, IPadInt>());
-                    /* do the primary registry */
-                    registeredServers.Insert(pendingServerID, pendingServerAddress);
-                    CreateBackupServer(pendingServerAddress, address, pendingServerID, new Dictionary<int, IPadInt>());
-
-                    /* cleans pending server variables */
-                    int temp = pendingServerID;
-                    pendingServerID = NO_SERVER_ID;
-                    pendingServerAddress = NO_SERVER_ADDRESS;
-                    return temp;
+                    serverIsPrimary=true;
+                    return new Tuple<int, bool>(registeredServers.Count-1, !serverIsPrimary);
                 }
             } catch(ArgumentException) {
-                throw new ServerAlreadyExistsException(NServers);
+                throw new ServerAlreadyExistsException(registeredServers.Count-1);
             }
         }
-
 
         /// <summary>
         /// Returns the information of the server where the PadInt is stored
