@@ -17,6 +17,10 @@ namespace PadIntServer {
     class Server : MarshalByRefObject, IServer {
 
         /// <summary>
+        /// Constant used to represent non atributed server address
+        /// </summary>
+        private const string NO_SERVER_ADDRESS = "";
+        /// <summary>
         /// Server's state
         /// </summary>
         private ServerState serverState;
@@ -36,6 +40,10 @@ namespace PadIntServer {
         /// Server identifier
         /// </summary>
         private int identifier;
+        /// <summary>
+        /// Server address
+        /// </summary>
+        private string address;
         /// <summary>
         /// Reference to master server
         /// </summary>
@@ -63,6 +71,11 @@ namespace PadIntServer {
             get { return identifier; }
         }
 
+        internal string Address {
+            set { this.address = value; }
+            get { return address; }
+        }
+
         internal IMaster Master {
             set { this.masterServerReference = value; }
             get { return masterServerReference; }
@@ -86,7 +99,13 @@ namespace PadIntServer {
         public bool Init(int port) {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-                ID = Master.RegisterServer("tcp://localhost:" + (8000 + port) + "/PadIntServer");
+                Address = "tcp://localhost:" + (8000 + port) + "/PadIntServer";
+                Tuple<int, string> info = Master.RegisterServer(Address);
+                ID = info.Item1;
+                if(info.Item2 != NO_SERVER_ADDRESS) {
+                    CreateBackupServer(info.Item2, info.Item1, new Dictionary<int, IPadInt>());
+                    ReplicationServer.CreatePrimaryServer(Address, ID, new Dictionary<int, IPadInt>());
+                }
             } catch(ServerAlreadyExistsException) {
                 throw;
             }

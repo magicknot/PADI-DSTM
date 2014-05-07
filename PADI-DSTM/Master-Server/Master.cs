@@ -12,6 +12,10 @@ namespace MasterServer {
     class Master : MarshalByRefObject, IMaster {
 
         /// <summary>
+        /// Constant used to represent non atributed server address
+        /// </summary>
+        private const string NO_SERVER_ADDRESS = "";
+        /// <summary>
         /// Identifier of the last transaction started
         /// </summary>
         private int lastTransactionIdentifier;
@@ -39,6 +43,7 @@ namespace MasterServer {
             registeredServers = new List<string>();
             padIntServers = new Dictionary<int, Tuple<int, bool>>();
             LastTID = 0;
+            serverIsPrimary = true;
         }
 
         /// <summary>
@@ -51,89 +56,12 @@ namespace MasterServer {
         }
 
         /// <summary>
-        /// Assigns primary role to a server
+        /// Verifies if a server is already registered on master server
         /// </summary>
-        /// <param name="primaryAddress">Primary server address</param>
-        /// <param name="backupAddress">Backup server address</param>
-        /// <param name="id">Primary server identifier</param>
-        /// <param name="padInts">Structure that maps UID to PadInt</param>
-        private void CreateServer(string primaryAddress, string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
-
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
-            server.CreatePrimaryServer(backupAddress, id, padInts);
-        }
-
-        /// <summary>
-        /// If possible assign a new backup server, redistribute PadInts otherwise
-        /// </summary>
-        /// <param name="primaryId">Primary server identifier</param>
-        /// <param name="backupAddress">Backup server address</param>
-        /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void CreateNewReplica(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Master", "createNewReplica", "primaryId", primaryId.ToString(), "backupAddress", backupAddress.ToString() });
-            try {
-                /* verify if the primary server exists */
-                VerifyServerRegistry(primaryId);
-
-                string primaryAddress = registeredServers[primaryId];
-
-                /* if a server is available to be the new backup server */
-                if(pendingServerID != NO_SERVER_ID) {
-                    CreatePrimaryServer(primaryAddress, pendingServerAddress, primaryId, padInts);
-                    CreateBackupServer(primaryAddress, pendingServerAddress, primaryId, padInts);
-
-                    /* cleans pending server variables */
-                    pendingServerID = NO_SERVER_ID;
-                    pendingServerAddress = NO_SERVER_ADDRESS;
-                } else {
-                    /* redistribute server's PadInts */
-                    //TODO
-
-                    /* puts the backup server in the pending variables */
-                    pendingServerID = primaryId;
-                    pendingServerAddress = primaryAddress;
-
-                    //TODO
-                    throw new NotImplementedException();
-                }
-            } catch(ServerNotFoundException) {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// If possible backup server becames primary server, redistribute PadInts otherwise
-        /// </summary>
-        /// <param name="primaryAddress">Primary server address</param>
-        /// <param name="backupAddress">Backup server address</param>
-        /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void BecomePrimary(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Master", "becomePrimary", "primaryId", primaryId.ToString(), "backupAddress", backupAddress.ToString() });
-            try {
-                /* verify if the primary server exists */
-                VerifyServerRegistry(primaryId);
-
-                /* if a server is available to be the new backup server */
-                if(pendingServerID != NO_SERVER_ID) {
-                    CreatePrimaryServer(backupAddress, pendingServerAddress, primaryId, padInts);
-                    CreateBackupServer(backupAddress, pendingServerAddress, primaryId, padInts);
-
-                    /* cleans pending server variables */
-                    pendingServerID = NO_SERVER_ID;
-                    pendingServerAddress = NO_SERVER_ADDRESS;
-                } else {
-                    /* redistribute server's PadInts */
-                    //TODO
-
-                    /* puts the backup server in the pending variables */
-                    pendingServerID = primaryId;
-                    pendingServerAddress = backupAddress;
-
-                    //TODO
-                    throw new NotImplementedException();
-                }
-            } catch(ServerNotFoundException) {
-                throw;
+        /// <param name="serverID">server identifier</param>
+        private void VerifyServerRegistry(int serverID) {
+            if(registeredServers.ElementAtOrDefault(serverID) == null) {
+                throw new ServerNotFoundException(serverID);
             }
         }
 
@@ -142,19 +70,19 @@ namespace MasterServer {
         /// </summary>
         /// <param name="address">Server Address</param>
         /// <returns>Server identifier</returns>
-        public Tuple<int, bool> RegisterServer(String address) {
+        public Tuple<int, string> RegisterServer(String address) {
             Logger.Log(new String[] { "Master", "registerServer", "address", address.ToString() });
             try {
                 if(serverIsPrimary) {
                     registeredServers.Insert(registeredServers.Count, address);
-                    serverIsPrimary=false;
-                    return new Tuple<int, bool>(registeredServers.Count-1, !serverIsPrimary);
+                    serverIsPrimary = false;
+                    return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
                 } else {
-                    serverIsPrimary=true;
-                    return new Tuple<int, bool>(registeredServers.Count-1, !serverIsPrimary);
+                    serverIsPrimary = true;
+                    return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1]);
                 }
             } catch(ArgumentException) {
-                throw new ServerAlreadyExistsException(registeredServers.Count-1);
+                throw new ServerAlreadyExistsException(registeredServers.Count - 1);
             }
         }
 
@@ -213,16 +141,6 @@ namespace MasterServer {
             Console.WriteLine("-----------------------");
 
             return true;
-        }
-
-        /// <summary>
-        /// Verifies if a server is already registered on master server
-        /// </summary>
-        /// <param name="serverID">server identifier</param>
-        private void VerifyServerRegistry(int serverID) {
-            if(registeredServers.ElementAtOrDefault(serverID) == null) {
-                throw new ServerNotFoundException(serverID);
-            }
         }
     }
 }

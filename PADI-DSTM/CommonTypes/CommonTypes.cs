@@ -30,9 +30,7 @@ namespace CommonTypes {
     /// </summary>
     public interface IMaster {
         int GetNextTID();
-        int RegisterServer(String address);
-        void BecomePrimary(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
-        void CreateNewReplica(int primaryId, string backupAddress, Dictionary<int, IPadInt> padInts);
+        Tuple<int, string> RegisterServer(String address);
         Tuple<int, string> GetPadIntServer(int uid);
         Tuple<int, string> RegisterPadInt(int uid);
         bool Status();

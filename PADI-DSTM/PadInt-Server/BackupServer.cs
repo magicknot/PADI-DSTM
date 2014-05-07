@@ -47,7 +47,7 @@ namespace PadIntServer {
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            Server.Master.BecomePrimary(Server.ID, Server.ReplicationServerAddr, Server.PdInts);
+            Server.ReplicationServer.CreatePrimaryServer(Server.Address, Server.ID, Server.PdInts);
         }
 
         private PadInt GetPadInt(int uid) {
