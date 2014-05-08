@@ -24,6 +24,10 @@ namespace ClientLibrary {
         /// Identifer of server where remote PadInt is stored
         /// </summary>
         private int serverID;
+        /// <summary>
+        /// Reference to the PadInt's cache
+        /// </summary>
+        private ClientCache cache;
 
         /// <summary>
         /// Constructor
@@ -32,11 +36,12 @@ namespace ClientLibrary {
         /// <param name="tid">Transaction identifier</param>
         /// <param name="serverID">Server identifier</param>
         /// <param name="address">Server address</param>
-        public PadIntStub(int uid, int tid, int serverID, string address) {
+        internal PadIntStub(int uid, int tid, int serverID, string address, ClientCache cache) {
             this.uid = uid;
             this.tid = tid;
             this.address = address;
             this.serverID = serverID;
+            this.cache = cache;
         }
 
         /// <summary>
@@ -45,13 +50,19 @@ namespace ClientLibrary {
         /// <returns>The value of the remote PadInt</returns>
         public int Read() {
             Logger.Log(new String[] { "PadIntStub", "read" });
-            try {
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-                int result = server.ReadPadInt(tid, uid);
-                Library.RegisterUID(serverID, uid);
-                return result;
-            } catch(PadIntNotFoundException) {
-                throw;
+
+            if(cache.hasUidInCache(uid)) {
+                return cache.getValueInCache(uid);
+            } else {
+                try {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+                    int result = server.ReadPadInt(tid, uid);
+                    Library.RegisterUID(serverID, uid);
+                    cache.updateReadValue(uid, result);
+                    return result;
+                } catch(PadIntNotFoundException) {
+                    throw;
+                }
             }
         }
 
@@ -62,13 +73,20 @@ namespace ClientLibrary {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         public bool Write(int value) {
             Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
-            try {
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-                server.WritePadInt(tid, uid, value);
-                Library.RegisterUID(serverID, uid);
+
+            if(cache.hasPreviousWrite(uid)) {
+                cache.updateWriteValue(uid, value);
                 return true;
-            } catch(PadIntNotFoundException) {
-                throw;
+            } else {
+                try {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+                    server.WritePadInt(tid, uid, value);
+                    Library.RegisterUID(serverID, uid);
+                    cache.addWriteValue(uid, value, address);
+                    return true;
+                } catch(PadIntNotFoundException) {
+                    throw;
+                }
             }
         }
     }

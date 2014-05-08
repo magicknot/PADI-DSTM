@@ -14,13 +14,25 @@ using System.Runtime.Serialization;
 namespace ClientLibrary {
 
     public class Library {
-        /*Master Server reference*/
+        /// <summary>
+        /// Master Server reference
+        /// </summary>
         private static IMaster masterServer;
-        /*Identifier of the current transaction*/
+        /// <summary>
+        /// Identifier of the current transaction
+        /// </summary>
         private static int actualTID;
-        /*List of PadInts stored on each server*/
+        /// <summary>
+        /// List of PadInts stored on each server
+        /// </summary>
         private static List<PadIntRegistry> padIntsList;
-        /*Tcp Channel in use*/
+        /// <summary>
+        /// Cache used to store PadInt's values
+        /// </summary>
+        private static ClientCache cache;
+        /// <summary>
+        /// Tcp Channel in use
+        /// </summary>
         private static TcpChannel channel;
 
         public static TcpChannel Channel {
@@ -48,6 +60,7 @@ namespace ClientLibrary {
             Logger.Log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.GetNextTID();
             Logger.Log(new String[] { " " });
+            cache = new ClientCache();
             return true;
         }
 
@@ -60,6 +73,12 @@ namespace ClientLibrary {
 
             if(padIntsList.Count == 0) {
                 Logger.Log(new String[] { "Library", "txCommit", "nothing to commit" });
+            }
+
+            /* Before commit do writes of the values in cache */
+            foreach(int uid in cache.CacheWrites.Keys) {
+                IServer serverWrite = (IServer) Activator.GetObject(typeof(IServer), cache.CacheWrites[uid]);
+                serverWrite.WritePadInt(actualTID, uid, cache.getValueInCache(uid));
             }
 
             bool result = true;
@@ -94,6 +113,7 @@ namespace ClientLibrary {
             }
 
             padIntsList.Clear();
+            cache = new ClientCache();
             return result;
         }
 
@@ -113,7 +133,7 @@ namespace ClientLibrary {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.CreatePadInt(uid);
                 padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
-                return new PadIntStub(uid, actualTID, serverID, serverAddr);
+                return new PadIntStub(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
                 throw;
             }
@@ -134,7 +154,7 @@ namespace ClientLibrary {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.ConfirmPadInt(uid);
                 padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
-                return new PadIntStub(uid, actualTID, serverID, serverAddr);
+                return new PadIntStub(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(NoServersFoundException) {
