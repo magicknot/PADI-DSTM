@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="ClientApp.cs" />
+    <Compile Include="TestCache.cs" />
     <Compile Include="CrossedLocksRW.cs" />
     <Compile Include="CrossedLocksWR.cs" />
     <Compile Include="CrossedLocks.cs" />
