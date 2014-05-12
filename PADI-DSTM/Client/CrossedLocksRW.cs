@@ -3,7 +3,7 @@
 using ClientLibrary;
 
 class CrossedLocksRW {
-    static void Main(string[] args) {
+    static void Mainaa(string[] args) {
         bool res;
         PadInt pi_a;
         Library.Init();
