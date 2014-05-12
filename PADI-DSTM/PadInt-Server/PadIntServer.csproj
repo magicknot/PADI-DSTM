@@ -44,10 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackupServer.cs" />
-    <Compile Include="FailedServer.cs" />
-    <Compile Include="FreezedServer.cs" />
+    <Compile Include="ServerState\FailedState.cs" />
+    <Compile Include="ServerState\FrozeState.cs" />
     <Compile Include="PadInt.cs" />
-    <Compile Include="ServerState.cs" />
+    <Compile Include="ServerState\ServerState.cs" />
     <Compile Include="PrimaryServer.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />

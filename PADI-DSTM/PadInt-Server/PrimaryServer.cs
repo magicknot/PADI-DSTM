@@ -31,9 +31,37 @@ namespace PadIntServer {
         ///  from backup server
         /// </summary>
         private System.Timers.Timer backupReplyTimer;
+        /// <summary>
+        /// Primary/backup server
+        ///  (backup if this server is the primary server, primary otherwise)
+        /// </summary>
+        private IServer backupServerReference;
 
-        internal PrimaryServer(Server server)
+        /// <summary>
+        /// Primary/backup server's address
+        ///  (backup server's address if this server is the primary server,
+        ///   primary server's address otherwise)
+        /// </summary>
+        private string backupServerAddress;
+
+        internal IServer BackupServer {
+            set { this.backupServerReference = value; }
+            get { return backupServerReference; }
+        }
+
+        internal string BackupAddress {
+            set { this.backupServerAddress = value; }
+            get { return backupServerAddress; }
+        }
+
+
+
+        internal PrimaryServer(Server server, String backupAddress)
             : base(server) {
+
+            BackupAddress = backupAddress;
+            BackupServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
+
             // Create a timer with IM_ALIVE_INTERVAL second interval.
             imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
             imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
@@ -46,6 +74,8 @@ namespace PadIntServer {
             imAliveTimer.Start();
         }
 
+
+
         /// <summary>
         /// Sends I'm alive to backup server
         /// </summary>
@@ -53,7 +83,7 @@ namespace PadIntServer {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "ImAlive" });
 
             imAliveTimer.Stop();
-            Server.ReplicationServer.ImAlive();
+            BackupServer.ImAlive();
             //re-starts the timer
             imAliveTimer.Start();
         }
@@ -72,7 +102,7 @@ namespace PadIntServer {
         private void BackupReplyEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
             backupReplyTimer.Stop();
-            Server.ReplicationServer.CreateBackupServer(Server.Address, Server.ID, Server.PdInts);
+            BackupServer.CreateBackupServer(Server.Address, Server.PdInts);
         }
 
         /// <summary>
@@ -115,7 +145,7 @@ namespace PadIntServer {
                 Server.PdInts.Add(uid, new PadInt(uid));
                 /* updates the backup server */
                 backupReplyTimer.Start();
-                Server.ReplicationServer.CreatePadInt(uid);
+                BackupServer.CreatePadInt(uid);
                 backupReplyTimer.Stop();
                 return true;
             } catch(ArgumentException) {
@@ -151,7 +181,7 @@ namespace PadIntServer {
                     if(padInt.HasWriteLock(tid) || padInt.GetReadLock(tid)) {
                         /* updates the backup server */
                         backupReplyTimer.Start();
-                        Server.ReplicationServer.ReadPadInt(tid, uid);
+                        BackupServer.ReadPadInt(tid, uid);
                         backupReplyTimer.Stop();
                         return padInt.ActualValue;
                     }
@@ -182,7 +212,7 @@ namespace PadIntServer {
                         padInt.ActualValue = value;
                         /* updates the backup server */
                         backupReplyTimer.Start();
-                        Server.ReplicationServer.WritePadInt(tid, uid, value);
+                        BackupServer.WritePadInt(tid, uid, value);
                         backupReplyTimer.Stop();
                         return true;
                     }
@@ -218,7 +248,7 @@ namespace PadIntServer {
 
             /* updates the backup server */
             backupReplyTimer.Start();
-            Server.ReplicationServer.Commit(tid, usedPadInts);
+            BackupServer.Commit(tid, usedPadInts);
             backupReplyTimer.Stop();
 
             return resultCommit;
@@ -248,7 +278,7 @@ namespace PadIntServer {
 
             /* updates the backup server */
             backupReplyTimer.Start();
-            Server.ReplicationServer.Abort(tid, usedPadInts);
+            BackupServer.Abort(tid, usedPadInts);
             backupReplyTimer.Stop();
 
             return resultAbort;

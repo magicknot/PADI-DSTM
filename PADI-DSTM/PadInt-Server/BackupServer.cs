@@ -25,8 +25,36 @@ namespace PadIntServer {
         /// </summary>
         private System.Timers.Timer imAliveTimer;
 
-        internal BackupServer(Server server)
+        /// <summary>
+        /// Primary/backup server
+        ///  (backup if this server is the primary server, primary otherwise)
+        /// </summary>
+        private IServer primaryServerReference;
+
+        /// <summary>
+        /// Primary/backup server's address
+        ///  (backup server's address if this server is the primary server,
+        ///   primary server's address otherwise)
+        /// </summary>
+        private string primaryServerAddress;
+
+        internal IServer PrimaryServer {
+            set { this.primaryServerReference = value; }
+            get { return primaryServerReference; }
+        }
+
+        internal string PrimaryAddress {
+            set { this.primaryServerAddress = value; }
+            get { return primaryServerAddress; }
+        }
+
+        internal BackupServer(Server server, string primaryAddress)
             : base(server) {
+
+            PrimaryAddress = PrimaryAddress;
+            PrimaryServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
+            PrimaryServer.CreatePrimaryServer(Server.Address, new Dictionary<int, IPadInt>());
+
             // Create a timer with inAliveInterval second interval.
             imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
             imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
@@ -47,7 +75,8 @@ namespace PadIntServer {
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            Server.ReplicationServer.CreatePrimaryServer(Server.Address, Server.ID, Server.PdInts);
+            //Isto estava a fazer coisas potencialmente horriveis
+            PrimaryServer.CreatePrimaryServer(Server.Address, Server.PdInts);
         }
 
         private PadInt GetPadInt(int uid) {

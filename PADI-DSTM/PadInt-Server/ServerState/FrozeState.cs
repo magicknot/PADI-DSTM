@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 using CommonTypes;
 
 namespace PadIntServer {
-    class FreezedServer : ServerState {
+    class FrozenState : ServerState {
 
-        internal FreezedServer(Server server)
+        /// <summary>
+        /// Server's old state
+        /// </summary>
+        private ServerState oldState;
+
+        internal FrozenState(Server server)
             : base(server) {
-            // Nothing to do here
+            oldState = server.State;
         }
 
         /// <summary>
@@ -76,6 +81,10 @@ namespace PadIntServer {
 
             //TODO cria o pedido e guarda-o
             throw new ServerDoesNotReplyException(Server.ID);
+        }
+
+        internal override bool Recover() {
+            return false;
         }
     }
 }

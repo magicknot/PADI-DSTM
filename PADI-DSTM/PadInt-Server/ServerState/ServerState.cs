@@ -29,5 +29,6 @@ namespace PadIntServer {
         internal abstract bool WritePadInt(int tid, int uid, int value);
         internal abstract bool Commit(int tid, List<int> usedPadInts);
         internal abstract bool Abort(int tid, List<int> usedPadInts);
+        internal virtual bool Recover() { return false; }
     }
 }

@@ -11,8 +11,8 @@ namespace CommonTypes {
     /// </summary>
     public interface IServer {
         void ImAlive();
-        void CreatePrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts);
-        void CreateBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts);
+        void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts);
+        void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts);
         bool CreatePadInt(int uid);
         bool ConfirmPadInt(int uid);
         int ReadPadInt(int tid, int uid);

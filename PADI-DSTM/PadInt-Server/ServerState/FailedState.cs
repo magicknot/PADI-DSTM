@@ -6,9 +6,9 @@ using System.Threading;
 using CommonTypes;
 
 namespace PadIntServer {
-    class FailedServer : ServerState {
+    class FailedState : ServerState {
 
-        internal FailedServer(Server server)
+        internal FailedState(Server server)
             : base(server) {
             // Nothing to do here
         }

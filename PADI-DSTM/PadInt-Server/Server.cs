@@ -25,17 +25,9 @@ namespace PadIntServer {
         /// </summary>
         private ServerState serverState;
         /// <summary>
-        /// Server's old state
-        /// </summary>
-        private ServerState oldState;
-        /// <summary>
         /// Structure that maps UID to PadInt
         /// </summary>
         internal Dictionary<int, IPadInt> padIntDictionary;
-        /// <summary>
-        /// Pending request list
-        /// </summary>
-        //private List<Request> requestList = new List<Request>();
         /// <summary>
         /// Server identifier
         /// </summary>
@@ -43,26 +35,14 @@ namespace PadIntServer {
         /// <summary>
         /// Server address
         /// </summary>
-        private string address;
+        private string serverAddress;
         /// <summary>
         /// Reference to master server
         /// </summary>
         IMaster masterServerReference;
-        /// <summary>
-        /// Primary/backup server
-        ///  (backup if this server is the primary server, primary otherwise)
-        /// </summary>
-        private IServer replicationServer;
-        /// <summary>
-        /// Primary/backup server's address
-        ///  (backup server's address if this server is the primary server,
-        ///   primary server's address otherwise)
-        /// </summary>
-        private string replicationServerAddress;
 
         public Server() {
-            serverState = (ServerState) new FailedServer(this);
-            oldState = (ServerState) new FailedServer(this);
+            serverState = new FailedState(this);
             padIntDictionary = new Dictionary<int, IPadInt>();
         }
 
@@ -72,8 +52,8 @@ namespace PadIntServer {
         }
 
         internal string Address {
-            set { this.address = value; }
-            get { return address; }
+            set { this.serverAddress = value; }
+            get { return serverAddress; }
         }
 
         internal IMaster Master {
@@ -81,19 +61,14 @@ namespace PadIntServer {
             get { return masterServerReference; }
         }
 
-        internal IServer ReplicationServer {
-            set { this.replicationServer = value; }
-            get { return replicationServer; }
-        }
-
-        internal string ReplicationServerAddr {
-            set { this.replicationServerAddress = value; }
-            get { return replicationServerAddress; }
-        }
-
         internal Dictionary<int, IPadInt> PdInts {
             set { this.padIntDictionary = value; }
             get { return this.padIntDictionary; }
+        }
+
+        internal ServerState State {
+            set { this.serverState = value; }
+            get { return this.serverState; }
         }
 
         public bool Init(int port) {
@@ -102,9 +77,9 @@ namespace PadIntServer {
                 Address = "tcp://localhost:" + (port) + "/PadIntServer";
                 Tuple<int, string> info = Master.RegisterServer(Address);
                 ID = info.Item1;
-                if(info.Item2 != NO_SERVER_ADDRESS) {
-                    CreateBackupServer(info.Item2, info.Item1, new Dictionary<int, IPadInt>());
-                    ReplicationServer.CreatePrimaryServer(Address, ID, new Dictionary<int, IPadInt>());
+                string primaryServerAddr = info.Item2;
+                if(primaryServerAddr!= NO_SERVER_ADDRESS) {
+                    CreateBackupServer(primaryServerAddr, new Dictionary<int, IPadInt>());
                 }
             } catch(ServerAlreadyExistsException) {
                 throw;
@@ -118,12 +93,10 @@ namespace PadIntServer {
         /// <param name="backupAddress">Backup server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void CreatePrimaryServer(string backupAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
-            serverState = new PrimaryServer(this);
-            ReplicationServerAddr = backupAddress;
-            ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
-            ID = id;
+        public void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
+            serverState = new PrimaryServer(this, backupAddress);
+            //ID = id; este nao e preciso porque o servidor primario sabe sempre o seu id e a chamada e feita do secundario
             padIntDictionary = padInts;
         }
 
@@ -133,12 +106,10 @@ namespace PadIntServer {
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void CreateBackupServer(string primaryAddress, int id, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", id.ToString(), "padInts ", padInts.Count.ToString() });
-            serverState = new BackupServer(this);
-            ReplicationServerAddr = primaryAddress;
-            ReplicationServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
-            ID = id;
+        public void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
+            serverState = new BackupServer(this, primaryAddress);
+            //ID = id; // este nao e preciso porque e feito pelo init
             padIntDictionary = padInts;
         }
 
@@ -253,22 +224,17 @@ namespace PadIntServer {
         }
 
         public bool Freeze() {
-            oldState = serverState;
-            serverState = new FreezedServer(this);
+            serverState = new FrozenState(this);
             return true;
         }
 
         public bool Fail() {
-            oldState = serverState;
-            serverState = new FailedServer(this);
+            serverState = new FailedState(this);
             return true;
         }
+
         public bool Recover() {
-            serverState = oldState;
-
-            //TODO
-            //Trata os pedidos que tinha pendentes
-
+            serverState.Recover();
             return true;
         }
 
