@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CommonTypes;
 
 namespace ClientLibrary {
-    public class PadIntStub {
+    public class PadInt {
 
         /// <summary>
         /// Identifier of remote PadInt
@@ -36,7 +36,7 @@ namespace ClientLibrary {
         /// <param name="tid">Transaction identifier</param>
         /// <param name="serverID">Server identifier</param>
         /// <param name="address">Server address</param>
-        internal PadIntStub(int uid, int tid, int serverID, string address, ClientCache cache) {
+        internal PadInt(int uid, int tid, int serverID, string address, ClientCache cache) {
             this.uid = uid;
             this.tid = tid;
             this.address = address;

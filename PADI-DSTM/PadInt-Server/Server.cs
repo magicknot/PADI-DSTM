@@ -99,7 +99,7 @@ namespace PadIntServer {
         public bool Init(int port) {
             try {
                 Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-                Address = "tcp://localhost:" + (8000 + port) + "/PadIntServer";
+                Address = "tcp://localhost:" + (port) + "/PadIntServer";
                 Tuple<int, string> info = Master.RegisterServer(Address);
                 ID = info.Item1;
                 if(info.Item2 != NO_SERVER_ADDRESS) {

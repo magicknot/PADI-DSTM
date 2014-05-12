@@ -5,7 +5,7 @@ using ClientLibrary;
 class CrossedLocks {
     /*static void Main(string[] args) {
         bool res;
-        PadIntStub pi_a, pi_b;
+        PadInt pi_a, pi_b;
         Library.Init();
 
         if((args.Length > 0) && (args[0].Equals("C"))) {
@@ -62,8 +62,8 @@ class CrossedLocks {
         Console.WriteLine("####################################################################");
         Console.ReadLine();
         res = Library.TxBegin();
-        PadIntStub pi_c = Library.AccessPadInt(1);
-        PadIntStub pi_d = Library.AccessPadInt(2000000000);
+        PadInt pi_c = Library.AccessPadInt(1);
+        PadInt pi_d = Library.AccessPadInt(2000000000);
         Console.WriteLine("0 = " + pi_c.Read());
         Console.WriteLine("2000000000 = " + pi_d.Read());
         Console.WriteLine("####################################################################");

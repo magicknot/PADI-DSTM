@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Cache.cs" />
     <Compile Include="PadIntRegistry.cs" />
-    <Compile Include="PadIntStub.cs" />
+    <Compile Include="PadInt.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

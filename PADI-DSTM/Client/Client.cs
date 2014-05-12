@@ -15,13 +15,10 @@ namespace Client {
 
         private Random random;
         private int nextUid;
-        /* if true stops the loop */
-        private bool stopLoop;
 
         public Client() {
             random = new Random();
             nextUid = 0;
-            stopLoop = true;
         }
 
         internal int NextUID {
@@ -30,33 +27,8 @@ namespace Client {
 
         }
 
-        internal bool StopLoop {
-            set { this.stopLoop = value; }
-            get { return stopLoop; }
-
-        }
-
-        public void SetStop(bool value) {
-            this.stopLoop = value;
-        }
-
-        public void SetStopLoop(bool value) {
-            //TcpChannel channel = new TcpChannel();
-            //ChannelServices.RegisterChannel(channel, true);
-            Client c = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
-            c.SetStop(value);
-            Console.WriteLine("client.StopLoop = " + StopLoop);
-        }
-
         public int LastUid() {
             return nextUid;
-        }
-
-        public int GetLastUid() {
-            //TcpChannel channel = new TcpChannel();
-            //ChannelServices.RegisterChannel(channel, true);
-            Client c = (Client) Activator.GetObject(typeof(Client), "tcp://localhost:6085/Client");
-            return c.LastUid();
         }
 
         public int GetNextUid() {
@@ -91,15 +63,10 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 Console.WriteLine("padInt0 read: " + padInt0.Read());
-
-                /* to test with more than one client */
-                while(!stopLoop) {
-                    Console.WriteLine("loop stopLoop = " + stopLoop);
-                }
 
                 Library.TxCommit();
                 Console.WriteLine("txCommit Done");
@@ -127,16 +94,12 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(20)) {
                     Console.WriteLine("padInt0 write done with value (20) : " + padInt0.Read());
                 }
-
-                /* to test with more than one client */
-                while(!stopLoop)
-                    ;
 
                 Library.TxCommit();
                 Console.WriteLine("txCommit Done");
@@ -164,7 +127,7 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(20)) {
@@ -180,7 +143,7 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = Library.AccessPadInt(uid0);
 
                 /* the padInt's value must be equal to initialization value */
                 int value = padInt0A.Read();
@@ -216,7 +179,7 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(21)) {
@@ -233,7 +196,7 @@ namespace Client {
                 Console.WriteLine("txBegin Done");
 
                 /* the padInt's value must be equal to initialization value */
-                PadIntStub padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = Library.AccessPadInt(uid0);
 
                 if(padInt0A.Read() == 21) {
                     Console.WriteLine("it's OK");
@@ -267,11 +230,11 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
-                PadIntStub padInt1 = Library.CreatePadInt(uid1);
+                PadInt padInt1 = Library.CreatePadInt(uid1);
                 Console.WriteLine("padInt1 created with uid: " + uid1);
-                PadIntStub padInt2 = Library.CreatePadInt(uid2);
+                PadInt padInt2 = Library.CreatePadInt(uid2);
                 Console.WriteLine("padInt2 created with uid: " + uid2);
 
                 bool result = padInt0.Read() == 0;
@@ -284,10 +247,6 @@ namespace Client {
                     Console.WriteLine("BUG!!!!!: multiple read was not successful...");
                 }
 
-                /* to test with more than one client */
-                while(!stopLoop)
-                    ;
-
                 Library.TxCommit();
                 Console.WriteLine("txCommit Done");
 
@@ -298,34 +257,6 @@ namespace Client {
 
             Console.WriteLine("------------");
             Logger.Log(new String[] { "---------multiple read end----------" });
-        }
-
-        public void TestSampleApp() {
-            Console.WriteLine("------ Test: Sample App ------");
-            Logger.Log(new String[] { "Client", "------ Test: Sample App ------" });
-
-            bool res;
-            res = Library.TxBegin();
-            PadIntStub pi_a = Library.CreatePadInt(0);
-            PadIntStub pi_b = Library.CreatePadInt(1);
-            res = Library.TxCommit();
-
-            res = Library.TxBegin();
-            pi_a = Library.AccessPadInt(0);
-            pi_b = Library.AccessPadInt(1);
-            pi_a.Write(36);
-            pi_b.Write(37);
-            Console.WriteLine("a = " + pi_a.Read());
-            Console.WriteLine("b = " + pi_b.Read());
-            Library.Status();
-
-            // The following 3 lines assume we have 2 servers: one at port 2001 and another at port 2002
-            /*res = PadiDstm.Freeze("tcp://localhost:2001/Server");
-            res = PadiDstm.Recover("tcp://localhost:2001/Server");
-            res = PadiDstm.Fail("tcp://localhost:2002/Server");*/
-
-            res = Library.TxCommit();
-            Logger.Log(new String[] { "---------Sample App end----------" });
         }
 
         public void TestReadWrite(int uid0) {
@@ -342,7 +273,7 @@ namespace Client {
                 Library.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadIntStub padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = Library.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 //read
@@ -358,7 +289,7 @@ namespace Client {
                 Console.WriteLine("txBegin Done");
 
                 /* the padInt's value must be equal to initialization value */
-                PadIntStub padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = Library.AccessPadInt(uid0);
 
                 if(padInt0.Write(211)) {
                     Console.WriteLine("padInt0 write done with value (211) : " + padInt0.Read());
@@ -375,116 +306,5 @@ namespace Client {
             Console.WriteLine("------------");
             Logger.Log(new String[] { "---------Read write end----------" });
         }
-
-        //-----------------------------------------------------
-        //client 2
-        public void TestSimpleReadClient2(int uid0) {
-
-            Console.WriteLine("------ Test: client2 Simple read ------");
-            Logger.Log(new String[] { "Client", "------ Test: client2 Simple read ------" });
-
-            Library library = new Library();
-
-            Console.WriteLine("library created");
-
-            try {
-                Console.WriteLine("init() Done");
-
-                Library.TxBegin();
-                Console.WriteLine("txBegin Done");
-
-                PadIntStub padInt0 = Library.AccessPadInt(uid0);
-                Console.WriteLine("padInt0 created with uid: " + uid0);
-
-                Console.WriteLine("padInt0 read: " + padInt0.Read());
-
-                Library.TxCommit();
-                Console.WriteLine("txCommit Done");
-
-                Console.WriteLine("closeChannel Done");
-            } catch(Exception e) {
-                Console.WriteLine(e.Message);
-            }
-
-            Console.WriteLine("------------");
-            Logger.Log(new String[] { "---------Client2 Simple read end----------" });
-        }
-
-        public void TestSimpleWriteClient2(int uid0) {
-
-            Console.WriteLine("------ Test: client2 Simple write ------");
-            Logger.Log(new String[] { "Client", "------ Test: client2 Simple write ------" });
-
-            Library library = new Library();
-            Console.WriteLine("library created");
-
-            try {
-                Console.WriteLine("init() Done");
-
-                Library.TxBegin();
-                Console.WriteLine("txBegin Done");
-
-                PadIntStub padInt0 = Library.AccessPadInt(uid0);
-                Console.WriteLine("padInt0 created with uid: " + uid0);
-
-                if(padInt0.Write(20)) {
-                    Console.WriteLine("padInt0 write done with value (20) : " + padInt0.Read());
-                }
-
-                Library.TxCommit();
-                Console.WriteLine("txCommit Done");
-
-                Console.WriteLine("closeChannel Done");
-            } catch(Exception e) {
-                Console.WriteLine(e.Message);
-            }
-
-            Console.WriteLine("------------");
-            Logger.Log(new String[] { "---------Client2 Simple write end----------" });
-        }
-
-        public void TestMultipleReadClient2(int uid0, int uid1, int uid2) {
-
-            Console.WriteLine("------ Test: Client2 Multiple read ------");
-            Logger.Log(new String[] { "Client", "------ Test: Client2 Multiple read ------" });
-
-            Library library = new Library();
-            Console.WriteLine("library created");
-
-            try {
-                Console.WriteLine("init() Done");
-
-                Library.TxBegin();
-                Console.WriteLine("txBegin Done");
-
-                PadIntStub padInt0 = Library.AccessPadInt(uid0);
-                Console.WriteLine("padInt0 created with uid: " + uid0);
-                PadIntStub padInt1 = Library.AccessPadInt(uid1);
-                Console.WriteLine("padInt1 created with uid: " + uid1);
-                PadIntStub padInt2 = Library.AccessPadInt(uid2);
-                Console.WriteLine("padInt2 created with uid: " + uid2);
-
-                bool result = padInt0.Read() == 0;
-                result = (padInt0.Read() == padInt1.Read());
-                result = (padInt0.Read() == padInt2.Read());
-
-                if(result) {
-                    Console.WriteLine("it's OK");
-                } else {
-                    Console.WriteLine("BUG!!!!!: multiple read was not successful...");
-                }
-
-                Library.TxCommit();
-                Console.WriteLine("txCommit Done");
-
-                Console.WriteLine("closeChannel Done");
-            } catch(Exception e) {
-                Console.WriteLine(e.Message);
-            }
-
-            Console.WriteLine("------------");
-            Logger.Log(new String[] { "---------Client2 Multiple read end----------" });
-        }
-
     }
 }

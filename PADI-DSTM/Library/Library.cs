@@ -123,7 +123,7 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="uid"> PadInt identifier</param>
         /// <returns>A stub of created padInt</returns>
-        public static PadIntStub CreatePadInt(int uid) {
+        public static PadInt CreatePadInt(int uid) {
             Logger.Log(new String[] { "Library", "createPadInt", uid.ToString() });
 
             try {
@@ -133,7 +133,7 @@ namespace ClientLibrary {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.CreatePadInt(uid);
                 padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
-                return new PadIntStub(uid, actualTID, serverID, serverAddr, cache);
+                return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
                 throw;
             }
@@ -144,7 +144,7 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <returns>A stub of request padInt</returns>
-        public static PadIntStub AccessPadInt(int uid) {
+        public static PadInt AccessPadInt(int uid) {
             Logger.Log(new String[] { "Library", "accessPadInt", "uid", uid.ToString() });
 
             try {
@@ -154,7 +154,7 @@ namespace ClientLibrary {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.ConfirmPadInt(uid);
                 padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
-                return new PadIntStub(uid, actualTID, serverID, serverAddr, cache);
+                return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(NoServersFoundException) {
@@ -175,6 +175,39 @@ namespace ClientLibrary {
             } else {
                 throw new WrongPadIntRequestException(uid, actualTID);
             }
+        }
+
+        /// <summary>
+        /// Sends freeze request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Freeze(String address) {
+            Logger.Log(new String[] { "Library", "Freeze", "address", address });
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            return server.Freeze();
+        }
+
+        /// <summary>
+        /// Sends fail request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Fail(String address) {
+            Logger.Log(new String[] { "Library", "Fail", "address", address });
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            return server.Fail();
+        }
+
+        /// <summary>
+        /// Sends recover request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Recover(String address) {
+            Logger.Log(new String[] { "Library", "Recover", "address", address });
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            return server.Recover();
         }
 
         /// <summary>

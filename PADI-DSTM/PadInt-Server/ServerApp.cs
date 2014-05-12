@@ -18,18 +18,24 @@ namespace PadIntServer {
         static void Main(string[] args) {
 
             Console.Title = "Server";
-            Random random = new Random();
-            int randomNumber = random.Next(0, 100);
+            int port;
+
+            if(args.Length > 0) {
+                port = Int32.Parse(args[0]);
+            } else {
+                Random random = new Random();
+                port = 8000 + random.Next(0, 100);
+            }
 
             Server padIntServer = new Server();
 
-            TcpChannel channel = new TcpChannel(8000 + randomNumber);
+            TcpChannel channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
 
             try {
                 RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
-                padIntServer.Init(randomNumber);
-                Console.WriteLine("Server up and running on port " + (8000 + randomNumber));
+                padIntServer.Init(port);
+                Console.WriteLine("Server up and running on port " + (port));
             } catch(ServerAlreadyExistsException e) {
                 Console.WriteLine(e.GetMessage());
             }
