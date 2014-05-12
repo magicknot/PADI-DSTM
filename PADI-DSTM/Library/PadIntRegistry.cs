@@ -7,38 +7,32 @@ using System.Threading.Tasks;
 namespace ClientLibrary {
     class PadIntRegistry {
 
-        /// <summary>
-        /// List of PadInts indexed by uid
-        /// </summary>
-        private List<int> padIntsList;
-        /// <summary>
-        /// Server address
-        /// </summary>
-        private string serverAddress;
+        private Boolean wasWrite;
+        private int uid;
+        private int numericValue;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="serverAddress">Server Address</param>
-        public PadIntRegistry(string serverAddress) {
-            padIntsList = new List<int>();
-            this.serverAddress = serverAddress;
+        public PadIntRegistry(int uid, int value, bool wasWrite) {
+            this.uid = uid;
+            this.Value = value;
+            this.wasWrite = wasWrite;
         }
 
-        /// <summary>
-        /// PadInt list accessor
-        /// </summary>
-        internal List<int> PdInts {
-            set { this.padIntsList = value; }
-            get { return padIntsList; }
+        public Boolean WasWrite {
+            get { return wasWrite; }
+            set { wasWrite = value; }
         }
 
-        /// <summary>
-        /// Server Address accessor
-        /// </summary>
-        internal string Address {
-            set { this.serverAddress = value; }
-            get { return serverAddress; }
+        public int UID {
+            get { return UID; }
+            set { UID = value; }
+        }
+
+        public int Value {
+            get { return numericValue; }
+            set {
+                WasWrite = true;
+                numericValue = value;
+            }
         }
     }
 }

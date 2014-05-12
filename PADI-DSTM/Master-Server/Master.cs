@@ -23,13 +23,14 @@ namespace MasterServer {
         /// List of registered servers indexed by server identifier
         /// </summary>
         private List<string> registeredServers;
+        /// <summary>
+        /// It identifies if next server added will be a primary or backup
+        /// </summary>
         private bool serverIsPrimary;
         /// <summary>
-        /// Dictionary storing tuple(server identifier, predicate identifying if padInt was already stored) 
-        /// indexed by PadInt identifier. The predicate is relevant because it may be allocated 20 PadInts on 
-        /// a single server, but only one slotted is used at a time, leaving the remaining for future requests
+        /// It maps uids into padInt server identifiers
         /// </summary>
-        private Dictionary<int, Tuple<int, bool>> padIntServers;
+        private Dictionary<int, int> padIntServers;
 
         internal int LastTID {
             get { return this.lastTransactionIdentifier; }
@@ -41,7 +42,7 @@ namespace MasterServer {
         /// </summary>
         public Master() {
             registeredServers = new List<string>();
-            padIntServers = new Dictionary<int, Tuple<int, bool>>();
+            padIntServers = new Dictionary<int, int>();
             LastTID = 0;
             serverIsPrimary = true;
         }
@@ -59,7 +60,7 @@ namespace MasterServer {
         /// Verifies if a server is already registered on master server
         /// </summary>
         /// <param name="serverID">server identifier</param>
-        private void VerifyServerRegistry(int serverID) {
+        private void ConfirmServerRegistry(int serverID) {
             if(registeredServers.ElementAtOrDefault(serverID) == null) {
                 throw new ServerNotFoundException(serverID);
             }
@@ -94,8 +95,8 @@ namespace MasterServer {
         public Tuple<int, string> GetPadIntServer(int uid) {
             Logger.Log(new String[] { "Master", " getPadIntServer", "uid", uid.ToString() });
             try {
-                int serverID = padIntServers[uid].Item1;
-                VerifyServerRegistry(serverID);
+                int serverID = padIntServers[uid];
+                ConfirmServerRegistry(serverID);
                 return new Tuple<int, string>(serverID, registeredServers[serverID]);
             } catch(ServerNotFoundException) {
                 throw;
@@ -111,11 +112,11 @@ namespace MasterServer {
             Logger.Log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
             try {
                 int serverID = MasterServer.LoadBalancer.GetAvailableServer(registeredServers);
-                padIntServers.Add(uid, new Tuple<int, bool>(serverID, true));
+                padIntServers.Add(uid, serverID);
                 //registeredServers[serverID].Hits+=1;
                 return new Tuple<int, string>(serverID, registeredServers[serverID]);
             } catch(ArgumentException) {
-                throw new PadIntAlreadyExistsException(uid, padIntServers[uid].Item1);
+                throw new PadIntAlreadyExistsException(uid, padIntServers[uid]);
             } catch(NoServersFoundException) {
                 throw;
             }

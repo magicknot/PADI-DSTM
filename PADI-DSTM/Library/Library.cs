@@ -23,10 +23,6 @@ namespace ClientLibrary {
         /// </summary>
         private static int actualTID;
         /// <summary>
-        /// List of PadInts stored on each server
-        /// </summary>
-        private static List<PadIntRegistry> padIntsList;
-        /// <summary>
         /// Cache used to store PadInt's values
         /// </summary>
         private static ClientCache cache;
@@ -35,19 +31,14 @@ namespace ClientLibrary {
         /// </summary>
         private static TcpChannel channel;
 
-        public static TcpChannel Channel {
-            get { return channel; }
-        }
-
         /// <summary>
         /// Creates Tcp channel, and gets a reference to master server
         /// </summary>
         /// <returns> a predicate confirming the sucess of the operations</returns>
         public static bool Init() {
-            padIntsList = new List<PadIntRegistry>();
+            Logger.Log(new String[] { "Library", "init", "\r\n" });
             channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, false);
-            Logger.Log(new String[] { "Library", "init", "\r\n" });
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
         }
@@ -59,7 +50,6 @@ namespace ClientLibrary {
         public static bool TxBegin() {
             Logger.Log(new String[] { "Library", "txBegin" });
             actualTID = masterServer.GetNextTID();
-            Logger.Log(new String[] { " " });
             cache = new ClientCache();
             return true;
         }
@@ -70,26 +60,30 @@ namespace ClientLibrary {
         /// <returns>A predicate confirming the sucess of the operations</returns>
         public static bool TxCommit() {
             Logger.Log(new String[] { "Library", "txCommit" });
-
-            if(padIntsList.Count == 0) {
-                Logger.Log(new String[] { "Library", "txCommit", "nothing to commit" });
-            }
-
-            /* Before commit do writes of the values in cache */
-            foreach(int uid in cache.CacheWrites.Keys) {
-                IServer serverWrite = (IServer) Activator.GetObject(typeof(IServer), cache.CacheWrites[uid]);
-                serverWrite.WritePadInt(actualTID, uid, cache.getValueInCache(uid));
-            }
-
             bool result = true;
             IServer server;
 
-            foreach(PadIntRegistry pd in padIntsList) {
-                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
-                result = server.Commit(actualTID, pd.PdInts) && result;
+            if(cache.ServersWPadInts.Count == 0) {
+                Logger.Log(new String[] { "Library", "txCommit", "nothing to commit" });
+                return result;
             }
 
-            padIntsList.Clear();
+            cache.FlushCache(actualTID);
+
+            List<int> commitList = new List<int>();
+
+            foreach(ServerRegistry srvr in cache.ServersWPadInts) {
+                foreach(PadIntRegistry pd in srvr.PdInts) {
+                    commitList.Add(pd.UID);
+                }
+            }
+
+            foreach(ServerRegistry pd in cache.ServersWPadInts) {
+                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                result = server.Commit(actualTID, commitList) && result;
+            }
+
+            cache.ServersWPadInts.Clear();
             return result;
         }
 
@@ -99,21 +93,28 @@ namespace ClientLibrary {
         /// <returns>a predicate confirming the sucess of the operations</returns>
         public static bool TxAbort() {
             Logger.Log(new String[] { "Library", "txAbort" });
-
-            if(padIntsList.Count == 0) {
-                Logger.Log(new String[] { "Library", "txAbort", "nothing to abort" });
-            }
-
             bool result = true;
             IServer server;
 
-            foreach(PadIntRegistry pd in padIntsList) {
-                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
-                result = server.Abort(actualTID, pd.PdInts) && result;
+            if(cache.ServersWPadInts.Count == 0) {
+                Logger.Log(new String[] { "Library", "txAbort", "nothing to abort" });
+                return result;
             }
 
-            padIntsList.Clear();
-            cache = new ClientCache();
+            List<int> abortList = new List<int>();
+
+            foreach(ServerRegistry srvr in cache.ServersWPadInts) {
+                foreach(PadIntRegistry pd in srvr.PdInts) {
+                    abortList.Add(pd.UID);
+                }
+            }
+
+            foreach(ServerRegistry pd in cache.ServersWPadInts) {
+                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                result = server.Abort(actualTID, abortList) && result;
+            }
+
+            cache.ServersWPadInts.Clear();
             return result;
         }
 
@@ -132,7 +133,7 @@ namespace ClientLibrary {
                 int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.CreatePadInt(uid);
-                padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
+                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
                 throw;
@@ -153,61 +154,13 @@ namespace ClientLibrary {
                 int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.ConfirmPadInt(uid);
-                padIntsList.Insert(serverID, new PadIntRegistry(serverAddr));
+                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(NoServersFoundException) {
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Associates an uid, to a server and a transaction, so it is later involved in commit or abort
-        /// </summary>
-        /// <param name="serverID">Server identifier</param>
-        /// <param name="uid">PadInt identifier</</param>
-        public static void RegisterUID(int serverID, int uid) {
-            Logger.Log(new String[] { "Library", "registerWrite", "uid", uid.ToString() });
-            PadIntRegistry registry = padIntsList.ElementAtOrDefault(serverID);
-            if(registry != null) {
-                registry.PdInts.Add(uid);
-            } else {
-                throw new WrongPadIntRequestException(uid, actualTID);
-            }
-        }
-
-        /// <summary>
-        /// Sends freeze request to a server
-        /// </summary>
-        /// <param name="address">server's address</param>
-        /// <returns>true if successful</returns>
-        public static bool Freeze(String address) {
-            Logger.Log(new String[] { "Library", "Freeze", "address", address });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            return server.Freeze();
-        }
-
-        /// <summary>
-        /// Sends fail request to a server
-        /// </summary>
-        /// <param name="address">server's address</param>
-        /// <returns>true if successful</returns>
-        public static bool Fail(String address) {
-            Logger.Log(new String[] { "Library", "Fail", "address", address });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            return server.Fail();
-        }
-
-        /// <summary>
-        /// Sends recover request to a server
-        /// </summary>
-        /// <param name="address">server's address</param>
-        /// <returns>true if successful</returns>
-        public static bool Recover(String address) {
-            Logger.Log(new String[] { "Library", "Recover", "address", address });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            return server.Recover();
         }
 
         /// <summary>

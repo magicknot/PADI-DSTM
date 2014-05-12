@@ -51,18 +51,17 @@ namespace ClientLibrary {
         public int Read() {
             Logger.Log(new String[] { "PadIntStub", "read" });
 
-            if(cache.hasUidInCache(uid)) {
-                return cache.getValueInCache(uid);
-            } else {
-                try {
+            try {
+                if(cache.HasPadInt(serverID, uid)) {
+                    return cache.GetPadIntValue(serverID, uid);
+                } else {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     int result = server.ReadPadInt(tid, uid);
-                    Library.RegisterUID(serverID, uid);
-                    cache.updateReadValue(uid, result);
+                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, result, false));
                     return result;
-                } catch(PadIntNotFoundException) {
-                    throw;
                 }
+            } catch(PadIntNotFoundException) {
+                throw;
             }
         }
 
@@ -74,19 +73,20 @@ namespace ClientLibrary {
         public bool Write(int value) {
             Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
 
-            if(cache.hasPreviousWrite(uid)) {
-                cache.updateWriteValue(uid, value);
-                return true;
-            } else {
-                try {
+            try {
+                if(cache.HasPadInt(serverID, uid)) {
+                    cache.UpdatePadIntValue(serverID, uid, value);
+                    return true;
+                } else {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     server.WritePadInt(tid, uid, value);
-                    Library.RegisterUID(serverID, uid);
-                    cache.addWriteValue(uid, value, address);
+                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, value, false));
                     return true;
-                } catch(PadIntNotFoundException) {
-                    throw;
                 }
+            } catch(PadIntNotFoundException) {
+                throw;
+            } catch(WrongPadIntRequestException) {
+                throw;
             }
         }
     }

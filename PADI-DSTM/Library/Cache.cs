@@ -3,58 +3,72 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommonTypes;
 
 namespace ClientLibrary {
     class ClientCache {
 
         /// <summary>
-        /// Structure that maps UID to PadInt's value
+        /// List of PadInts stored on each server
         /// </summary>
-        private Dictionary<int, int> padIntsCache;
-        /// <summary>
-        /// Structure that stores uid of writes and server's address
-        /// </summary>
-        private Dictionary<int, string> cacheWrites;
+        private static List<ServerRegistry> serverList;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="serverAddress">Server Address</param>
         internal ClientCache() {
-            padIntsCache = new Dictionary<int, int>();
-            cacheWrites = new Dictionary<int, string>();
+            serverList = new List<ServerRegistry>();
+        }
+
+        internal List<ServerRegistry> ServersWPadInts {
+            get { return serverList; }
+        }
+
+        public ServerRegistry GetServer(int serverID) {
+            return serverList.ElementAtOrDefault(serverID);
+        }
+
+        public void AddServer(int serverID, string serverAddr) {
+            ServersWPadInts.Insert(serverID, new ServerRegistry(serverAddr));
+        }
+
+        private PadIntRegistry GetPadInt(int serverID, int uid) {
+            return GetServer(serverID).getPadInt(uid);
         }
 
         /// <summary>
-        /// PadInt cache accessor
+        /// Associates an uid, to a server and a transaction, so it is later involved in commit or abort
         /// </summary>
-        internal Dictionary<int, int> Cache {
-            get { return padIntsCache; }
+        /// <param name="serverID">Server identifier</param>
+        /// <param name="uid">PadInt identifier</</param>
+        internal void AddPadInt(int serverID, int tid, PadIntRegistry pd) {
+            ServerRegistry serverRegistry = GetServer(serverID);
+            if(serverRegistry != null) {
+                serverRegistry.PdInts.Add(pd);
+            } else {
+                throw new WrongPadIntRequestException(pd.UID, tid);
+            }
         }
 
-        /// <summary>
-        /// PadInt list accessor
-        /// </summary>
-        internal Dictionary<int, string> CacheWrites {
-            get { return cacheWrites; }
-        }
 
         /// <summary>
         /// See if a previous write has occurred
         /// </summary>
         /// <param name="uid">PadInt's uid</param>
         /// <returns>True if a previous write has occurred</returns>
-        internal bool hasPreviousWrite(int uid) {
-            return cacheWrites.ContainsKey(uid);
-        }
+        /*internal bool padIntWasWrite(int serverID, int uid) {
+            //isto vai rebentar aqui!
+            return getPadInt(serverID, uid).WasWrite;
+        }*/
 
         /// <summary>
         /// See if a given uid is in cache
         /// </summary>
         /// <param name="uid">PadInt's uid</param>
         /// <returns>Returns true if the uid is in cache</returns>
-        internal bool hasUidInCache(int uid) {
-            return padIntsCache.ContainsKey(uid);
+        internal bool HasPadInt(int serverID, int uid) {
+            return GetPadInt(serverID, uid) != null;
         }
 
         /// <summary>
@@ -62,21 +76,8 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="uid">PadInt's value</param>
         /// <returns>PadInt's value</returns>
-        internal int getValueInCache(int uid) {
-            return padIntsCache[uid];
-        }
-
-        /// <summary>
-        /// Updates PadInt's read value store in cache
-        /// </summary>
-        /// <param name="uid">PadInt's uid</param>
-        /// <param name="value">Value to assign</param>
-        internal void updateReadValue(int uid, int value) {
-            if(padIntsCache.ContainsKey(uid)) {
-                padIntsCache[uid] = value;
-            } else {
-                padIntsCache.Add(uid, value);
-            }
+        internal int GetPadIntValue(int serverID, int uid) {
+            return GetPadInt(serverID, uid).Value;
         }
 
         /// <summary>
@@ -84,25 +85,21 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="uid">PadInt's uid</param>
         /// <param name="value">Value to assign</param>
-        internal void updateWriteValue(int uid, int value) {
-
-            padIntsCache[uid] = value;
+        internal void UpdatePadIntValue(int serverID, int uid, int value) {
+            GetPadInt(serverID, uid).Value = value;
         }
 
-        /// <summary>
-        /// Updates PadInt's write value store in cache and adds the uid to the cacheWrites
-        /// </summary>
-        /// <param name="uid">PadInt's uid</param>
-        /// <param name="value">Value to assign</param>
-        internal void addWriteValue(int uid, int value, string address) {
-            if(!cacheWrites.ContainsKey(uid)) {
-                cacheWrites.Add(uid, address);
-            }
 
-            if(padIntsCache.ContainsKey(uid)) {
-                padIntsCache[uid] = value;
-            } else {
-                padIntsCache.Add(uid, value);
+
+        /* Before commit do writes of the values in cache */
+        internal void FlushCache(int tid) {
+            foreach(ServerRegistry server in serverList) {
+                foreach(PadIntRegistry padInt in server.PdInts) {
+                    if(padInt.WasWrite) {
+                        IServer serverWrite = (IServer) Activator.GetObject(typeof(IServer), server.Address);
+                        serverWrite.WritePadInt(tid, padInt.UID, padInt.Value);
+                    }
+                }
             }
         }
     }
