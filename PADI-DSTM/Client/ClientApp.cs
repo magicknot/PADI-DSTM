@@ -12,13 +12,12 @@ using System.Runtime.Remoting;
 namespace Client {
     class ClientApp {
 
-        public static void Main(string[] args) {
+        public static void Mainaa(string[] args) {
 
             Client client = new Client();
 
             Console.Title = "Client";
             Console.WriteLine("Client up and running..");
-            TcpChannel channel;
 
             if(Library.Init()) {
 

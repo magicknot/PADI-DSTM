@@ -86,7 +86,7 @@ namespace CommonTypes {
         /// <summary>
         /// Predicate that defines where the log messages are printed
         /// </summary>
-        private static bool isLocal = true;
+        private static bool isLocal = false;
 
         /// <summary>
         /// Redirects the log message according to predicates

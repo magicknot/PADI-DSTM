@@ -144,9 +144,8 @@ namespace PadIntServer {
             } else {
                 pendingReaders.Add(tid);
 
-                Logger.Log(new String[] { "PadInt", "espera read... writter: ", writer.ToString() });
                 while(pendingReaders.Contains(tid)) {
-
+                    Logger.Log(new String[] { "PadInt", "espera read tid: " + tid.ToString() + "... Writer tem tid: ", writer.ToString() });
                     //activates the deadLock detection if it is not already started
                     if(!deadLockTimer.Enabled) {
                         try {
@@ -155,7 +154,6 @@ namespace PadIntServer {
                         } catch(AbortException) {
                             throw;
                         }
-
                     }
                 }
             }
@@ -171,6 +169,28 @@ namespace PadIntServer {
         /// <returns>bool</returns>
         internal bool HasWriteLock(int tid) {
             return writer == tid;
+        }
+
+        /// <summary>
+        /// Puts a transaction in wait
+        /// </summary>
+        /// <param name="tid">Transaction id</param>
+        private void waitWrite(int tid) {
+            Logger.Log(new String[] { "PadInt", "waitWrite" + tid.ToString() });
+            while(pendingWriters.Contains(tid)) {
+
+                //activates the deadLock detection if it is not already started
+                if(!deadLockTimer.Enabled) {
+                    try {
+                        isWaitingWrite = true;
+                        deadLockTimer.Start();
+                    } catch(AbortException) {
+                        throw;
+                    }
+                }
+
+                Logger.Log(new String[] { "PadInt", "espera write tid: " + tid.ToString() });
+            }
         }
 
         /// <summary>
@@ -195,49 +215,27 @@ namespace PadIntServer {
             /* if don't exists a writer or readers */
             if(writer == INITIALIZATION || readers.Count == 0) {
                 writer = tid;
+                Console.WriteLine("obtive o lock");
             } else {
+                Console.WriteLine("lock atribuido é escrita");
                 /* if the lock is a write lock */
                 if(readers.Count == 0) {
                     /* if the lock is not assigned to the transaction
                      *  identified by tid */
                     if(writer != tid) {
                         pendingWriters.Add(tid);
-                        while(pendingWriters.Contains(tid)) {
-
-                            //activates the deadLock detection if it is not already started
-                            if(!deadLockTimer.Enabled) {
-                                try {
-                                    isWaitingWrite = true;
-                                    deadLockTimer.Start();
-                                } catch(AbortException) {
-                                    throw;
-                                }
-                            }
-
-                            Logger.Log(new String[] { "PadInt", "espera write 1... writer: ", writer.ToString() });
-                        }
+                        waitWrite(tid);
                     }
                 } else {
+                    Console.WriteLine("lock atribuido é read");
                     /* if the locks are read locks */
 
                     /* if the transaction, identified by tid,
                      *  does not have a read lock */
                     if(!readers.Contains(tid)) {
+                        Console.WriteLine("nao sou leitor");
                         pendingWriters.Add(tid);
-                        while(pendingWriters.Contains(tid)) {
-
-                            //activates the deadLock detection if it is not already started
-                            if(!deadLockTimer.Enabled) {
-                                try {
-                                    isWaitingWrite = true;
-                                    deadLockTimer.Start();
-                                } catch(AbortException) {
-                                    throw;
-                                }
-                            }
-
-                            Logger.Log(new String[] { "PadInt", "espera write 2...writer: ", writer.ToString() });
-                        }
+                        waitWrite(tid);
                     } else {
                         /* if there is only a
                          *  reader (transaction identified by tid) */
@@ -249,6 +247,7 @@ namespace PadIntServer {
                              * for promotion */
                             if(promotion == INITIALIZATION) {
                                 promotion = tid;
+                                waitWrite(tid);
                             } else {
                                 /* abort */
                                 return false;
