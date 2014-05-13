@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 
 namespace CommonTypes {
 
@@ -105,6 +108,8 @@ namespace CommonTypes {
                     }
                     Console.WriteLine(message);
                 } else {
+                    TcpChannel channel = new TcpChannel();
+                    ChannelServices.RegisterChannel(channel, false);
                     ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
                     logServer.log(args);
                 }

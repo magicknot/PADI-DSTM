@@ -22,7 +22,7 @@ namespace MasterServer {
         /// <summary>
         /// List of registered servers indexed by server identifier
         /// </summary>
-        private List<string> registeredServers;
+        private List<ServerRegistry> registeredServers;
         /// <summary>
         /// It identifies if next server added will be a primary or backup
         /// </summary>
@@ -41,7 +41,7 @@ namespace MasterServer {
         /// Constructor
         /// </summary>
         public Master() {
-            registeredServers = new List<string>();
+            registeredServers = new List<ServerRegistry>();
             padIntServers = new Dictionary<int, int>();
             LastTID = 0;
             serverIsPrimary = true;
@@ -75,12 +75,12 @@ namespace MasterServer {
             Logger.Log(new String[] { "Master", "registerServer", "address", address.ToString() });
             try {
                 if(serverIsPrimary) {
-                    registeredServers.Insert(registeredServers.Count, address);
+                    registeredServers.Insert(registeredServers.Count, new ServerRegistry(address));
                     serverIsPrimary = false;
                     return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
                 } else {
                     serverIsPrimary = true;
-                    return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1]);
+                    return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1].Address);
                 }
             } catch(ArgumentException) {
                 throw new ServerAlreadyExistsException(registeredServers.Count - 1);
@@ -97,7 +97,7 @@ namespace MasterServer {
             try {
                 int serverID = padIntServers[uid];
                 ConfirmServerRegistry(serverID);
-                return new Tuple<int, string>(serverID, registeredServers[serverID]);
+                return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
             } catch(ServerNotFoundException) {
                 throw;
             }
@@ -111,10 +111,10 @@ namespace MasterServer {
         public Tuple<int, string> RegisterPadInt(int uid) {
             Logger.Log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
             try {
-                int serverID = MasterServer.LoadBalancer.GetAvailableServer(registeredServers);
+                int serverID = GetAvailableServer();
                 padIntServers.Add(uid, serverID);
-                //registeredServers[serverID].Hits+=1;
-                return new Tuple<int, string>(serverID, registeredServers[serverID]);
+                registeredServers[serverID].Hits+=1;
+                return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, padIntServers[uid]);
             } catch(NoServersFoundException) {
@@ -135,13 +135,40 @@ namespace MasterServer {
                 Console.WriteLine("Server " + i + " with address " + registeredServers[i]);
             }
 
-            foreach(string serverAddr in registeredServers) {
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
+            foreach(ServerRegistry srvr in registeredServers) {
+                IServer server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
                 server.Status();
             }
             Console.WriteLine("-----------------------");
 
             return true;
         }
+
+        private int GetAvailableServer() {
+            int count;
+            int minHits;
+            int serverID;
+
+            if(registeredServers.Count == 0 || registeredServers.Count == 1 && !serverIsPrimary) {
+                throw new NoServersFoundException();
+            } else if(serverIsPrimary) {
+                count = registeredServers.Count;
+            } else {
+                count = registeredServers.Count-1;
+            }
+
+            minHits = registeredServers[0].Hits;
+            serverID = 0;
+
+            for(int id = 0; id <count; id++) {
+                if(registeredServers[id].Hits < minHits) {
+                    minHits = registeredServers[id].Hits;
+                    serverID = id;
+                }
+            }
+
+            return serverID;
+        }
+
     }
 }

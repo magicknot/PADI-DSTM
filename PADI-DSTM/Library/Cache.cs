@@ -32,13 +32,7 @@ namespace ClientLibrary {
 
         internal ServerRegistry GetServer(int serverID) {
             Logger.Log(new String[] { "Cache", "GetServer", "serverID", serverID.ToString() });
-
-            //return serverList.ElementAtOrDefault(serverID);
-            if(serverList.ContainsKey(serverID)) {
-                return serverList[serverID];
-            } else {
-                return null;
-            }
+            return serverList.ElementAtOrDefault(serverID).Value;
         }
 
         internal void AddServer(int serverID, string serverAddr) {
