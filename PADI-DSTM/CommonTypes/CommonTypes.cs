@@ -19,10 +19,14 @@ namespace CommonTypes {
         bool WritePadInt(int tid, int uid, int value);
         bool Commit(int tid, List<int> usedPadInts);
         bool Abort(int tid, List<int> usedPadInts);
-        bool Dump();
+        bool Status();
         bool Freeze();
         bool Fail();
         bool Recover();
+    }
+
+    public interface IServerMachine {
+        void restartServer(int ID);
     }
 
     /// <summary>
@@ -44,13 +48,6 @@ namespace CommonTypes {
     }
 
     /// <summary>
-    /// Remote Log server interface
-    /// </summary>
-    public interface ILog {
-        void log(String[] logs);
-    }
-
-    /// <summary>
     /// Remote PadInt Exception interface
     /// </summary>
     [Serializable]
@@ -68,6 +65,13 @@ namespace CommonTypes {
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) {
             base.GetObjectData(info, context);
         }
+    }
+
+    /// <summary>
+    /// Remote Log server interface
+    /// </summary>
+    public interface ILog {
+        void log(String[] logs);
     }
 
     /// <summary>

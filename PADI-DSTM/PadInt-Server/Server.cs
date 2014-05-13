@@ -14,7 +14,7 @@ namespace PadIntServer {
     /// <summary>
     /// This class represents the PadInt server
     /// </summary>
-    class Server : MarshalByRefObject, IServer {
+    class Server : MarshalByRefObject, IServer, IDisposable {
 
         /// <summary>
         /// Constant used to represent non atributed server address
@@ -36,14 +36,11 @@ namespace PadIntServer {
         /// Server address
         /// </summary>
         private string serverAddress;
-        /// <summary>
-        /// Reference to master server
-        /// </summary>
-        IMaster masterServerReference;
 
-        public Server() {
+        public Server(string address) {
             serverState = new FailedState(this);
             padIntDictionary = new Dictionary<int, IPadInt>();
+            Address = address;
         }
 
         internal int ID {
@@ -54,11 +51,6 @@ namespace PadIntServer {
         internal string Address {
             set { this.serverAddress = value; }
             get { return serverAddress; }
-        }
-
-        internal IMaster Master {
-            set { this.masterServerReference = value; }
-            get { return masterServerReference; }
         }
 
         internal Dictionary<int, IPadInt> PdInts {
@@ -73,12 +65,11 @@ namespace PadIntServer {
 
         public bool Init(int port) {
             try {
-                Master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
-                Address = "tcp://localhost:" + (port) + "/PadIntServer";
-                Tuple<int, string> info = Master.RegisterServer(Address);
+                IMaster master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+                Tuple<int, string> info = master.RegisterServer(Address);
                 ID = info.Item1;
                 string primaryServerAddr = info.Item2;
-                if(primaryServerAddr!= NO_SERVER_ADDRESS) {
+                if(primaryServerAddr != NO_SERVER_ADDRESS) {
                     CreateBackupServer(primaryServerAddr, new Dictionary<int, IPadInt>());
                 }
             } catch(ServerAlreadyExistsException) {
@@ -96,7 +87,6 @@ namespace PadIntServer {
         public void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts) {
             Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new PrimaryServer(this, backupAddress);
-            //ID = id; este nao e preciso porque o servidor primario sabe sempre o seu id e a chamada e feita do secundario
             padIntDictionary = padInts;
         }
 
@@ -109,7 +99,6 @@ namespace PadIntServer {
         public void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts) {
             Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
             serverState = new BackupServer(this, primaryAddress);
-            //ID = id; // este nao e preciso porque e feito pelo init
             padIntDictionary = padInts;
         }
 
@@ -230,6 +219,7 @@ namespace PadIntServer {
 
         public bool Fail() {
             serverState = new FailedState(this);
+            ServerMachine.killServer();
             return true;
         }
 
@@ -238,7 +228,7 @@ namespace PadIntServer {
             return true;
         }
 
-        public bool Dump() {
+        public bool Status() {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");
@@ -247,6 +237,11 @@ namespace PadIntServer {
             }
             Console.WriteLine("-----------------------");
             return true;
+        }
+
+
+        public void Dispose() {
+            serverState.Dispose();
         }
     }
 }

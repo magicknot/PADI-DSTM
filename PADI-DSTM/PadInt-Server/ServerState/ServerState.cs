@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 using System.Timers;
 
 namespace PadIntServer {
-    abstract class ServerState {
+    abstract class ServerState : IDisposable {
 
         /// <summary>
         /// Server that has this state
         /// </summary>
         private Server server;
+        /// <summary>
+        /// Timer used in I'm Alive mechanism
+        /// </summary>
+        internal PadIntTimer imAliveTimer;
 
         internal ServerState(Server server) {
             this.server = server;
@@ -30,5 +34,10 @@ namespace PadIntServer {
         internal abstract bool Commit(int tid, List<int> usedPadInts);
         internal abstract bool Abort(int tid, List<int> usedPadInts);
         internal virtual bool Recover() { return false; }
+
+
+        public virtual void Dispose() {
+            imAliveTimer.Dispose(true);
+        }
     }
 }

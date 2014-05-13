@@ -10,7 +10,7 @@ namespace PadIntServer {
     /// <summary>
     /// This class represents the PadInt primary server
     /// </summary>
-    class PrimaryServer : ServerState {
+    class PrimaryServer : ServerState, IDisposable {
 
         /// <summary>
         /// Constant used to represent the interval after which primary server
@@ -18,24 +18,22 @@ namespace PadIntServer {
         /// </summary>
         private const int IM_ALIVE_INTERVAL = 20000;
         /// <summary>
-        /// Timer used in I'm Alive mechanism
-        /// </summary>
-        private System.Timers.Timer imAliveTimer;
-        /// <summary>
         /// Constant used to represent the interval after which primary server
         ///  requires a new backup server (1000 = 1s)
         /// </summary>
         private const int BACKUP_REPLY_INTERVAL = 35000;
         /// <summary>
-        /// Timer used to detect that primary server does not receive a reply
-        ///  from backup server
-        /// </summary>
-        private System.Timers.Timer backupReplyTimer;
-        /// <summary>
         /// Primary/backup server
         ///  (backup if this server is the primary server, primary otherwise)
         /// </summary>
         private IServer backupServerReference;
+
+
+        /// <summary>
+        /// Timer used to detect that primary server does not receive a reply
+        ///  from backup server
+        /// </summary>
+        internal PadIntTimer backupReplyTimer;
 
         /// <summary>
         /// Primary/backup server's address
@@ -63,12 +61,12 @@ namespace PadIntServer {
             BackupServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
 
             // Create a timer with IM_ALIVE_INTERVAL second interval.
-            imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
-            imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
+            imAliveTimer = new PadIntTimer(IM_ALIVE_INTERVAL);
+            imAliveTimer.Timer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
 
             // Create a timer with BACKUP_REPLY_INTERVAL second interval.
-            backupReplyTimer = new System.Timers.Timer(BACKUP_REPLY_INTERVAL);
-            backupReplyTimer.Elapsed += new ElapsedEventHandler(BackupReplyEvent);
+            backupReplyTimer = new PadIntTimer(BACKUP_REPLY_INTERVAL);
+            backupReplyTimer.Timer.Elapsed += new ElapsedEventHandler(BackupReplyEvent);
 
             //starts im alive timer
             imAliveTimer.Start();
@@ -102,6 +100,8 @@ namespace PadIntServer {
         private void BackupReplyEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "BackupReplyEvent" });
             backupReplyTimer.Stop();
+            IServerMachine backupServerMachine = (IServerMachine) Activator.GetObject(typeof(IServer), BackupAddress);
+            backupServerMachine.restartServer(Server.ID);
             BackupServer.CreateBackupServer(Server.Address, Server.PdInts);
         }
 
@@ -282,6 +282,11 @@ namespace PadIntServer {
             backupReplyTimer.Stop();
 
             return resultAbort;
+        }
+
+        public override void Dispose() {
+            backupReplyTimer.Dispose(true);
+            base.Dispose();
         }
     }
 }

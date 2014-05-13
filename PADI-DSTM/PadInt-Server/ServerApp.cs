@@ -13,10 +13,8 @@ namespace PadIntServer {
     /// This class represents the PadInt server application
     /// </summary>
     class ServerApp {
-        private const int MASTERADDRESS = 8001;
 
         static void Main(string[] args) {
-
             Console.Title = "Server";
             int port;
 
@@ -27,14 +25,16 @@ namespace PadIntServer {
                 port = 8000 + random.Next(0, 100);
             }
 
-            Server padIntServer = new Server();
-
-            TcpChannel channel = new TcpChannel(port);
-            ChannelServices.RegisterChannel(channel, false);
+            string address = "tcp://localhost:" + (port) + "/PadIntServer";
+            ServerMachine machine = new ServerMachine(address);
+            Server server = machine.Server;
 
             try {
-                RemotingServices.Marshal(padIntServer, "PadIntServer", typeof(IServer));
-                padIntServer.Init(port);
+                TcpChannel channel = new TcpChannel(port);
+                ChannelServices.RegisterChannel(channel, false);
+                RemotingServices.Marshal(server, "PadIntServer", typeof(IServer));
+                RemotingServices.Marshal(machine, "ServerMachine", typeof(IServerMachine));
+                server.Init(port);
                 Console.WriteLine("Server up and running on port " + (port));
             } catch(ServerAlreadyExistsException e) {
                 Console.WriteLine(e.GetMessage());

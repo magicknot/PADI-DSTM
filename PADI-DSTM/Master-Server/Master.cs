@@ -137,7 +137,7 @@ namespace MasterServer {
 
             foreach(string serverAddr in registeredServers) {
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
-                server.Dump();
+                server.Status();
             }
             Console.WriteLine("-----------------------");
 

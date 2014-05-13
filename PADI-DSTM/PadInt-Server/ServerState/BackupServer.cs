@@ -20,10 +20,6 @@ namespace PadIntServer {
         ///  backup server tries to be a primary server (1000 = 1s)
         /// </summary>
         private const int IM_ALIVE_INTERVAL = 35000;
-        /// <summary>
-        /// Timer used in I'm Alive mechanism
-        /// </summary>
-        private System.Timers.Timer imAliveTimer;
 
         /// <summary>
         /// Primary/backup server
@@ -56,8 +52,8 @@ namespace PadIntServer {
             PrimaryServer.CreatePrimaryServer(Server.Address, new Dictionary<int, IPadInt>());
 
             // Create a timer with inAliveInterval second interval.
-            imAliveTimer = new System.Timers.Timer(IM_ALIVE_INTERVAL);
-            imAliveTimer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
+            imAliveTimer = new PadIntTimer(IM_ALIVE_INTERVAL);
+            imAliveTimer.Timer.Elapsed += new ElapsedEventHandler(ImAliveEvent);
 
             //starts im alive timer
             imAliveTimer.Start();
@@ -75,7 +71,8 @@ namespace PadIntServer {
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            //Isto estava a fazer coisas potencialmente horriveis
+            IServerMachine primaryServerMachine = (IServerMachine) Activator.GetObject(typeof(IServer), PrimaryAddress);
+            primaryServerMachine.restartServer(Server.ID);
             PrimaryServer.CreatePrimaryServer(Server.Address, Server.PdInts);
         }
 
