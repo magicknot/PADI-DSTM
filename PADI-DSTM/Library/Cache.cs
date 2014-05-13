@@ -72,6 +72,10 @@ namespace ClientLibrary {
             return GetPadInt(serverID, uid) != null;
         }
 
+        internal bool HasWritePadInt(int serverID, int uid) {
+            return GetPadInt(serverID, uid).WasWrite;
+        }
+
         /// <summary>
         /// Obtains PadInt's value stored in cache
         /// </summary>

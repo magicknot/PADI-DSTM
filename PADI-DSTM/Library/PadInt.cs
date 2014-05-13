@@ -76,13 +76,13 @@ namespace ClientLibrary {
             Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
 
             try {
-                if(cache.HasPadInt(serverID, uid)) {
+                if(cache.HasWritePadInt(serverID, uid)) {
                     cache.UpdatePadIntValue(serverID, uid, value);
                     return true;
                 } else {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     server.WritePadInt(tid, uid, value);
-                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, value, false));
+                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, value, true));
                     return true;
                 }
             } catch(PadIntNotFoundException) {
