@@ -33,12 +33,7 @@ namespace ClientLibrary {
         internal ServerRegistry GetServer(int serverID) {
             Logger.Log(new String[] { "Cache", "GetServer", "serverID", serverID.ToString() });
 
-            //return serverList.ElementAtOrDefault(serverID);
-            if(serverList.ContainsKey(serverID)) {
-                return serverList[serverID];
-            } else {
-                return null;
-            }
+            return serverList.ElementAtOrDefault(serverID).Value;
         }
 
         internal void AddServer(int serverID, string serverAddr) {
@@ -76,6 +71,10 @@ namespace ClientLibrary {
         internal bool HasPadInt(int serverID, int uid) {
             Logger.Log(new String[] { "Cache", "HasPadInt", "serverID", serverID.ToString(), "uid", uid.ToString() });
             return GetPadInt(serverID, uid) != null;
+        }
+
+        internal bool HasWritePadInt(int serverID, int uid) {
+            return GetPadInt(serverID, uid).WasWrite;
         }
 
         /// <summary>
