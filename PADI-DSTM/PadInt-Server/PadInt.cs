@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommonTypes;
 using System.Timers;
+using System.Threading;
 
 namespace PadIntServer {
     [Serializable]
@@ -20,6 +21,10 @@ namespace PadIntServer {
         /// </summary>
         private const int DEADLOCK_INTERVAL = 10000;
         /// <summary>
+        /// Constant used to represent a write lock
+        /// </summary>
+        private const bool WRITE_LOCK = false;
+        /// <summary>
         /// PadInt identifier
         /// </summary>
         private int uid;
@@ -32,19 +37,9 @@ namespace PadIntServer {
         /// </summary>
         private int originalValue;
         /// <summary>
-        /// Timer used in deadlock detection
+        /// Type of the attributed lock
         /// </summary>
-        private System.Timers.Timer deadLockTimer;
-        /// <summary>
-        /// Variable used to indicate who (pending write/read) starts the deadlocks timer
-        /// </summary>
-        private bool isWaitingWrite;
-        /// <summary>
-        /// identifier (tid) of the next transaction to be promoted.
-        /// Value INITIALIZATION means that there is no transaction, 
-        ///   identified by tid, waiting for promotion. 
-        /// </summary>
-        private int promotion;
+        private bool lockType;
         /// <summary>
         /// Queue with transactions' tid with atributed read locks
         /// </summary>
@@ -56,13 +51,9 @@ namespace PadIntServer {
         /// </summary>
         private int writer;
         /// <summary>
-        /// Queue with transactions' tid with pending read locks
+        /// Queue with transactions' tid with pending read/write locks
         /// </summary>
-        private List<int> pendingReaders;
-        /// <summary>
-        /// Queue with transactions' tid with pending write locks
-        /// </summary>
-        private List<int> pendingWriters;
+        private List<bool> pendingTransactions;
 
         /// <summary>
         /// Constructor
@@ -74,15 +65,9 @@ namespace PadIntServer {
             this.actualValue = 0;
             this.originalValue = 0;
 
-            // Create a timer with a DEADLOCK_INTERVAL interval.
-            deadLockTimer = new System.Timers.Timer(DEADLOCK_INTERVAL);
-            deadLockTimer.Elapsed += new ElapsedEventHandler(DeadLockEvent);
-
-            this.promotion = INITIALIZATION;
             this.readers = new List<int>();
             this.writer = INITIALIZATION;
-            this.pendingReaders = new List<int>();
-            this.pendingWriters = new List<int>();
+            this.pendingTransactions = new List<bool>();
         }
 
         internal int Uid {
@@ -101,30 +86,51 @@ namespace PadIntServer {
         }
 
         /// <summary>
-        /// Deals with deadLock events
+        /// Acquires a lock
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        private void DeadLockEvent(object source, ElapsedEventArgs e) {
-            Logger.Log(new String[] { "PadInt", "DeadLockEvent" });
+        /// <param name="tid">Transaction identifier</param>
+        /// <param name="requiredLockType">Lock type</param>
+        /// <returns>Returns true if successful</returns>
+        internal bool AcquireLock(int tid, bool requiredLockType) {
+            lock(this) {
+                while(lockType != requiredLockType || lockType == requiredLockType == WRITE_LOCK) {
+                    /*if(requiredLockType == WRITE_LOCK) {
+                        pendingTransactions.Add(WRITE_LOCK);
+                    } else {
+                        pendingTransactions.Add(!WRITE_LOCK);
+                    }*/
 
-            /* stops the timer */
-            deadLockTimer.Close();
+                    Boolean res = Monitor.Wait(this, DEADLOCK_INTERVAL);
+                    //pendingTransactions.RemoveAt(0);
+                    if(!res) {
+                        throw new AbortException(tid, uid);
+                    }
+                }
 
-            /* if was a write request that starts the timer */
-            if(isWaitingWrite) {
-                pendingWriters.RemoveAt(0);
-            } else {
-                pendingReaders.RemoveAt(0);
+                //updates the type of the lock
+                lockType = requiredLockType;
+
+                if(requiredLockType == !WRITE_LOCK) {
+                    readers.Add(tid);
+                } else {
+                    if(requiredLockType == WRITE_LOCK) {
+                        //promotion (Remove(tid) removes tid if it exists, otherwise don't remove anything)
+                        readers.Remove(tid);
+
+                        writer = tid;
+                    }
+                }
+                /*if(lockType != WRITE_LOCK) {
+                    int pendingIndex = 0;
+                    while(pendingTransactions[pendingIndex] == lockType && pendingTransactions.Count > 0) {
+                        Monitor.Pulse(this);
+                    }
+                } else {
+                    Monitor.Pulse(this);
+                }*/
+                //Monitor.Pulse(this);
+                return true;
             }
-
-            /* restart the timer if exists other pending requests because
-             *  the timer is only activated by the first one */
-            if(pendingWriters.Count > 0 || pendingReaders.Count > 0) {
-                deadLockTimer.Start();
-            }
-
-            throw new AbortException(uid);
         }
 
         /// <summary>
@@ -135,30 +141,9 @@ namespace PadIntServer {
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
         internal bool GetReadLock(int tid) {
-
             Logger.Log(new String[] { "PadInt", "getReadLock" });
 
-            /* if there is no writer */
-            if(writer == INITIALIZATION) {
-                readers.Add(tid);
-            } else {
-                pendingReaders.Add(tid);
-
-                while(pendingReaders.Contains(tid)) {
-                    Logger.Log(new String[] { "PadInt", "espera read tid: " + tid.ToString() + "... Writer tem tid: ", writer.ToString() });
-                    //activates the deadLock detection if it is not already started
-                    if(!deadLockTimer.Enabled) {
-                        try {
-                            isWaitingWrite = false;
-                            deadLockTimer.Start();
-                        } catch(AbortException) {
-                            throw;
-                        }
-                    }
-                }
-            }
-
-            return true;
+            return AcquireLock(tid, !WRITE_LOCK);
         }
 
         /// <summary>
@@ -172,28 +157,6 @@ namespace PadIntServer {
         }
 
         /// <summary>
-        /// Puts a transaction in wait
-        /// </summary>
-        /// <param name="tid">Transaction id</param>
-        private void waitWrite(int tid) {
-            Logger.Log(new String[] { "PadInt", "waitWrite" + tid.ToString() });
-            while(pendingWriters.Contains(tid)) {
-
-                //activates the deadLock detection if it is not already started
-                if(!deadLockTimer.Enabled) {
-                    try {
-                        isWaitingWrite = true;
-                        deadLockTimer.Start();
-                    } catch(AbortException) {
-                        throw;
-                    }
-                }
-
-                Logger.Log(new String[] { "PadInt", "espera write tid: " + tid.ToString() });
-            }
-        }
-
-        /// <summary>
         /// Assigns to the transaction identified by tid
         ///  a write lock over the PadInt identified by uid,
         ///  as soon as possible.
@@ -201,63 +164,9 @@ namespace PadIntServer {
         /// <param name="tid">Transaction identifier</param>
         /// <returns>Returns true if successful</returns>
         internal bool GetWriteLock(int tid) {
-
             Logger.Log(new String[] { "PadInt", "getWriteLock" });
 
-            /* TODO
-             * 
-             * ver como e´ o caso em que existe alguma
-             * no promotion e depois vem para aqui.
-             * Ver caso da tiraQueueLeitura.
-             * 
-             */
-
-            /* if don't exists a writer or readers */
-            if(writer == INITIALIZATION || readers.Count == 0) {
-                writer = tid;
-                Console.WriteLine("obtive o lock");
-            } else {
-                Console.WriteLine("lock atribuido é escrita");
-                /* if the lock is a write lock */
-                if(readers.Count == 0) {
-                    /* if the lock is not assigned to the transaction
-                     *  identified by tid */
-                    if(writer != tid) {
-                        pendingWriters.Add(tid);
-                        waitWrite(tid);
-                    }
-                } else {
-                    Console.WriteLine("lock atribuido é read");
-                    /* if the locks are read locks */
-
-                    /* if the transaction, identified by tid,
-                     *  does not have a read lock */
-                    if(!readers.Contains(tid)) {
-                        Console.WriteLine("nao sou leitor");
-                        pendingWriters.Add(tid);
-                        waitWrite(tid);
-                    } else {
-                        /* if there is only a
-                         *  reader (transaction identified by tid) */
-                        readers.Remove(tid);
-                        if(readers.Count == 1) {
-                            writer = tid;
-                        } else {
-                            /* if there is no transaction wainting
-                             * for promotion */
-                            if(promotion == INITIALIZATION) {
-                                promotion = tid;
-                                waitWrite(tid);
-                            } else {
-                                /* abort */
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return true;
+            return AcquireLock(tid, WRITE_LOCK);
         }
 
         /// <summary>
@@ -269,12 +178,7 @@ namespace PadIntServer {
         internal bool FreeReadLock(int tid) {
             Logger.Log(new String[] { "PadInt", "freeReadLock" });
 
-            if(readers.Remove(tid)) {
-                DequeueReadLock();
-                return true;
-            } else {
-                return false;
-            }
+            return readers.Remove(tid);
         }
 
         /// <summary>
@@ -289,73 +193,9 @@ namespace PadIntServer {
             /* "frees" writer variable */
             if(writer != INITIALIZATION) {
                 writer = INITIALIZATION;
-                DequeueWriteLock();
                 return true;
             } else {
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// If called when does not exist any reader,
-        ///  see if exists any transaction waiting for
-        ///  a promotion then do the promotion. If only
-        ///  exists pending writers, assigns the lock to
-        ///  the first one.
-        /// </summary>
-        internal void DequeueReadLock() {
-            Logger.Log(new String[] { "PadInt", "dequeueReadLock" });
-
-            int temp = INITIALIZATION;
-
-            if(readers.Count == 0) {
-                if(promotion != INITIALIZATION) {
-                    /* "frees" promotion variable */
-                    temp = promotion;
-                    promotion = INITIALIZATION;
-                    GetWriteLock(temp);
-                } else {
-                    if(pendingWriters.Count > 0) {
-                        /* removes the first writer in the queue */
-                        temp = pendingWriters[0];
-                        pendingWriters.RemoveAt(0);
-                        GetWriteLock(temp);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// If exists any transaction waiting for a promotion
-        ///  then do the promotion. Otherwise if exists pending
-        ///  writers, assigns the lock to the first one.
-        /// If none of the last cenarios was true see if exists
-        ///  any pending reader and assigns the lock to the
-        ///  first one.
-        /// </summary>
-        internal void DequeueWriteLock() {
-            Logger.Log(new String[] { "PadInt", "dequeueWriteLock" });
-
-            int temp = INITIALIZATION;
-
-            if(promotion != INITIALIZATION) {
-                temp = promotion;
-                promotion = INITIALIZATION;
-                GetWriteLock(temp);
-            } else {
-                if(pendingWriters.Count > 0) {
-                    /* removes the first writer in the queue */
-                    temp = pendingWriters[0];
-                    pendingWriters.RemoveAt(0);
-                    GetWriteLock(temp);
-                } else {
-                    if(pendingReaders.Count > 0) {
-                        /* removes the first reader in the queue */
-                        temp = pendingReaders[0];
-                        pendingReaders.RemoveAt(0);
-                        GetReadLock(temp);
-                    }
-                }
             }
         }
 
@@ -373,32 +213,18 @@ namespace PadIntServer {
         internal bool Commit(int tid) {
             Logger.Log(new String[] { "PadInt", "commit" });
 
-            bool commitSuccessful = true;
+            lock(this) {
+                bool commitSuccessful = true;
 
-            if(pendingReaders.Remove(tid)) {
-                commitSuccessful = false;
+                FreeReadLock(tid);
+
+                if(FreeWriteLock(tid)) {
+                    OriginalValue = ActualValue;
+                }
+
+                Monitor.PulseAll(this);
+                return commitSuccessful;
             }
-
-            if(pendingWriters.Remove(tid)) {
-                commitSuccessful = false;
-            }
-
-            FreeReadLock(tid);
-
-            if(FreeWriteLock(tid)) {
-                OriginalValue = ActualValue;
-                Logger.Log(new String[] { "PadInt", "commit", " Cleaned writer= ", writer.ToString() });
-            }
-
-            /* this must be done in the end because if we do this before
-             *  we return false and don't free the locks or pending locks.
-             */
-            if(promotion == tid) {
-                promotion = INITIALIZATION;
-                commitSuccessful = false;
-            }
-
-            return commitSuccessful;
         }
 
         /// <summary>
@@ -414,22 +240,17 @@ namespace PadIntServer {
         internal bool Abort(int tid) {
             Logger.Log(new String[] { "PadInt", "abort" });
 
-            pendingReaders.Remove(tid);
-            pendingWriters.Remove(tid);
+            lock(this) {
+                FreeReadLock(tid);
 
-            if(promotion == tid) {
-                promotion = INITIALIZATION;
+                /* only if exists a write lock we do the rollback of the PadInt's value */
+                if(FreeWriteLock(tid)) {
+                    ActualValue = OriginalValue;
+                }
+
+                Monitor.PulseAll(this);
+                return true;
             }
-
-            FreeReadLock(tid);
-
-            /* only if exists a write lock we do the rollback of the PadInt's value */
-            if(FreeWriteLock(tid)) {
-                ActualValue = OriginalValue;
-                Logger.Log(new String[] { "PadInt", "abort", " Cleaned writer= ", writer.ToString() });
-            }
-
-            return true;
         }
     }
 }

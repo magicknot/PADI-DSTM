@@ -62,6 +62,8 @@ namespace ClientLibrary {
                 }
             } catch(PadIntNotFoundException) {
                 throw;
+            } catch(WrongPadIntRequestException) {
+                throw;
             }
         }
 

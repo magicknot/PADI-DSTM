@@ -11,20 +11,29 @@ namespace CommonTypes {
     [Serializable]
     public class AbortException : IPadiException {
         /// <summary>
+        /// Transaction identifier
+        /// </summary>
+        private int tid;
+        /// <summary>
         /// PadInt identifier
         /// </summary>
         private int uid;
 
+        internal int TID {
+            get { return this.uid; }
+        }
+
         internal int UID {
-            set { this.uid = value; }
             get { return this.uid; }
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="uid">Transaction identifier</param>
         /// <param name="uid">PadInt identifier</param>
-        public AbortException(int uid) {
+        public AbortException(int tid, int uid) {
+            this.tid = tid;
             this.uid = uid;
         }
 
@@ -47,13 +56,12 @@ namespace CommonTypes {
             base.GetObjectData(info, context);
         }
 
-
         /// <summary>
         /// Returns exception message
         /// </summary>
         /// <returns>message</returns>
         public override String GetMessage() {
-            return "Abort in PadInt with identifier " + uid;
+            return "Transaction" + tid + "abort in PadInt with identifier " + uid;
         }
     }
 }

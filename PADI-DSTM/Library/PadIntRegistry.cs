@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ClientLibrary {
     class PadIntRegistry {
 
-        private Boolean wasWrite;
+        private bool wasWrite;
         private int uid;
         private int numericValue;
 
@@ -23,8 +23,8 @@ namespace ClientLibrary {
         }
 
         public int UID {
-            get { return UID; }
-            set { UID = value; }
+            get { return uid; }
+            set { this.uid = value; }
         }
 
         public int Value {

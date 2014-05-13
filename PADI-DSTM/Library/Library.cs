@@ -72,15 +72,14 @@ namespace ClientLibrary {
 
             List<int> commitList = new List<int>();
 
-            foreach(ServerRegistry srvr in cache.ServersWPadInts) {
+            foreach(ServerRegistry srvr in cache.ServersWPadInts.Values) {
                 foreach(PadIntRegistry pd in srvr.PdInts) {
                     commitList.Add(pd.UID);
                 }
-            }
-
-            foreach(ServerRegistry pd in cache.ServersWPadInts) {
-                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
                 result = server.Commit(actualTID, commitList) && result;
+
+                commitList = new List<int>();
             }
 
             cache.ServersWPadInts.Clear();
@@ -103,13 +102,13 @@ namespace ClientLibrary {
 
             List<int> abortList = new List<int>();
 
-            foreach(ServerRegistry srvr in cache.ServersWPadInts) {
+            foreach(ServerRegistry srvr in cache.ServersWPadInts.Values) {
                 foreach(PadIntRegistry pd in srvr.PdInts) {
                     abortList.Add(pd.UID);
                 }
             }
 
-            foreach(ServerRegistry pd in cache.ServersWPadInts) {
+            foreach(ServerRegistry pd in cache.ServersWPadInts.Values) {
                 server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
                 result = server.Abort(actualTID, abortList) && result;
             }
@@ -133,9 +132,15 @@ namespace ClientLibrary {
                 int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.CreatePadInt(uid);
+
+                if(!cache.HasServer(serverID)) {
+                    cache.AddServer(serverID, serverAddr);
+                }
                 cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
+                throw;
+            } catch(WrongPadIntRequestException) {
                 throw;
             }
         }
@@ -154,11 +159,17 @@ namespace ClientLibrary {
                 int serverID = serverInfo.Item1;
                 IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
                 server.ConfirmPadInt(uid);
+
+                if(!cache.HasServer(serverID)) {
+                    cache.AddServer(serverID, serverAddr);
+                }
                 cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(NoServersFoundException) {
+                throw;
+            } catch(WrongPadIntRequestException) {
                 throw;
             }
         }

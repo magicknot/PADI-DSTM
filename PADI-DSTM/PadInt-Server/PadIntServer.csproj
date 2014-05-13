@@ -43,16 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackupServer.cs" />
+    <Compile Include="ServerState\BackupServer.cs" />
     <Compile Include="ServerState\FailedState.cs" />
     <Compile Include="ServerState\FrozeState.cs" />
     <Compile Include="PadInt.cs" />
     <Compile Include="ServerState\ServerState.cs" />
-    <Compile Include="PrimaryServer.cs" />
+    <Compile Include="ServerState\PrimaryServer.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

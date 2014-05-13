@@ -19,18 +19,16 @@ namespace CommonTypes {
         /// </summary>
         private int uid;
         /// <summary>
-        /// Transaction identifier
+        /// Server identifier
         /// </summary>
-        private int tid;
+        private int serverID;
 
         internal int UID {
-            set { this.uid = value; }
             get { return this.uid; }
         }
 
-        internal int TID {
-            set { this.TID = value; }
-            get { return this.TID; }
+        internal int SID {
+            get { return this.serverID; }
         }
 
         /// <summary>
@@ -38,9 +36,9 @@ namespace CommonTypes {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <param name="tid">Transaction identifier</param>
-        public WrongPadIntRequestException(int uid, int tid) {
+        public WrongPadIntRequestException(int uid, int serverID) {
             this.uid = uid;
-            this.tid = tid;
+            this.serverID = serverID;
         }
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace CommonTypes {
         /// </summary>
         /// <returns>message</returns>
         public override String GetMessage() {
-            return "The padInt with uid " + uid + " was not accessed nor created on the context of transaction with tid " + tid;
+            return "The padInt with uid " + uid + " was not accessed nor created on the context of server " + serverID;
         }
 
     }

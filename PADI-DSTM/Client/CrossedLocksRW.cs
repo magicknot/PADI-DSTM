@@ -3,7 +3,7 @@
 using ClientLibrary;
 
 class CrossedLocksRW {
-    static void Mainaa(string[] args) {
+    /*static void Main(string[] args) {
         bool res;
         PadInt pi_a;
         Library.Init();
@@ -45,5 +45,5 @@ class CrossedLocksRW {
         Console.WriteLine("Fiz o commit = " + res + " . Press enter for verification transaction.");
         Console.WriteLine("####################################################################");
         Console.ReadLine();
-    }
+    }*/
 }

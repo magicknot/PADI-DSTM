@@ -3,7 +3,7 @@
 using ClientLibrary;
 
 class TesteCache {
-    static void Main(string[] args) {
+    /*static void Main(string[] args) {
         bool res;
         PadInt pi_a;
         Library.Init();
@@ -40,5 +40,5 @@ class TesteCache {
         Console.WriteLine("End: Fiz o commit = " + res + " . Press enter for verification transaction.");
         Console.WriteLine("####################################################################");
         Console.ReadLine();
-    }
+    }*/
 }

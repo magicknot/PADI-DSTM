@@ -49,11 +49,8 @@ namespace Client {
         }
 
         public void TestSimpleRead(int uid0) {
-
             Console.WriteLine("------ Test: Simple read ------");
             Logger.Log(new String[] { "Client", "------ Test: Simple read begin ------" });
-
-            Library library = new Library();
 
             Console.WriteLine("library created");
 
@@ -81,11 +78,9 @@ namespace Client {
         }
 
         public void TestSimpleWrite(int uid0) {
-
             Console.WriteLine("------ Test: Simple write ------");
             Logger.Log(new String[] { "Client", "------ Test: Simple write ------" });
 
-            Library library = new Library();
             Console.WriteLine("library created");
 
             try {
@@ -114,11 +109,9 @@ namespace Client {
         }
 
         public void TestSimpleAbort(int uid0) {
-
             Console.WriteLine("------ Test: Simple Abort ------");
             Logger.Log(new String[] { "Client", "------ Test: Simple Abort ------" });
 
-            Library library = new Library();
             Console.WriteLine("library created");
 
             try {
@@ -166,11 +159,9 @@ namespace Client {
         }
 
         public void TestSimpleCommit(int uid0) {
-
             Console.WriteLine("------ Test: Simple Commit ------");
             Logger.Log(new String[] { "Client", "------ Test: Simple Commit ------" });
 
-            Library library = new Library();
             Console.WriteLine("library created");
 
             try {
@@ -217,11 +208,9 @@ namespace Client {
         }
 
         public void TestMultipleRead(int uid0, int uid1, int uid2) {
-
             Console.WriteLine("------ Test: Multiple read ------");
             Logger.Log(new String[] { "Client", "------ Test: Multiple read ------" });
 
-            Library library = new Library();
             Console.WriteLine("library created");
 
             try {
@@ -260,11 +249,9 @@ namespace Client {
         }
 
         public void TestReadWrite(int uid0) {
-
             Console.WriteLine("------ Test: Read write ------");
             Logger.Log(new String[] { "Client", "------ Test: Read write ------" });
 
-            Library library = new Library();
             Console.WriteLine("library created");
 
             try {
