@@ -41,11 +41,10 @@ namespace ClientLibrary {
         /// <returns> a predicate confirming the sucess of the operations</returns>
         public static bool Init() {
             Logger.Log(new String[] { "Library", "init", "\r\n" });
-            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
             IDictionary props = new Hashtable();
             props["retryCount"] = 5;
             props["timeout"] = 30000; // in milliseconds
-            TcpChannel channel = new TcpChannel(props, null, provider);
+            TcpChannel channel = new TcpChannel(props, null, null);
             ChannelServices.RegisterChannel(channel, false);
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
