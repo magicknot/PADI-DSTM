@@ -18,6 +18,20 @@ namespace PadIntServer {
         /// </summary>
         internal PadIntTimer imAliveTimer;
 
+
+        /// <summary>
+        /// Primary/backup server
+        ///  (backup if this server is the primary server, primary otherwise)
+        /// </summary>
+        protected IServer pairServerReference;
+
+        /// <summary>
+        /// Primary/backup server's address
+        ///  (backup server's address if this server is the primary server,
+        ///   primary server's address otherwise)
+        /// </summary>
+        protected string pairServerAddress;
+
         internal ServerState(Server server) {
             this.server = server;
         }
@@ -29,7 +43,6 @@ namespace PadIntServer {
 
         internal abstract void ImAlive();
         internal abstract bool CreatePadInt(int uid);
-        internal abstract bool ConfirmPadInt(int uid);
         internal abstract int ReadPadInt(int tid, int uid);
         internal abstract bool WritePadInt(int tid, int uid, int value);
         internal abstract bool Commit(int tid, List<int> usedPadInts);
@@ -37,15 +50,34 @@ namespace PadIntServer {
         internal virtual bool Recover() { return false; }
 
 
+        protected virtual void VerifyPadInts(List<int> padInts) {
+            try {
+                foreach(int uid in padInts) {
+                    GetPadInt(uid);
+                }
+            } catch(PadIntNotFoundException) {
+                throw;
+            }
+        }
+
         public virtual void Dispose() {
             imAliveTimer.Dispose(true);
         }
 
-        internal virtual PadInt GetPadInt(int uid) {
+        protected virtual PadInt GetPadInt(int uid) {
             if(Server.PdInts.ContainsKey(uid)) {
                 return (PadInt) Server.PdInts[uid];
             } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
+            }
+        }
+
+        internal virtual bool ConfirmPadInt(int uid) {
+            try {
+                GetPadInt(uid);
+                return true;
+            } catch(PadIntNotFoundException) {
+                throw;
             }
         }
 

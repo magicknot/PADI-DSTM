@@ -22,12 +22,6 @@ namespace PadIntServer {
         ///  requires a new backup server (1000 = 1s)
         /// </summary>
         private const int BACKUP_REPLY_INTERVAL = 35000;
-        /// <summary>
-        /// Primary/backup server
-        ///  (backup if this server is the primary server, primary otherwise)
-        /// </summary>
-        private IServer backupServerReference;
-
 
         /// <summary>
         /// Timer used to detect that primary server does not receive a reply
@@ -35,21 +29,14 @@ namespace PadIntServer {
         /// </summary>
         internal PadIntTimer backupReplyTimer;
 
-        /// <summary>
-        /// Primary/backup server's address
-        ///  (backup server's address if this server is the primary server,
-        ///   primary server's address otherwise)
-        /// </summary>
-        private string backupServerAddress;
-
         internal IServer BackupServer {
-            set { this.backupServerReference = value; }
-            get { return backupServerReference; }
+            set { this.pairServerReference = value; }
+            get { return pairServerReference; }
         }
 
         internal string BackupAddress {
-            set { this.backupServerAddress = value; }
-            get { return backupServerAddress; }
+            set { this.pairServerAddress = value; }
+            get { return pairServerAddress; }
         }
 
 
@@ -110,7 +97,7 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
-        internal override PadInt GetPadInt(int uid) {
+        protected override PadInt GetPadInt(int uid) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
             return base.GetPadInt(uid);
         }
@@ -119,15 +106,9 @@ namespace PadIntServer {
         /// Verifies if each PadInt in padInts exist
         /// </summary>
         /// <param name="padInts">List with PadInts' identifiers</param>
-        private void VerifyPadInts(List<int> padInts) {
+        protected override void VerifyPadInts(List<int> padInts) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "verifyPadInts" });
-            try {
-                foreach(int uid in padInts) {
-                    GetPadInt(uid);
-                }
-            } catch(PadIntNotFoundException) {
-                throw;
-            }
+            base.VerifyPadInts(padInts);
         }
 
         /// <summary>
@@ -151,12 +132,7 @@ namespace PadIntServer {
 
         internal override bool ConfirmPadInt(int uid) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
-            try {
-                GetPadInt(uid);
-                return true;
-            } catch(PadIntNotFoundException) {
-                throw;
-            }
+            return base.ConfirmPadInt(uid);
         }
 
         /// <summary>
