@@ -56,15 +56,15 @@ namespace ClientLibrary {
                 if(!cache.HasReadPadInt(serverID, uid)) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     result = server.ReadPadInt(tid, uid);
-                    cache.isReadPadInt(serverID, uid);
+                    cache.setPadIntAsRead(serverID, uid);
                 } else {
                     result = cache.GetPadIntValue(serverID, uid);
                     cache.UpdatePadIntValue(serverID, uid, result);
                 }
-
                 return result;
             } catch(PadIntNotFoundException) {
-                throw;
+                cache.UpdatePadIntServer(serverID, uid);
+                return Read();
             } catch(WrongPadIntRequestException) {
                 throw;
             }
@@ -82,13 +82,14 @@ namespace ClientLibrary {
                 if(!cache.HasWritePadInt(serverID, uid)) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     server.WritePadInt(tid, uid, value);
-                    cache.isWritePadInt(serverID, uid);
+                    cache.setPadIntAsWrite(serverID, uid);
                 }
 
                 cache.UpdatePadIntValue(serverID, uid, value);
                 return true;
             } catch(PadIntNotFoundException) {
-                throw;
+                cache.UpdatePadIntServer(serverID, uid);
+                return Write(value);
             } catch(WrongPadIntRequestException) {
                 throw;
             }

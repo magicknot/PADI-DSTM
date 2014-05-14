@@ -31,13 +31,21 @@ namespace ClientLibrary {
         /// </summary>
         private static TcpChannel channel;
 
+        internal static IMaster MasterServer {
+            get { return masterServer; }
+        }
+
         /// <summary>
         /// Creates Tcp channel, and gets a reference to master server
         /// </summary>
         /// <returns> a predicate confirming the sucess of the operations</returns>
         public static bool Init() {
             Logger.Log(new String[] { "Library", "init", "\r\n" });
-            channel = new TcpChannel();
+            BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
+            IDictionary props = new Hashtable();
+            props["retryCount"] = 5;
+            props["timeout"] = 30000; // in milliseconds
+            TcpChannel channel = new TcpChannel(props, null, provider);
             ChannelServices.RegisterChannel(channel, false);
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
@@ -136,7 +144,7 @@ namespace ClientLibrary {
                 if(!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
-                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid));
+                cache.AddPadInt(serverID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
                 throw;
@@ -163,7 +171,7 @@ namespace ClientLibrary {
                 if(!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
-                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid));
+                cache.AddPadInt(serverID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;

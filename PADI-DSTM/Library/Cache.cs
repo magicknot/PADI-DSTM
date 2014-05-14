@@ -42,7 +42,7 @@ namespace ClientLibrary {
 
         private PadIntRegistry GetPadInt(int serverID, int uid) {
             Logger.Log(new String[] { "Cache", "GetPadInt", "serverID", serverID.ToString(), "uid", uid.ToString() });
-            return GetServer(serverID).getPadInt(uid);
+            return GetServer(serverID).GetPadInt(uid);
         }
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace ClientLibrary {
         /// </summary>
         /// <param name="serverID">Server identifier</param>
         /// <param name="uid">PadInt identifier</</param>
-        internal void AddPadInt(int serverID, int tid, PadIntRegistry pd) {
-            Logger.Log(new String[] { "Cache", "AddPadInt", "serverID", serverID.ToString(), "tid", tid.ToString() });
+        internal void AddPadInt(int serverID, PadIntRegistry pd) {
+            Logger.Log(new String[] { "Cache", "AddPadInt", "serverID", serverID.ToString() });
 
             ServerRegistry serverRegistry = GetServer(serverID);
 
@@ -60,6 +60,26 @@ namespace ClientLibrary {
             } else {
                 throw new WrongPadIntRequestException(pd.UID, serverID);
             }
+        }
+
+        /// <summary>
+        /// Updates a PadInt's server stored in cache
+        /// </summary>
+        /// <param name="serverID">Server identifier</param>
+        /// <param name="uid">PadInt identifier</param>
+        internal void UpdatePadIntServer(int serverID, int uid) {
+            Tuple<int, string> serverInfo = Library.MasterServer.GetPadIntServer(uid);
+            string serverAddr = serverInfo.Item2;
+            int newServerID = serverInfo.Item1;
+
+            //obtains and removes the PadIntRegistry from the old server
+            PadIntRegistry pd = GetServer(serverID).RemovePadInt(uid);
+
+            if(!HasServer(serverID)) {
+                AddServer(serverID, serverAddr);
+            }
+            //adds the PadIntRegistry to the new server
+            AddPadInt(newServerID, pd);
         }
 
         /// <summary>
@@ -76,7 +96,7 @@ namespace ClientLibrary {
             return GetPadInt(serverID, uid).WasWrite;
         }
 
-        internal void isWritePadInt(int serverID, int uid) {
+        internal void setPadIntAsWrite(int serverID, int uid) {
             GetPadInt(serverID, uid).WasWrite = true;
         }
 
@@ -84,7 +104,7 @@ namespace ClientLibrary {
             return GetPadInt(serverID, uid).WasRead;
         }
 
-        internal void isReadPadInt(int serverID, int uid) {
+        internal void setPadIntAsRead(int serverID, int uid) {
             GetPadInt(serverID, uid).WasRead = true;
         }
 
