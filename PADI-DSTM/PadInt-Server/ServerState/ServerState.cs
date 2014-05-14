@@ -82,6 +82,7 @@ namespace PadIntServer {
         }
 
         public void MovePadInts(List<int> padInts, string receiverAddress) {
+            Logger.Log(new String[] { "ServerState", "MovePadInts", "to Server", receiverAddress });
             Dictionary<int, IPadInt> removedPadInt = new Dictionary<int, IPadInt>();
 
             foreach(int padIntId in padInts) {
@@ -94,6 +95,7 @@ namespace PadIntServer {
         }
 
         public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
+            Logger.Log(new String[] { "ServerState", "ReceivePadInts" });
             foreach(KeyValuePair<int, IPadInt> pair in receivedPadInts) {
                 server.padIntDictionary.Add(pair.Key, pair.Value);
             }

@@ -213,22 +213,26 @@ namespace PadIntServer {
         }
 
         public bool Freeze() {
-            serverState = new FrozenState(this);
+            Logger.Log(new String[] { "Server", "Freeze" });
+            serverState = new FrozeState(this);
             return true;
         }
 
         public bool Fail() {
+            Logger.Log(new String[] { "Server", "Fail" });
             serverState = new FailedState(this);
             ServerMachine.killServer();
             return true;
         }
 
         public bool Recover() {
+            Logger.Log(new String[] { "Server", "Recover" });
             serverState.Recover();
             return true;
         }
 
         public bool Status() {
+            Logger.Log(new String[] { "Server", "Status" });
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");

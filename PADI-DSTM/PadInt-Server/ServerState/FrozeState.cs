@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using CommonTypes;
 
 namespace PadIntServer {
-    class FrozenState : ServerState {
+    class FrozeState : ServerState {
 
         /// <summary>
         /// Server's old state
@@ -15,7 +15,7 @@ namespace PadIntServer {
         private ServerState oldState;
         private bool recover;
 
-        internal FrozenState(Server server)
+        internal FrozeState(Server server)
             : base(server) {
             oldState = server.State;
         }
@@ -24,6 +24,7 @@ namespace PadIntServer {
         /// Freezed servers do nothing when this method is called
         /// </summary>
         internal override void ImAlive() {
+            Logger.Log(new String[] { "FreezedServer", "ImAlive" });
             lock(this) {
                 while(!recover) {
                     Monitor.Wait(this);
@@ -134,10 +135,12 @@ namespace PadIntServer {
         }
 
         internal override bool Recover() {
+            Logger.Log(new String[] { "FreezedServer", "Recover" });
             lock(this) {
                 recover = true;
                 Monitor.Pulse(this);
             }
+            Server.State = oldState;
             return true;
         }
     }
