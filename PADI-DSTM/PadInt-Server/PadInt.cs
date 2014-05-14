@@ -23,7 +23,7 @@ namespace PadIntServer {
         /// <summary>
         /// Constant used to represent a write lock
         /// </summary>
-        private const bool WRITE_LOCK = false;
+        private const bool WRITE_LOCK = true;
         /// <summary>
         /// PadInt identifier
         /// </summary>
@@ -86,6 +86,38 @@ namespace PadIntServer {
         }
 
         /// <summary>
+        /// Tests if a transaction wants and can do a promotion
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <param name="requiredLockType">Type of the required lock</param>
+        /// <returns>Returns true if is possible to do the promotion</returns>
+        private bool WantPromotion(int tid, bool requiredLockType) {
+            return lockType == !WRITE_LOCK && requiredLockType == WRITE_LOCK && readers.Contains(tid) && readers.Count == 1;
+        }
+
+        /// <summary>
+        /// Test if it is possible to acquire a lock
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <param name="requiredLockType">Type of the required lock</param>
+        /// <returns>Returns true if should not enter in AcquireLock loop</returns>
+        private bool Go(int tid, bool requiredLockType) {
+            return (writer == INITIALIZATION && readers.Count == 0) ||
+                   (writer == INITIALIZATION && requiredLockType == !WRITE_LOCK) ||
+                   WantPromotion(tid, requiredLockType);
+        }
+
+        /// <summary>
+        /// Test if it is not possible to acquire a lock
+        /// </summary>
+        /// <param name="tid">Transaction identifier</param>
+        /// <param name="requiredLockType">Type of the required lock</param>
+        /// <returns>Returns true if should enter in AcquireLock loop</returns>
+        private bool Ngo(int tid, bool requiredLockType) {
+            return (lockType == requiredLockType == WRITE_LOCK) || (lockType != requiredLockType && !WantPromotion(tid, requiredLockType));
+        }
+
+        /// <summary>
         /// Acquires a lock
         /// </summary>
         /// <param name="tid">Transaction identifier</param>
@@ -93,15 +125,8 @@ namespace PadIntServer {
         /// <returns>Returns true if successful</returns>
         internal bool AcquireLock(int tid, bool requiredLockType) {
             lock(this) {
-                while(lockType != requiredLockType || lockType == requiredLockType == WRITE_LOCK) {
-                    /*if(requiredLockType == WRITE_LOCK) {
-                        pendingTransactions.Add(WRITE_LOCK);
-                    } else {
-                        pendingTransactions.Add(!WRITE_LOCK);
-                    }*/
-
-                    Boolean res = Monitor.Wait(this, DEADLOCK_INTERVAL);
-                    //pendingTransactions.RemoveAt(0);
+                while(!Go(tid, requiredLockType) && Ngo(tid, requiredLockType)) {
+                    bool res = Monitor.Wait(this, DEADLOCK_INTERVAL);
                     if(!res) {
                         throw new AbortException(tid, uid);
                     }
@@ -120,15 +145,6 @@ namespace PadIntServer {
                         writer = tid;
                     }
                 }
-                /*if(lockType != WRITE_LOCK) {
-                    int pendingIndex = 0;
-                    while(pendingTransactions[pendingIndex] == lockType && pendingTransactions.Count > 0) {
-                        Monitor.Pulse(this);
-                    }
-                } else {
-                    Monitor.Pulse(this);
-                }*/
-                //Monitor.Pulse(this);
                 return true;
             }
         }
@@ -143,6 +159,9 @@ namespace PadIntServer {
         internal bool GetReadLock(int tid) {
             Logger.Log(new String[] { "PadInt", "getReadLock" });
 
+            if(readers.Contains(tid)) {
+                return true;
+            }
             return AcquireLock(tid, !WRITE_LOCK);
         }
 
@@ -166,6 +185,9 @@ namespace PadIntServer {
         internal bool GetWriteLock(int tid) {
             Logger.Log(new String[] { "PadInt", "getWriteLock" });
 
+            if(HasWriteLock(tid)) {
+                return true;
+            }
             return AcquireLock(tid, WRITE_LOCK);
         }
 

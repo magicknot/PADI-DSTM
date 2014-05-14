@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using ClientLibrary;
 
 namespace Client {
-    /*class Cycle {
+    class Cycle {
 
-        public static void Main(string[] args) {
+        /*public static void Main(string[] args) {
 
             bool res;
 
@@ -67,6 +67,6 @@ namespace Client {
             Console.WriteLine("####################################################################");
             Library.Status();
             Console.ReadLine();
-        }
-    }*/
+        }*/
+    }
 }
