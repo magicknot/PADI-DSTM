@@ -106,11 +106,11 @@ namespace ClientLibrary {
                 foreach(PadIntRegistry pd in srvr.PdInts) {
                     abortList.Add(pd.UID);
                 }
-            }
 
-            foreach(ServerRegistry pd in cache.ServersWPadInts.Values) {
-                server = (IServer) Activator.GetObject(typeof(IServer), pd.Address);
+                server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
                 result = server.Abort(actualTID, abortList) && result;
+
+                abortList = new List<int>();
             }
 
             cache.ServersWPadInts.Clear();
@@ -136,7 +136,7 @@ namespace ClientLibrary {
                 if(!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
-                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
+                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntAlreadyExistsException) {
                 throw;
@@ -163,7 +163,7 @@ namespace ClientLibrary {
                 if(!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
-                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid, 0, false));
+                cache.AddPadInt(serverID, actualTID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
             } catch(PadIntNotFoundException) {
                 throw;

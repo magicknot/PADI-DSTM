@@ -76,6 +76,18 @@ namespace ClientLibrary {
             return GetPadInt(serverID, uid).WasWrite;
         }
 
+        internal void isWritePadInt(int serverID, int uid) {
+            GetPadInt(serverID, uid).WasWrite = true;
+        }
+
+        internal bool HasReadPadInt(int serverID, int uid) {
+            return GetPadInt(serverID, uid).WasRead;
+        }
+
+        internal void isReadPadInt(int serverID, int uid) {
+            GetPadInt(serverID, uid).WasRead = true;
+        }
+
         /// <summary>
         /// Obtains PadInt's value stored in cache
         /// </summary>

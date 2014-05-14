@@ -52,14 +52,17 @@ namespace ClientLibrary {
             Logger.Log(new String[] { "PadIntStub", "read" });
 
             try {
-                if(cache.HasPadInt(serverID, uid)) {
-                    return cache.GetPadIntValue(serverID, uid);
-                } else {
+                int result;
+                if(!cache.HasReadPadInt(serverID, uid)) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-                    int result = server.ReadPadInt(tid, uid);
-                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, result, false));
-                    return result;
+                    result = server.ReadPadInt(tid, uid);
+                    cache.isReadPadInt(serverID, uid);
+                } else {
+                    result = cache.GetPadIntValue(serverID, uid);
+                    cache.UpdatePadIntValue(serverID, uid, result);
                 }
+
+                return result;
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(WrongPadIntRequestException) {
@@ -76,15 +79,14 @@ namespace ClientLibrary {
             Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
 
             try {
-                if(cache.HasWritePadInt(serverID, uid)) {
-                    cache.UpdatePadIntValue(serverID, uid, value);
-                    return true;
-                } else {
+                if(!cache.HasWritePadInt(serverID, uid)) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     server.WritePadInt(tid, uid, value);
-                    cache.AddPadInt(serverID, tid, new PadIntRegistry(uid, value, true));
-                    return true;
+                    cache.isWritePadInt(serverID, uid);
                 }
+
+                cache.UpdatePadIntValue(serverID, uid, value);
+                return true;
             } catch(PadIntNotFoundException) {
                 throw;
             } catch(WrongPadIntRequestException) {

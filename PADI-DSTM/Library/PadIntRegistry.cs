@@ -7,14 +7,21 @@ using System.Threading.Tasks;
 namespace ClientLibrary {
     class PadIntRegistry {
 
+        private bool wasRead;
         private bool wasWrite;
         private int uid;
         private int numericValue;
 
-        public PadIntRegistry(int uid, int value, bool wasWrite) {
+        public PadIntRegistry(int uid) {
             this.uid = uid;
-            this.Value = value;
-            this.wasWrite = wasWrite;
+            this.Value = 0;
+            this.wasRead = false;
+            this.wasWrite = false;
+        }
+
+        public Boolean WasRead {
+            get { return wasRead; }
+            set { wasRead = value; }
         }
 
         public Boolean WasWrite {
@@ -29,10 +36,7 @@ namespace ClientLibrary {
 
         public int Value {
             get { return numericValue; }
-            set {
-                WasWrite = true;
-                numericValue = value;
-            }
+            set { numericValue = value; }
         }
     }
 }
