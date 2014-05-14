@@ -239,6 +239,13 @@ namespace PadIntServer {
             return true;
         }
 
+        public void MovePadInts(List<int> padInts, string receiverAddress) {
+            serverState.MovePadInts(padInts, receiverAddress);
+        }
+
+        public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
+            serverState.ReceivePadInts(receivedPadInts);
+        }
 
         public void Dispose() {
             serverState.Dispose();

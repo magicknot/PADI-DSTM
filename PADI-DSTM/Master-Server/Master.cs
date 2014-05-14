@@ -30,7 +30,7 @@ namespace MasterServer {
         /// <summary>
         /// It maps uids into padInt server identifiers
         /// </summary>
-        private Dictionary<int, int> padIntServers;
+        // private Dictionary<int, int> padIntServers;
 
         internal int LastTID {
             get { return this.lastTransactionIdentifier; }
@@ -42,7 +42,7 @@ namespace MasterServer {
         /// </summary>
         public Master() {
             registeredServers = new List<ServerRegistry>();
-            padIntServers = new Dictionary<int, int>();
+            // padIntServers = new Dictionary<int, int>();
             LastTID = 0;
             serverIsPrimary = true;
         }
@@ -57,34 +57,30 @@ namespace MasterServer {
         }
 
         /// <summary>
-        /// Verifies if a server is already registered on master server
-        /// </summary>
-        /// <param name="serverID">server identifier</param>
-        private void ConfirmServerRegistry(int serverID) {
-            if(registeredServers.ElementAtOrDefault(serverID) == null) {
-                throw new ServerNotFoundException(serverID);
-            }
-        }
-
-        /// <summary>
         /// Registers a new server on Master server.
         /// </summary>
         /// <param name="address">Server Address</param>
         /// <returns>Server identifier</returns>
         public Tuple<int, string> RegisterServer(String address) {
             Logger.Log(new String[] { "Master", "registerServer", "address", address.ToString() });
-            try {
-                if(serverIsPrimary) {
-                    registeredServers.Insert(registeredServers.Count, new ServerRegistry(address));
-                    serverIsPrimary = false;
-                    return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
-                } else {
-                    serverIsPrimary = true;
-                    return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1].Address);
-                }
-            } catch(ArgumentException) {
-                throw new ServerAlreadyExistsException(registeredServers.Count - 1);
+            if(serverIsPrimary) {
+                registeredServers.Insert(registeredServers.Count, new ServerRegistry(registeredServers.Count, address));
+                serverIsPrimary = false;
+                return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
+            } else {
+                serverIsPrimary = true;
+                LoadBalancer.DistributePadInts(registeredServers);
+                return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1].Address);
             }
+        }
+
+        private ServerRegistry getServerRegistry(int uid) {
+            foreach(ServerRegistry srvr in registeredServers) {
+                if(srvr.HasPadInt(uid)) {
+                    return srvr;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -94,12 +90,12 @@ namespace MasterServer {
         /// <returns>Tuple containing (server identifier,server address)</returns>
         public Tuple<int, string> GetPadIntServer(int uid) {
             Logger.Log(new String[] { "Master", " getPadIntServer", "uid", uid.ToString() });
-            try {
-                int serverID = padIntServers[uid];
-                ConfirmServerRegistry(serverID);
-                return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
-            } catch(ServerNotFoundException) {
-                throw;
+
+            ServerRegistry srvr = getServerRegistry(uid);
+            if(srvr != null) {
+                return new Tuple<int, string>(srvr.ID, srvr.Address);
+            } else {
+                throw new PadIntNotFoundException(uid);
             }
         }
 
@@ -110,15 +106,14 @@ namespace MasterServer {
         /// <returns>Tuple containing (server identifier,server address)</returns>
         public Tuple<int, string> RegisterPadInt(int uid) {
             Logger.Log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
-            try {
-                int serverID = GetAvailableServer();
-                padIntServers.Add(uid, serverID);
-                registeredServers[serverID].Hits+=1;
-                return new Tuple<int, string>(serverID, registeredServers[serverID].Address);
-            } catch(ArgumentException) {
-                throw new PadIntAlreadyExistsException(uid, padIntServers[uid]);
-            } catch(NoServersFoundException) {
-                throw;
+            int newServerID = LoadBalancer.GetAvailableServer(registeredServers, serverIsPrimary);
+            ServerRegistry oldServer = getServerRegistry(uid);
+
+            if(oldServer == null) {
+                registeredServers[newServerID].AddPadInt(uid);
+                return new Tuple<int, string>(newServerID, registeredServers[newServerID].Address);
+            } else {
+                throw new PadIntAlreadyExistsException(uid, oldServer.ID);
             }
         }
 
@@ -143,32 +138,5 @@ namespace MasterServer {
 
             return true;
         }
-
-        private int GetAvailableServer() {
-            int count;
-            int minHits;
-            int serverID;
-
-            if(registeredServers.Count == 0 || registeredServers.Count == 1 && !serverIsPrimary) {
-                throw new NoServersFoundException();
-            } else if(serverIsPrimary) {
-                count = registeredServers.Count;
-            } else {
-                count = registeredServers.Count-1;
-            }
-
-            minHits = registeredServers[0].Hits;
-            serverID = 0;
-
-            for(int id = 0; id <count; id++) {
-                if(registeredServers[id].Hits < minHits) {
-                    minHits = registeredServers[id].Hits;
-                    serverID = id;
-                }
-            }
-
-            return serverID;
-        }
-
     }
 }

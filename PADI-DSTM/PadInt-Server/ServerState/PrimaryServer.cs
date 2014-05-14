@@ -110,13 +110,9 @@ namespace PadIntServer {
         /// </summary>
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
-        private PadInt GetPadInt(int uid) {
+        internal override PadInt GetPadInt(int uid) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
-            if(Server.PdInts.ContainsKey(uid)) {
-                return (PadInt) Server.PdInts[uid];
-            } else {
-                throw new PadIntNotFoundException(uid, Server.ID);
-            }
+            return base.GetPadInt(uid);
         }
 
         /// <summary>

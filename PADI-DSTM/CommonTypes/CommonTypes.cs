@@ -26,6 +26,8 @@ namespace CommonTypes {
         bool Freeze();
         bool Fail();
         bool Recover();
+        void MovePadInts(List<int> padInts, string receiverAddress);
+        void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts);
     }
 
     public interface IServerMachine {

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadBalancer.cs" />
     <Compile Include="Master.cs" />
     <Compile Include="MasterApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

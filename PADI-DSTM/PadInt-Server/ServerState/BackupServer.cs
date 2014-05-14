@@ -76,12 +76,9 @@ namespace PadIntServer {
             PrimaryServer.CreatePrimaryServer(Server.Address, Server.PdInts);
         }
 
-        private PadInt GetPadInt(int uid) {
-            if(Server.PdInts.ContainsKey(uid)) {
-                return (PadInt) Server.PdInts[uid];
-            } else {
-                throw new PadIntNotFoundException(uid, Server.ID);
-            }
+        internal override PadInt GetPadInt(int uid) {
+            Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "getPadInt", "uid ", uid.ToString() });
+            return base.GetPadInt(uid);
         }
 
         private void VerifyPadInts(List<int> padInts) {

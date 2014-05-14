@@ -20,6 +20,8 @@ namespace CommonTypes {
         /// </summary>
         private int serverID;
 
+        private const int NO_SERVER = -1;
+
         internal int UID {
             set { this.uid = value; }
             get { return this.uid; }
@@ -38,6 +40,11 @@ namespace CommonTypes {
         public PadIntNotFoundException(int uid, int serverID) {
             this.uid = uid;
             this.serverID = serverID;
+        }
+
+        public PadIntNotFoundException(int uid) {
+            this.uid = uid;
+            this.serverID = NO_SERVER;
         }
 
         /// <summary>
@@ -64,8 +71,11 @@ namespace CommonTypes {
         /// </summary>
         /// <returns>message</returns>
         public override String GetMessage() {
-            return "The PadInt with uid " + uid + " was not found on server " + serverID;
+            if(serverID == NO_SERVER) {
+                return "The PadInt with uid " + uid + " was not found on any server ";
+            } else {
+                return "The PadInt with uid " + uid + " was not found on server " + serverID;
+            }
         }
-
     }
 }
