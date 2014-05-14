@@ -175,6 +175,42 @@ namespace ClientLibrary {
         }
 
         /// <summary>
+        /// Sends freeze request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Freeze(String address) {
+            Logger.Log(new String[] { "Library", "Freeze", "address", address });
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+
+            return server.Freeze();
+        }
+
+        /// <summary>
+        /// Sends fail request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Fail(String address) {
+            Logger.Log(new String[] { "Library", "Fail", "address", address });
+
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            return server.Fail();
+        }
+
+        /// <summary>
+        /// Sends recover request to a server
+        /// </summary>
+        /// <param name="address">server's address</param>
+        /// <returns>true if successful</returns>
+        public static bool Recover(String address) {
+            Logger.Log(new String[] { "Library", "Recover", "address", address });
+
+            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            return server.Recover();
+        }
+
+        /// <summary>
         /// A request is send to Master server, asking for all nodes to be dumped.
         /// </summary>
         /// <returns>A predicate confirming the sucess of the operations</returns>
