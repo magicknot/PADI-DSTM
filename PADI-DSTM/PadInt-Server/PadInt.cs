@@ -101,7 +101,7 @@ namespace PadIntServer {
         /// <param name="tid">Transaction identifier</param>
         /// <param name="requiredLockType">Type of the required lock</param>
         /// <returns>Returns true if should not enter in AcquireLock loop</returns>
-        private bool Go(int tid, bool requiredLockType) {
+        private bool IsPossibleAcquire(int tid, bool requiredLockType) {
             return (writer == INITIALIZATION && readers.Count == 0) ||
                    (writer == INITIALIZATION && requiredLockType == !WRITE_LOCK) ||
                    WantPromotion(tid, requiredLockType);
@@ -113,7 +113,7 @@ namespace PadIntServer {
         /// <param name="tid">Transaction identifier</param>
         /// <param name="requiredLockType">Type of the required lock</param>
         /// <returns>Returns true if should enter in AcquireLock loop</returns>
-        private bool Ngo(int tid, bool requiredLockType) {
+        private bool IsNotPossibleAcquire(int tid, bool requiredLockType) {
             return (lockType == requiredLockType == WRITE_LOCK) || (lockType != requiredLockType && !WantPromotion(tid, requiredLockType));
         }
 
@@ -125,7 +125,7 @@ namespace PadIntServer {
         /// <returns>Returns true if successful</returns>
         internal bool AcquireLock(int tid, bool requiredLockType) {
             lock(this) {
-                while(!Go(tid, requiredLockType) && Ngo(tid, requiredLockType)) {
+                while(!IsPossibleAcquire(tid, requiredLockType) && IsNotPossibleAcquire(tid, requiredLockType)) {
                     bool res = Monitor.Wait(this, DEADLOCK_INTERVAL);
                     if(!res) {
                         throw new AbortException(tid, uid);

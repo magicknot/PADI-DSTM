@@ -41,7 +41,7 @@ namespace ClientLibrary {
             get { return serverAddress; }
         }
 
-        public PadIntRegistry getPadInt(int uid) {
+        public PadIntRegistry GetPadInt(int uid) {
             foreach(PadIntRegistry pd in padIntList) {
                 if(pd.UID == uid) {
                     return pd;
@@ -50,8 +50,14 @@ namespace ClientLibrary {
             return null;
         }
 
-        public void addPadInt(PadIntRegistry pd) {
+        public void AddPadInt(PadIntRegistry pd) {
             padIntList.Add(pd);
+        }
+
+        public PadIntRegistry RemovePadInt(int uid) {
+            PadIntRegistry pd = GetPadInt(uid);
+            padIntList.Remove(pd);
+            return pd;
         }
     }
 }
