@@ -12,7 +12,7 @@ using System.Runtime.Remoting;
 namespace Client {
     class ClientApp {
 
-        /*public static void Main(string[] args) {
+        public static void Main(string[] args) {
 
             Client client = new Client();
 
@@ -36,7 +36,7 @@ namespace Client {
                     Console.WriteLine("6- Base: testMultipleReads");
                     Console.WriteLine("7- status");
                     Console.WriteLine("---------");
-                    
+
                     Console.Write(">");
 
                     input = Console.ReadLine();
@@ -65,7 +65,7 @@ namespace Client {
                         client.TestMultipleRead(client.GetNextUid(), client.GetNextUid(), client.GetNextUid());
                     }
 
-             
+
                     if(input.Equals("7")) {
                         Library.Status();
                     }
@@ -74,6 +74,6 @@ namespace Client {
             } else {
                 Logger.Log(new String[] { "There are no servers available" });
             }
-        }*/
+        }
     }
 }

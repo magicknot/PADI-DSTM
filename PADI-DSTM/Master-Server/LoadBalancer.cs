@@ -10,6 +10,8 @@ namespace MasterServer {
 
 
         internal static int GetAvailableServer(List<ServerRegistry> registeredServers, bool serverIsPrimary) {
+            Logger.Log(new String[] { "LoadBalancer", "GetAvailableServer" });
+
             List<ServerRegistry> servers = new List<ServerRegistry>(registeredServers);
 
             if(!serverIsPrimary) {
@@ -25,6 +27,8 @@ namespace MasterServer {
         }
 
         internal static void DistributePadInts(List<ServerRegistry> registeredServers) {
+            Logger.Log(new String[] { "LoadBalancer", "DistributePadInts" });
+
             List<ServerRegistry> servers = new List<ServerRegistry>(registeredServers);
             ServerRegistry receiverServer = servers[registeredServers.Count - 1];
             servers.Sort(new ServerReverseComparer());
@@ -33,7 +37,7 @@ namespace MasterServer {
             int nServers = 0;
 
             foreach(ServerRegistry srvr in registeredServers) {
-                nPadInts += srvr.GetNPadInts();
+                nPadInts += srvr.Hits;
                 nServers++;
             }
 
@@ -47,7 +51,7 @@ namespace MasterServer {
             while(i < servers.Count) {
                 if(nMovedPadInts == averageCapacity) {
                     return;
-                } else if(servers[i].GetNPadInts() > averageCapacity) {
+                } else if(servers[i].Hits > averageCapacity) {
                     movingPadInts.Add(servers[i].RemovePadInt());
                 } else if(movingPadInts.Count == averageCapacity) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), servers[i].Address);

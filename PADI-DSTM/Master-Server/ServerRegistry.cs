@@ -54,10 +54,6 @@ namespace MasterServer {
             padInts.Add(uid);
         }
 
-        public int GetNPadInts() {
-            return padInts.Count;
-        }
-
         public int RemovePadInt() {
             int pd = padInts.First<int>();
             padInts.RemoveAt(0);

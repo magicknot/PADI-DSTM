@@ -44,7 +44,7 @@ namespace ClientLibrary {
             IDictionary props = new Hashtable();
             props["retryCount"] = 5;
             props["timeout"] = 30000; // in milliseconds
-            TcpChannel channel = new TcpChannel(props, null, null);
+            channel = new TcpChannel(props, null, null);
             ChannelServices.RegisterChannel(channel, false);
             masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;

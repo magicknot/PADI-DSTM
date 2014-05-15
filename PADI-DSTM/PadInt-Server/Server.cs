@@ -108,7 +108,8 @@ namespace PadIntServer {
         }
 
         public bool CreatePadInt(int uid) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+            Logger.Log(new String[] { "Server", ID.ToString(), "createPadInt", "uid", uid.ToString(),
+                "    NPadInts", (padIntDictionary.Count + 1).ToString() });
             try {
                 return serverState.CreatePadInt(uid);
             } catch(PadIntAlreadyExistsException) {
