@@ -41,8 +41,8 @@ namespace PadIntServer {
 
 
 
-        internal PrimaryServer(Server server, String backupAddress)
-            : base(server) {
+        internal PrimaryServer(Server server, String backupAddress, Dictionary<int, IPadInt> pdInts)
+            : base(server, pdInts) {
 
             BackupAddress = backupAddress;
             BackupServer = (IServer) Activator.GetObject(typeof(IServer), backupAddress);
@@ -89,7 +89,7 @@ namespace PadIntServer {
             backupReplyTimer.Stop();
             IServerMachine backupServerMachine = (IServerMachine) Activator.GetObject(typeof(IServer), BackupAddress);
             backupServerMachine.restartServer(Server.ID);
-            BackupServer.CreateBackupServer(Server.Address, Server.PdInts);
+            BackupServer.CreateBackupServer(Server.Address, padIntDictionary);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace PadIntServer {
         internal override bool CreatePadInt(int uid) {
             Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
-                Server.PdInts.Add(uid, new PadInt(uid));
+                padIntDictionary.Add(uid, new PadInt(uid));
                 /* updates the backup server */
                 backupReplyTimer.Start();
                 BackupServer.CreatePadInt(uid);

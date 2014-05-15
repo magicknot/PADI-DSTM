@@ -9,7 +9,7 @@ namespace PadIntServer {
     class FailedState : ServerState {
 
         internal FailedState(Server server)
-            : base(server) {
+            : base(server, new Dictionary<int, IPadInt>()) {
             // Nothing to do here
         }
 

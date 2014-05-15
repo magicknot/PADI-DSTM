@@ -31,12 +31,12 @@ namespace PadIntServer {
             get { return pairServerAddress; }
         }
 
-        internal BackupServer(Server server, string primaryAddress)
-            : base(server) {
+        internal BackupServer(Server server, string primaryAddress, Dictionary<int, IPadInt> pdInts)
+            : base(server, pdInts) {
 
             PrimaryAddress = PrimaryAddress;
             PrimaryServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
-            PrimaryServer.CreatePrimaryServer(Server.Address, new Dictionary<int, IPadInt>());
+            PrimaryServer.CreatePrimaryServer(Server.Address, padIntDictionary);
 
             // Create a timer with inAliveInterval second interval.
             imAliveTimer = new PadIntTimer(IM_ALIVE_INTERVAL);
@@ -60,7 +60,7 @@ namespace PadIntServer {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
             IServerMachine primaryServerMachine = (IServerMachine) Activator.GetObject(typeof(IServer), PrimaryAddress);
             primaryServerMachine.restartServer(Server.ID);
-            PrimaryServer.CreatePrimaryServer(Server.Address, Server.PdInts);
+            PrimaryServer.CreatePrimaryServer(Server.Address, padIntDictionary);
         }
 
         protected override PadInt GetPadInt(int uid) {
@@ -76,7 +76,7 @@ namespace PadIntServer {
         internal override bool CreatePadInt(int uid) {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
             try {
-                Server.PdInts.Add(uid, (IPadInt) new PadInt(uid));
+                padIntDictionary.Add(uid, (IPadInt) new PadInt(uid));
                 return true;
             } catch(ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, Server.ID);

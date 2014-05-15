@@ -16,7 +16,7 @@ namespace PadIntServer {
         private bool recover;
 
         internal FrozeState(Server server)
-            : base(server) {
+            : base(server, new Dictionary<int, IPadInt>()) {
             oldState = server.State;
         }
 

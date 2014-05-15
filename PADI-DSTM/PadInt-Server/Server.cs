@@ -25,10 +25,6 @@ namespace PadIntServer {
         /// </summary>
         private ServerState serverState;
         /// <summary>
-        /// Structure that maps UID to PadInt
-        /// </summary>
-        internal Dictionary<int, IPadInt> padIntDictionary;
-        /// <summary>
         /// Server identifier
         /// </summary>
         private int identifier;
@@ -39,7 +35,6 @@ namespace PadIntServer {
 
         public Server(string address) {
             serverState = new FailedState(this);
-            padIntDictionary = new Dictionary<int, IPadInt>();
             Address = address;
         }
 
@@ -51,11 +46,6 @@ namespace PadIntServer {
         internal string Address {
             set { this.serverAddress = value; }
             get { return serverAddress; }
-        }
-
-        internal Dictionary<int, IPadInt> PdInts {
-            set { this.padIntDictionary = value; }
-            get { return this.padIntDictionary; }
         }
 
         internal ServerState State {
@@ -70,7 +60,7 @@ namespace PadIntServer {
                 ID = info.Item1;
                 string primaryServerAddr = info.Item2;
                 if(primaryServerAddr != NO_SERVER_ADDRESS) {
-                    CreateBackupServer(primaryServerAddr, new Dictionary<int, IPadInt>());
+                    CreateBackupServer(primaryServerAddr, serverState.padIntDictionary);
                 }
             } catch(ServerAlreadyExistsException) {
                 throw;
@@ -86,8 +76,7 @@ namespace PadIntServer {
         /// <param name="padInts">Structure that maps UID to PadInt</param>
         public void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts) {
             Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
-            serverState = new PrimaryServer(this, backupAddress);
-            padIntDictionary = padInts;
+            serverState = new PrimaryServer(this, backupAddress, padInts);
         }
 
         /// <summary>
@@ -98,8 +87,7 @@ namespace PadIntServer {
         /// <param name="padInts">Structure that maps UID to PadInt</param>
         public void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts) {
             Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
-            serverState = new BackupServer(this, primaryAddress);
-            padIntDictionary = padInts;
+            serverState = new BackupServer(this, primaryAddress, padInts);
         }
 
         public void ImAlive() {
@@ -108,8 +96,6 @@ namespace PadIntServer {
         }
 
         public bool CreatePadInt(int uid) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createPadInt", "uid", uid.ToString(),
-                "    NPadInts", (padIntDictionary.Count + 1).ToString() });
             try {
                 return serverState.CreatePadInt(uid);
             } catch(PadIntAlreadyExistsException) {
@@ -237,7 +223,7 @@ namespace PadIntServer {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + ID);
             Console.WriteLine("PadInts stored on this server are:");
-            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+            foreach(KeyValuePair<int, IPadInt> pd in serverState.padIntDictionary) {
                 Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
             }
             Console.WriteLine("-----------------------");

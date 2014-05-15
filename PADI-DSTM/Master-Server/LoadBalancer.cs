@@ -18,7 +18,7 @@ namespace MasterServer {
                 servers.RemoveAt(registeredServers.Count - 1);
             }
 
-            if(registeredServers.Count == 0) {
+            if(servers.Count == 0) {
                 throw new NoServersFoundException();
             }
 
@@ -26,11 +26,10 @@ namespace MasterServer {
             return servers.First<ServerRegistry>().ID;
         }
 
-        internal static void DistributePadInts(List<ServerRegistry> registeredServers) {
+        internal static void DistributePadInts(List<ServerRegistry> registeredServers, string receiverServer) {
             Logger.Log(new String[] { "LoadBalancer", "DistributePadInts" });
 
             List<ServerRegistry> servers = new List<ServerRegistry>(registeredServers);
-            ServerRegistry receiverServer = servers[registeredServers.Count - 1];
             servers.Sort(new ServerReverseComparer());
 
             int nPadInts = 0;
@@ -55,7 +54,7 @@ namespace MasterServer {
                     movingPadInts.Add(servers[i].RemovePadInt());
                 } else if(movingPadInts.Count == averageCapacity) {
                     IServer server = (IServer) Activator.GetObject(typeof(IServer), servers[i].Address);
-                    server.MovePadInts(movingPadInts, receiverServer.Address);
+                    server.MovePadInts(movingPadInts, receiverServer);
                     nMovedPadInts = movingPadInts.Count;
                     movingPadInts.Clear();
                     i++;

@@ -10,6 +10,11 @@ namespace PadIntServer {
     abstract class ServerState : IDisposable {
 
         /// <summary>
+        /// Structure that maps UID to PadInt
+        /// </summary>
+        internal Dictionary<int, IPadInt> padIntDictionary;
+
+        /// <summary>
         /// Server that has this state
         /// </summary>
         private Server server;
@@ -32,13 +37,19 @@ namespace PadIntServer {
         /// </summary>
         protected string pairServerAddress;
 
-        internal ServerState(Server server) {
+        internal ServerState(Server server, Dictionary<int, IPadInt> pdInts) {
             this.server = server;
+            padIntDictionary = pdInts;
         }
 
         internal Server Server {
             set { this.server = value; }
             get { return this.server; }
+        }
+
+        internal Dictionary<int, IPadInt> PdInts {
+            set { this.padIntDictionary = value; }
+            get { return this.padIntDictionary; }
         }
 
         internal abstract void ImAlive();
@@ -65,8 +76,8 @@ namespace PadIntServer {
         }
 
         protected virtual PadInt GetPadInt(int uid) {
-            if(Server.PdInts.ContainsKey(uid)) {
-                return (PadInt) Server.PdInts[uid];
+            if(padIntDictionary.ContainsKey(uid)) {
+                return (PadInt) padIntDictionary[uid];
             } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }
@@ -86,8 +97,8 @@ namespace PadIntServer {
             Dictionary<int, IPadInt> removedPadInt = new Dictionary<int, IPadInt>();
 
             foreach(int padIntId in padInts) {
-                removedPadInt.Add(padIntId, server.PdInts[padIntId]);
-                server.PdInts.Remove(padIntId);
+                removedPadInt.Add(padIntId, padIntDictionary[padIntId]);
+                padIntDictionary.Remove(padIntId);
             }
 
             IServer receiverServer = (IServer) Activator.GetObject(typeof(IServer), receiverAddress);
@@ -97,7 +108,7 @@ namespace PadIntServer {
         public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
             Logger.Log(new String[] { "ServerState", "ReceivePadInts" });
             foreach(KeyValuePair<int, IPadInt> pair in receivedPadInts) {
-                server.padIntDictionary.Add(pair.Key, pair.Value);
+                padIntDictionary.Add(pair.Key, pair.Value);
             }
         }
     }

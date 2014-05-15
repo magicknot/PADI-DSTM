@@ -69,7 +69,7 @@ namespace MasterServer {
                 return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
             } else {
                 serverIsPrimary = true;
-                LoadBalancer.DistributePadInts(registeredServers);
+                LoadBalancer.DistributePadInts(registeredServers, address);
                 return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1].Address);
             }
         }
