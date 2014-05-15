@@ -16,12 +16,12 @@ namespace PadIntServer {
         /// Constant used to represent the interval after which primary server
         ///  sends I'm alive (1000 = 1s)
         /// </summary>
-        private const int IM_ALIVE_INTERVAL = 20000;
+        private const int IM_ALIVE_INTERVAL = 10000;
         /// <summary>
         /// Constant used to represent the interval after which primary server
         ///  requires a new backup server (1000 = 1s)
         /// </summary>
-        private const int BACKUP_REPLY_INTERVAL = 35000;
+        private const int BACKUP_REPLY_INTERVAL = 15000;
 
         /// <summary>
         /// Timer used to detect that primary server does not receive a reply

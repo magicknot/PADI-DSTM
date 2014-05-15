@@ -19,7 +19,7 @@ namespace PadIntServer {
         /// Constant used to represent the interval after which
         ///  backup server tries to be a primary server (1000 = 1s)
         /// </summary>
-        private const int IM_ALIVE_INTERVAL = 35000;
+        private const int IM_ALIVE_INTERVAL = 15000;
 
         internal IServer PrimaryServer {
             set { this.pairServerReference = value; }
