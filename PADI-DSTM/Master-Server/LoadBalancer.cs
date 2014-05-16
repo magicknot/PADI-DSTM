@@ -14,11 +14,11 @@ namespace MasterServer {
 
             List<ServerRegistry> servers = new List<ServerRegistry>(registeredServers);
 
-            if(!serverIsPrimary) {
+            if (!serverIsPrimary) {
                 servers.RemoveAt(registeredServers.Count - 1);
             }
 
-            if(servers.Count == 0) {
+            if (servers.Count == 0) {
                 throw new NoServersFoundException();
             }
 
@@ -35,7 +35,7 @@ namespace MasterServer {
             int nPadInts = 0;
             int nServers = 0;
 
-            foreach(ServerRegistry srvr in registeredServers) {
+            foreach (ServerRegistry srvr in registeredServers) {
                 nPadInts += srvr.Hits;
                 nServers++;
             }
@@ -45,19 +45,26 @@ namespace MasterServer {
             List<int> movingPadInts = new List<int>();
 
             int i = 0;
-            int nMovedPadInts = 0;
 
-            while(i < servers.Count) {
-                if(nMovedPadInts == averageCapacity) {
-                    return;
-                } else if(servers[i].Hits > averageCapacity) {
-                    movingPadInts.Add(servers[i].RemovePadInt());
-                } else if(movingPadInts.Count == averageCapacity) {
-                    IServer server = (IServer) Activator.GetObject(typeof(IServer), servers[i].Address);
-                    server.MovePadInts(movingPadInts, receiverServer);
-                    nMovedPadInts = movingPadInts.Count;
-                    movingPadInts.Clear();
+            while (i < servers.Count) {
+
+                if (servers[i].Hits < averageCapacity) {
+                    continue;
+                }
+                else if (servers[i].Hits == averageCapacity) {
+                    if (movingPadInts.Count > 0) {
+                        IServer server = (IServer)Activator.GetObject(typeof(IServer), servers[i].Address);
+                        server.MovePadInts(movingPadInts, receiverServer);
+
+                        foreach (int pd in movingPadInts) {
+                            servers[servers.Count - 1].AddPadInt(pd);
+                        }
+                        movingPadInts.Clear();
+                    }
                     i++;
+                }
+                else if (servers[i].Hits > averageCapacity) {
+                    movingPadInts.Add(servers[i].RemovePadInt());
                 }
             }
         }
