@@ -34,7 +34,12 @@ namespace Client {
                     Console.WriteLine("4- Base: testSimpleAbort");
                     Console.WriteLine("5- Base: testSimpleCommit");
                     Console.WriteLine("6- Base: testMultipleReads");
-                    Console.WriteLine("7- status");
+                    Console.WriteLine("7- Base: testReadWrite");
+                    Console.WriteLine("8- Base: testWriteRead");
+                    Console.WriteLine("8- Base: testFreezeCreate (client1)");
+                    Console.WriteLine("9- Base: testFreeze (client2)");
+                    Console.WriteLine("10- Base: testRecover");
+                    Console.WriteLine("11- status");
                     Console.WriteLine("---------");
 
                     Console.Write(">");
@@ -65,8 +70,28 @@ namespace Client {
                         client.TestMultipleRead(client.GetNextUid(), client.GetNextUid(), client.GetNextUid());
                     }
 
-
                     if(input.Equals("7")) {
+                        client.TestReadWrite(client.GetNextUid());
+                    }
+
+                    if(input.Equals("8")) {
+                        client.TestWriteRead(client.GetNextUid());
+                    }
+
+                    if(input.Equals("9")) {
+                        client.TestFreezeCreate(1);
+                    }
+
+                    if(input.Equals("10")) {
+                        client.TestFreeze(2);
+                    }
+
+                    if(input.Equals("11")) {
+                        client.TestRecover();
+                    }
+
+
+                    if(input.Equals("12")) {
                         Library.Status();
                     }
                 }

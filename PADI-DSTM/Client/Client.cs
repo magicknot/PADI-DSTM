@@ -293,5 +293,169 @@ namespace Client {
             Console.WriteLine("------------");
             Logger.Log(new String[] { "---------Read write end----------" });
         }
+
+        public void TestWriteRead(int uid0) {
+            Console.WriteLine("------ Test: write read ------");
+            Logger.Log(new String[] { "Client", "------ Test: write read ------" });
+
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+
+                PadInt padInt0 = Library.CreatePadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+
+                if(padInt0.Write(211)) {
+                    Console.WriteLine("padInt0 write done with value (211) : " + padInt0.Read());
+                }
+
+                //read
+                Console.WriteLine("padInt0 read: " + padInt0.Read());
+
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.Log(new String[] { "---------write read end----------" });
+        }
+
+        public void TestFreezeCreate(int uid0) {
+            Console.WriteLine("------ Test: Freeze Create ------");
+            Logger.Log(new String[] { "Client", "------ Test: Freeze Create ------" });
+
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+
+                PadInt padInt0 = Library.CreatePadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Vou fazer o primeiro ciclo de 5 writes. Depois vem o freeze");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                int i = 0;
+                for(; i < 5; i++) {
+                    Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
+
+                }
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Vou fazer o freeze");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
+                bool res = Library.Freeze("tcp://localhost:2001/PadIntServer");
+                //res = Library.Fail("tcp://localhost:2002/PadIntServer");
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz o freeze res= " + res + "Vou fazer o segundo ciclo de 5 writes. Depois vem o commit");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                for(; i < 10; i++) {
+                    Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
+                }
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz os 10 writes. (valor deve ser 10) padInt0.Read() =" + padInt0.Read() + "Press enter para commit.");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.Log(new String[] { "---------Read Freeze end----------" });
+        }
+
+        public void TestFreeze(int uid0) {
+            Console.WriteLine("------ Test: Freeze (o cliente1 tem que ja ter feito o freeze) ------");
+            Logger.Log(new String[] { "Client", "------ Test: Freeze ------" });
+
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+
+                PadInt padInt0 = Library.CreatePadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Vou fazer ciclo de 10 writes.");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                for(int i = 0; i < 10; i++) {
+                    Console.WriteLine("Fiz um Write no uid 2. uid() = " + padInt0.Write(i).ToString());
+                }
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz os 10 writes. (valor deve ser 10) padInt0.Read() =" + padInt0.Read() + "Press enter para commit.");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.Log(new String[] { "---------Read Freeze end----------" });
+        }
+
+        public void TestRecover() {
+            Console.WriteLine("------ Test: Recover ------");
+            Logger.Log(new String[] { "Client", "------ Test: Recover ------" });
+
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+
+                // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
+                bool res = Library.Recover("tcp://localhost:2001/PadIntServer");
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz o recover res= " + res + " Depois vem o commit");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.Log(new String[] { "---------Read Freeze end----------" });
+        }
     }
 }
