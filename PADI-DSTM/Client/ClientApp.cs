@@ -85,7 +85,7 @@ namespace Client {
                     }
 
                     if(input.Equals("10")) {
-                        client.TestFreezeCreate(1);
+                        client.TestFailCreate(1);
                     }
 
                     if(input.Equals("11")) {
