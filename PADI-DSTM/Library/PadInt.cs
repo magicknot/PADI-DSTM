@@ -71,6 +71,9 @@ namespace ClientLibrary {
                 }
             } catch(WrongPadIntRequestException) {
                 throw;
+            } catch(AbortException) {
+                Console.WriteLine("Abort Exception: cannot obtain the read lock.");
+                throw;
             }
         }
 
@@ -99,6 +102,9 @@ namespace ClientLibrary {
                     throw;
                 }
             } catch(WrongPadIntRequestException) {
+                throw;
+            } catch(AbortException) {
+                Console.WriteLine("Abort Exception: cannot obtain the write lock.");
                 throw;
             }
         }
