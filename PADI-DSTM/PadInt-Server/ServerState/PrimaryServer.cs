@@ -117,7 +117,8 @@ namespace PadIntServer {
         /// <param name="uid">PadInt identifier</param>
         /// <returns></returns>
         internal override bool CreatePadInt(int uid) {
-            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString() });
+            Logger.Log(new String[] { "PrimaryServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString(),
+                "    NPadInts", (padIntDictionary.Count + 1).ToString() });
             try {
                 padIntDictionary.Add(uid, new PadInt(uid));
                 /* updates the backup server */
