@@ -369,8 +369,15 @@ namespace Client {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
                 }
 
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+                /* the padInt's value must be equal to initialization value */
+                PadInt padInt0A = Library.AccessPadInt(uid0);
                 Console.WriteLine("####################################################################");
-                Console.WriteLine("Fiz os 10 writes. (valor deve ser 10) padInt0.Read() =" + padInt0.Read() + "Press enter para commit.");
+                Console.WriteLine("Fiz os 10 writes. padInt0A.Read()= " + padInt0A.Read() + " Press enter para commit.");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
 
@@ -427,11 +434,16 @@ namespace Client {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
                 }
 
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+                PadInt padInt0A = Library.AccessPadInt(uid0);
                 Console.WriteLine("####################################################################");
-                Console.WriteLine("Fiz os 10 writes. (valor deve ser 10) padInt0.Read() =" + padInt0.Read() + "Press enter para commit.");
+                Console.WriteLine("Fiz os 10 writes. padInt0A.Read()= " + padInt0A.Read() + " Press enter para commit.");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
-
                 Library.TxCommit();
                 Console.WriteLine("txCommit Done");
 
