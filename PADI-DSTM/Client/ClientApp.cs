@@ -36,10 +36,10 @@ namespace Client {
                     Console.WriteLine("6- Base: testMultipleReads");
                     Console.WriteLine("7- Base: testReadWrite");
                     Console.WriteLine("8- Base: testWriteRead");
-                    Console.WriteLine("8- Base: testFreezeCreate (client1)");
-                    Console.WriteLine("9- Base: testFreeze (client2)");
-                    Console.WriteLine("10- Base: testRecover");
-                    Console.WriteLine("11- status");
+                    Console.WriteLine("9- Base: testFreezeCreate (client1)");
+                    Console.WriteLine("10- Base: testFreeze (client2)");
+                    Console.WriteLine("11- Base: testRecover");
+                    Console.WriteLine("12- status");
                     Console.WriteLine("---------");
 
                     Console.Write(">");
