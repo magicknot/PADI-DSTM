@@ -54,6 +54,7 @@ namespace PadIntServer {
         }
 
         public bool Init(int port) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "Init", " on port", port.ToString() });
             try {
                 IMaster master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
                 Tuple<int, string> info = master.RegisterServer(Address);
@@ -219,14 +220,7 @@ namespace PadIntServer {
         }
 
         public bool Status() {
-            Logger.Log(new String[] { "Server", "Status" });
-            Console.WriteLine("-----------------------");
-            Console.WriteLine("This server has id " + ID);
-            Console.WriteLine("PadInts stored on this server are:");
-            foreach(KeyValuePair<int, IPadInt> pd in serverState.padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
-            }
-            Console.WriteLine("-----------------------");
+            serverState.Status();
             return true;
         }
 

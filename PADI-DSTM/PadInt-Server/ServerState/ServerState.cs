@@ -111,5 +111,17 @@ namespace PadIntServer {
                 padIntDictionary.Add(pair.Key, pair.Value);
             }
         }
+
+        public virtual bool Status() {
+            Logger.Log(new String[] { "Server", "Status" });
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("This server has id " + server.ID);
+            Console.WriteLine("PadInts stored on this server are:");
+            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
+            }
+            Console.WriteLine("-----------------------");
+            return true;
+        }
     }
 }

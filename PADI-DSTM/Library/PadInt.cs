@@ -63,8 +63,12 @@ namespace ClientLibrary {
                 }
                 return result;
             } catch(PadIntNotFoundException) {
-                cache.UpdatePadIntServer(serverID, uid);
-                return Read();
+                try {
+                    cache.UpdatePadIntServer(serverID, uid);
+                    return Read();
+                } catch(PadIntNotFoundException) {
+                    throw;
+                }
             } catch(WrongPadIntRequestException) {
                 throw;
             }
@@ -88,8 +92,12 @@ namespace ClientLibrary {
                 cache.UpdatePadIntValue(serverID, uid, value);
                 return true;
             } catch(PadIntNotFoundException) {
-                cache.UpdatePadIntServer(serverID, uid);
-                return Write(value);
+                try {
+                    cache.UpdatePadIntServer(serverID, uid);
+                    return Write(value);
+                } catch(PadIntNotFoundException) {
+                    throw;
+                }
             } catch(WrongPadIntRequestException) {
                 throw;
             }

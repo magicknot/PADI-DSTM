@@ -59,6 +59,15 @@ namespace MasterServer {
             padInts.RemoveAt(0);
             return pd;
         }
+
+        public string DumpPadInts() {
+            string result = "";
+
+            foreach(int uid in padInts) {
+                result += uid + " ";
+            }
+            return result;
+        }
     }
 
     class ServerComparer : IComparer<ServerRegistry> {

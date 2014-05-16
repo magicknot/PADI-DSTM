@@ -149,6 +149,8 @@ namespace ClientLibrary {
                 throw;
             } catch(WrongPadIntRequestException) {
                 throw;
+            } catch(NoServersFoundException) {
+                throw;
             }
         }
 

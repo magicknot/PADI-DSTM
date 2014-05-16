@@ -257,6 +257,12 @@ namespace PadIntServer {
             return resultAbort;
         }
 
+        public override bool Status() {
+            base.Status();
+            BackupServer.Status();
+            return true;
+        }
+
         public override void Dispose() {
             backupReplyTimer.Dispose(true);
             base.Dispose();

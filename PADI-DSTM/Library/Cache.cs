@@ -68,18 +68,22 @@ namespace ClientLibrary {
         /// <param name="serverID">Server identifier</param>
         /// <param name="uid">PadInt identifier</param>
         internal void UpdatePadIntServer(int serverID, int uid) {
-            Tuple<int, string> serverInfo = Library.MasterServer.GetPadIntServer(uid);
-            string serverAddr = serverInfo.Item2;
-            int newServerID = serverInfo.Item1;
+            try {
+                Tuple<int, string> serverInfo = Library.MasterServer.GetPadIntServer(uid);
+                string serverAddr = serverInfo.Item2;
+                int newServerID = serverInfo.Item1;
 
-            //obtains and removes the PadIntRegistry from the old server
-            PadIntRegistry pd = GetServer(serverID).RemovePadInt(uid);
+                //obtains and removes the PadIntRegistry from the old server
+                PadIntRegistry pd = GetServer(serverID).RemovePadInt(uid);
 
-            if(!HasServer(serverID)) {
-                AddServer(serverID, serverAddr);
+                if(!HasServer(newServerID)) {
+                    AddServer(newServerID, serverAddr);
+                }
+                //adds the PadIntRegistry to the new server
+                AddPadInt(newServerID, pd);
+            } catch(PadIntNotFoundException) {
+                throw;
             }
-            //adds the PadIntRegistry to the new server
-            AddPadInt(newServerID, pd);
         }
 
         /// <summary>

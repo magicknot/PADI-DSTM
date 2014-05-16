@@ -182,5 +182,10 @@ namespace PadIntServer {
 
             return resultAbort;
         }
+
+        public override bool Status() {
+            base.Status();
+            return true;
+        }
     }
 }

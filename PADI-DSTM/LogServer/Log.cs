@@ -9,16 +9,16 @@ namespace LogServer {
     /// <summary>
     /// This is the server used to log DSTM messages
     /// </summary>
-    class Log : MarshalByRefObject, ILog, IDisposable {
+    class Log : MarshalByRefObject, ILog/*, IDisposable*/ {
 
         /// <summary>
         /// File where messages are logged
         /// </summary>
-        System.IO.StreamWriter file = new System.IO.StreamWriter("log.txt");
+        //System.IO.StreamWriter file = new System.IO.StreamWriter("log.txt");
         /// <summary>
         /// Predicate that defines the moment for the stream to be closed
         /// </summary>
-        bool disposed = false;
+        //bool disposed = false;
 
         /// <summary>
         /// Constructor
@@ -33,32 +33,32 @@ namespace LogServer {
             }
 
             Console.WriteLine(message);
-            file.WriteLine(message);
-            file.Flush();
+            //file.WriteLine(message);
+            //file.Flush();
 
         }
 
         /// <summary>
         /// Closes the log file stream
         /// </summary>
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        /*  public void Dispose() {
+              Dispose(true);
+              GC.SuppressFinalize(this);
+          }*/
 
         /// <summary>
         /// Closes the log file stream
         /// </summary>
-        protected virtual void Dispose(bool disposing) {
-            if(disposed)
-                return;
+        /*    protected virtual void Dispose(bool disposing) {
+                if(disposed)
+                    return;
 
-            if(disposing) {
-                file.Close();
-            }
+                if(disposing) {
+                  //  file.Close();
+                }
 
-            disposed = true;
-        }
+                disposed = true;
+            }*/
 
     }
 

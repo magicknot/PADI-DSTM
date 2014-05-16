@@ -106,7 +106,13 @@ namespace MasterServer {
         /// <returns>Tuple containing (server identifier,server address)</returns>
         public Tuple<int, string> RegisterPadInt(int uid) {
             Logger.Log(new String[] { "Master", " registerPadInt", "uid", uid.ToString() });
-            int newServerID = LoadBalancer.GetAvailableServer(registeredServers, serverIsPrimary);
+            int newServerID;
+            try {
+                newServerID = LoadBalancer.GetAvailableServer(registeredServers, serverIsPrimary);
+            } catch(NoServersFoundException) {
+                throw;
+            }
+
             ServerRegistry oldServer = getServerRegistry(uid);
 
             if(oldServer == null) {
@@ -125,9 +131,9 @@ namespace MasterServer {
 
             Console.WriteLine("-----------------------");
             Console.WriteLine("This is master server and the last TID given was " + LastTID);
-            Console.WriteLine("Servers registered are:");
+            Console.WriteLine("Primary Servers registered are:");
             for(int i = 0; i < registeredServers.Count; i++) {
-                Console.WriteLine("Server " + i + " with address " + registeredServers[i]);
+                Console.WriteLine("Server " + i + " with address " + registeredServers[i].Address + " and carrying PadInts " + registeredServers[i].DumpPadInts());
             }
 
             foreach(ServerRegistry srvr in registeredServers) {
