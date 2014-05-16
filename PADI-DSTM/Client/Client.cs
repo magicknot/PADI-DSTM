@@ -272,11 +272,11 @@ namespace Client {
                 // write
                 Console.WriteLine("now I will do a write...");
 
-                Library.TxBegin();
-                Console.WriteLine("txBegin Done");
+                //Library.TxBegin();
+                //Console.WriteLine("txBegin Done");
 
                 /* the padInt's value must be equal to initialization value */
-                PadInt padInt0A = Library.AccessPadInt(uid0);
+                //PadInt padInt0A = Library.AccessPadInt(uid0);
 
                 if(padInt0.Write(211)) {
                     Console.WriteLine("padInt0 write done with value (211) : " + padInt0.Read());
@@ -349,13 +349,13 @@ namespace Client {
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
                 int i = 0;
-                for(; i < 5; i++) {
+                for(; i <= 5; i++) {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
 
                 }
 
                 Console.WriteLine("####################################################################");
-                Console.WriteLine("Vou fazer o freeze");
+                Console.WriteLine("Vou fazer o freeze Nota: Podem ser imprimidas writas que estao a ser feitas em cache! so vai parar quando fizer pedido ao server");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
                 // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
@@ -365,7 +365,7 @@ namespace Client {
                 Console.WriteLine("Fiz o freeze res= " + res + "Vou fazer o segundo ciclo de 5 writes. Depois vem o commit");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
-                for(; i < 10; i++) {
+                for(; i <= 10; i++) {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
                 }
 
@@ -386,9 +386,67 @@ namespace Client {
             Logger.Log(new String[] { "---------Read Freeze end----------" });
         }
 
-        public void TestFreeze(int uid0) {
-            Console.WriteLine("------ Test: Freeze (o cliente1 tem que ja ter feito o freeze) ------");
-            Logger.Log(new String[] { "Client", "------ Test: Freeze ------" });
+        public void TestFailCreate(int uid0) {
+            Console.WriteLine("------ Test: Fail Create ------");
+            Logger.Log(new String[] { "Client", "------ Test: Fail Create ------" });
+
+            Console.WriteLine("library created");
+
+            try {
+                Console.WriteLine("init() Done");
+
+                Library.TxBegin();
+                Console.WriteLine("txBegin Done");
+
+                PadInt padInt0 = Library.CreatePadInt(uid0);
+                Console.WriteLine("padInt0 created with uid: " + uid0);
+
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Vou fazer o primeiro ciclo de 5 writes. Depois vem o fail");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                int i = 0;
+                for(; i <= 5; i++) {
+                    Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
+
+                }
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Vou fazer o fail");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
+                //bool res = Library.Freeze("tcp://localhost:2001/PadIntServer");
+                bool res = Library.Fail("tcp://localhost:2001/PadIntServer");
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz o fail res= " + res + "Vou fazer o segundo ciclo de 5 writes. Depois vem o commit");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+                for(; i <= 10; i++) {
+                    Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
+                }
+
+                Console.WriteLine("####################################################################");
+                Console.WriteLine("Fiz os 10 writes. (valor deve ser 10) padInt0.Read() =" + padInt0.Read() + "Press enter para commit.");
+                Console.WriteLine("####################################################################");
+                Console.ReadLine();
+
+                Library.TxCommit();
+                Console.WriteLine("txCommit Done");
+
+                Console.WriteLine("closeChannel Done");
+            } catch(Exception e) {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine("------------");
+            Logger.Log(new String[] { "---------Read Fail end----------" });
+        }
+
+        public void TestFreezeFail(int uid0) {
+            Console.WriteLine("------ Test: Freeze (o cliente1 tem que ja ter feito o freeze/fail) ------");
+            Logger.Log(new String[] { "Client", "------ Test: Freeze/Fail ------" });
 
             Console.WriteLine("library created");
 
@@ -406,7 +464,7 @@ namespace Client {
                 Console.WriteLine("Vou fazer ciclo de 10 writes.");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
-                for(int i = 0; i < 10; i++) {
+                for(int i = 0; i <= 10; i++) {
                     Console.WriteLine("Fiz um Write no uid 2. uid() = " + padInt0.Write(i).ToString());
                 }
 

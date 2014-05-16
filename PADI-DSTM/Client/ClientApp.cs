@@ -36,10 +36,12 @@ namespace Client {
                     Console.WriteLine("6- Base: testMultipleReads");
                     Console.WriteLine("7- Base: testReadWrite");
                     Console.WriteLine("8- Base: testWriteRead");
+                    Console.WriteLine("---Freeze---");
                     Console.WriteLine("9- Base: testFreezeCreate (client1)");
-                    Console.WriteLine("10- Base: testFreeze (client2)");
-                    Console.WriteLine("11- Base: testRecover");
-                    Console.WriteLine("12- status");
+                    Console.WriteLine("10- Base: testFailCreate (client1)");
+                    Console.WriteLine("11- Base: testFreezeFail (client2)");
+                    Console.WriteLine("12- Base: testRecover");
+                    Console.WriteLine("13- status");
                     Console.WriteLine("---------");
 
                     Console.Write(">");
@@ -83,19 +85,21 @@ namespace Client {
                     }
 
                     if(input.Equals("10")) {
-                        client.TestFreeze(2);
+                        client.TestFreezeCreate(1);
                     }
 
                     if(input.Equals("11")) {
+                        client.TestFreezeFail(2);
+                    }
+
+                    if(input.Equals("12")) {
                         client.TestRecover();
                     }
 
-
-                    if(input.Equals("12")) {
+                    if(input.Equals("13")) {
                         Library.Status();
                     }
                 }
-
             } else {
                 Logger.Log(new String[] { "There are no servers available" });
             }
