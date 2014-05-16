@@ -48,7 +48,7 @@ namespace MasterServer {
 
             while (i < servers.Count) {
 
-                if (servers[i].Hits < averageCapacity) {
+                if (servers[i].Hits < averageCapacity || receiverServer.Equals(servers[i].Address)) {
                     continue;
                 }
                 else if (servers[i].Hits == averageCapacity) {

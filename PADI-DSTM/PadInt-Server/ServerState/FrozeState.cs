@@ -18,6 +18,7 @@ namespace PadIntServer {
         internal FrozeState(Server server)
             : base(server, new Dictionary<int, IPadInt>()) {
             oldState = server.State;
+            stateMessage = "FROZE STATE";
         }
 
         /// <summary>

@@ -34,9 +34,9 @@ namespace PadIntServer {
         internal BackupServer(Server server, string primaryAddress, Dictionary<int, IPadInt> pdInts)
             : base(server, pdInts) {
 
-            PrimaryAddress = PrimaryAddress;
-            PrimaryServer = (IServer) Activator.GetObject(typeof(IServer), primaryAddress);
-            PrimaryServer.CreatePrimaryServer(Server.Address, padIntDictionary);
+            PrimaryAddress = primaryAddress;
+            PrimaryServer = (IServer)Activator.GetObject(typeof(IServer), primaryAddress);
+            PrimaryServer.CreatePrimaryServer(Server.Address, padIntDictionary, false);
 
             // Create a timer with inAliveInterval second interval.
             imAliveTimer = new PadIntTimer(IM_ALIVE_INTERVAL);
@@ -44,6 +44,7 @@ namespace PadIntServer {
 
             //starts im alive timer
             imAliveTimer.Start();
+            StateMsg = "BACKUP STATE";
         }
 
         /// <summary>
@@ -58,9 +59,16 @@ namespace PadIntServer {
 
         private void ImAliveEvent(object source, ElapsedEventArgs e) {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "ImAliveEvent" });
-            IServerMachine primaryServerMachine = (IServerMachine) Activator.GetObject(typeof(IServer), PrimaryAddress);
-            primaryServerMachine.restartServer(Server.ID);
-            PrimaryServer.CreatePrimaryServer(Server.Address, padIntDictionary);
+            Console.WriteLine("PrimaryAddress: " + PrimaryAddress + " " + stateMessage);
+            imAliveTimer.Stop();
+            //imAliveTimer.Close();
+            IServerMachine primaryServerMachine = (IServerMachine)Activator.GetObject(typeof(IServerMachine), PrimaryAddress + "Machine");
+
+            primaryServerMachine.RestartServer();
+            PrimaryServer.CreateBackupServer(Server.Address, padIntDictionary, true);
+            //Server.CreatePrimaryServer(newBackupAddress, padIntDictionary, false);
+            IMaster master = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+            master.UpdateServerAddress(Server.ID, Server.Address);
         }
 
         protected override PadInt GetPadInt(int uid) {
@@ -77,9 +85,10 @@ namespace PadIntServer {
             Logger.Log(new String[] { "BackupServer", Server.ID.ToString(), "createPadInt", "uid ", uid.ToString(),
                 "    NPadInts", (padIntDictionary.Count + 1).ToString() });
             try {
-                padIntDictionary.Add(uid, (IPadInt) new PadInt(uid));
+                padIntDictionary.Add(uid, (IPadInt)new PadInt(uid));
                 return true;
-            } catch(ArgumentException) {
+            }
+            catch (ArgumentException) {
                 throw new PadIntAlreadyExistsException(uid, Server.ID);
             }
         }
@@ -100,12 +109,14 @@ namespace PadIntServer {
                 /* Obtain the PadInt identified by uid */
                 PadInt padInt = GetPadInt(uid);
 
-                if(padInt.HasWriteLock(tid) || padInt.GetReadLock(tid)) {
+                if (padInt.HasWriteLock(tid) || padInt.GetReadLock(tid)) {
                     return padInt.ActualValue;
                 }
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(AbortException) {
+            }
+            catch (AbortException) {
                 throw;
             }
 
@@ -119,13 +130,15 @@ namespace PadIntServer {
                 /* Obtain the PadInt identified by uid */
                 PadInt padInt = GetPadInt(uid);
 
-                if(padInt.GetWriteLock(tid)) {
+                if (padInt.GetWriteLock(tid)) {
                     padInt.ActualValue = value;
                     return true;
                 }
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(AbortException) {
+            }
+            catch (AbortException) {
                 throw;
             }
 
@@ -146,12 +159,13 @@ namespace PadIntServer {
             try {
                 VerifyPadInts(usedPadInts);
 
-                foreach(int padIntUid in usedPadInts) {
+                foreach (int padIntUid in usedPadInts) {
                     PadInt padInt = GetPadInt(padIntUid);
                     resultCommit = padInt.Commit(tid) && resultCommit;
                 }
 
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
             }
 
@@ -172,11 +186,12 @@ namespace PadIntServer {
             try {
                 VerifyPadInts(usedPadInts);
 
-                foreach(int padIntUid in usedPadInts) {
+                foreach (int padIntUid in usedPadInts) {
                     PadInt padInt = GetPadInt(padIntUid);
                     resultAbort = padInt.Abort(tid) && resultAbort;
                 }
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
             }
 

@@ -37,9 +37,16 @@ namespace PadIntServer {
         /// </summary>
         protected string pairServerAddress;
 
+        protected string stateMessage;
+
         internal ServerState(Server server, Dictionary<int, IPadInt> pdInts) {
             this.server = server;
             padIntDictionary = pdInts;
+        }
+
+        internal string pairAddress {
+            set { this.pairServerAddress = value; }
+            get { return pairServerAddress; }
         }
 
         internal Server Server {
@@ -50,6 +57,11 @@ namespace PadIntServer {
         internal Dictionary<int, IPadInt> PdInts {
             set { this.padIntDictionary = value; }
             get { return this.padIntDictionary; }
+        }
+
+        internal string StateMsg {
+            get { return stateMessage; }
+            set { stateMessage = value; }
         }
 
         internal abstract void ImAlive();
@@ -63,10 +75,11 @@ namespace PadIntServer {
 
         protected virtual void VerifyPadInts(List<int> padInts) {
             try {
-                foreach(int uid in padInts) {
+                foreach (int uid in padInts) {
                     GetPadInt(uid);
                 }
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
             }
         }
@@ -76,9 +89,10 @@ namespace PadIntServer {
         }
 
         protected virtual PadInt GetPadInt(int uid) {
-            if(padIntDictionary.ContainsKey(uid)) {
-                return (PadInt) padIntDictionary[uid];
-            } else {
+            if (padIntDictionary.ContainsKey(uid)) {
+                return (PadInt)padIntDictionary[uid];
+            }
+            else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }
         }
@@ -87,7 +101,8 @@ namespace PadIntServer {
             try {
                 GetPadInt(uid);
                 return true;
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
             }
         }
@@ -96,29 +111,37 @@ namespace PadIntServer {
             Logger.Log(new String[] { "ServerState", "MovePadInts", "to Server", receiverAddress });
             Dictionary<int, IPadInt> removedPadInt = new Dictionary<int, IPadInt>();
 
-            foreach(int padIntId in padInts) {
+            foreach (int padIntId in padInts) {
                 removedPadInt.Add(padIntId, padIntDictionary[padIntId]);
                 padIntDictionary.Remove(padIntId);
             }
 
-            IServer receiverServer = (IServer) Activator.GetObject(typeof(IServer), receiverAddress);
+            IServer receiverServer = (IServer)Activator.GetObject(typeof(IServer), receiverAddress);
             receiverServer.ReceivePadInts(removedPadInt);
+            pairServerReference.RemovePadInts(padInts);
+
         }
 
         public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
             Logger.Log(new String[] { "ServerState", "ReceivePadInts" });
-            foreach(KeyValuePair<int, IPadInt> pair in receivedPadInts) {
+            foreach (KeyValuePair<int, IPadInt> pair in receivedPadInts) {
                 padIntDictionary.Add(pair.Key, pair.Value);
             }
         }
 
+        public void RemovePadInts(List<int> receivedPadInts) {
+            Logger.Log(new String[] { "ServerState", "RemovePadInts" });
+            foreach (int pd in receivedPadInts) {
+                padIntDictionary.Remove(pd);
+            }
+        }
+
         public virtual bool Status() {
-            Logger.Log(new String[] { "Server", "Status" });
             Console.WriteLine("-----------------------");
-            Console.WriteLine("This server has id " + server.ID);
+            Console.WriteLine("This server has id " + server.ID + " and has address " + server.Address);
             Console.WriteLine("PadInts stored on this server are:");
-            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
+            foreach (KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt)pd.Value).ActualValue);
             }
             Console.WriteLine("-----------------------");
             return true;

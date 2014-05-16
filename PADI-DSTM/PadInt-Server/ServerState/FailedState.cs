@@ -4,20 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using CommonTypes;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 
 namespace PadIntServer {
     class FailedState : ServerState {
 
         internal FailedState(Server server)
             : base(server, new Dictionary<int, IPadInt>()) {
-            // Nothing to do here
+            StateMsg = "FAILED STATE";
         }
 
         /// <summary>
         /// Frailed servers do nothing when this method is called
         /// </summary>
         internal override void ImAlive() {
-            //Nothing to do here
+            Logger.Log(new String[] { "FailedServer", "ImAlive" });
         }
 
         internal override bool CreatePadInt(int uid) {
@@ -60,6 +63,11 @@ namespace PadIntServer {
         internal override bool Abort(int tid, List<int> usedPadInts) {
             Logger.Log(new String[] { "FailedServer", Server.ID.ToString(), "abort", "tid", tid.ToString() });
             throw new ServerDoesNotReplyException(Server.ID);
+        }
+
+        internal override bool Recover() {
+            RemotingServices.Marshal(Server, "PadIntServer", typeof(IServer));
+            return true;
         }
     }
 }

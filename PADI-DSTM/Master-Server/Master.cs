@@ -63,11 +63,12 @@ namespace MasterServer {
         /// <returns>Server identifier</returns>
         public Tuple<int, string> RegisterServer(String address) {
             Logger.Log(new String[] { "Master", "registerServer", "address", address.ToString() });
-            if(serverIsPrimary) {
+            if (serverIsPrimary) {
                 registeredServers.Insert(registeredServers.Count, new ServerRegistry(registeredServers.Count, address));
                 serverIsPrimary = false;
                 return new Tuple<int, string>(registeredServers.Count - 1, NO_SERVER_ADDRESS);
-            } else {
+            }
+            else {
                 serverIsPrimary = true;
                 LoadBalancer.DistributePadInts(registeredServers, address);
                 return new Tuple<int, string>(registeredServers.Count - 1, registeredServers[registeredServers.Count - 1].Address);
@@ -75,8 +76,8 @@ namespace MasterServer {
         }
 
         private ServerRegistry getServerRegistry(int uid) {
-            foreach(ServerRegistry srvr in registeredServers) {
-                if(srvr.HasPadInt(uid)) {
+            foreach (ServerRegistry srvr in registeredServers) {
+                if (srvr.HasPadInt(uid)) {
                     return srvr;
                 }
             }
@@ -92,9 +93,10 @@ namespace MasterServer {
             Logger.Log(new String[] { "Master", " getPadIntServer", "uid", uid.ToString() });
 
             ServerRegistry srvr = getServerRegistry(uid);
-            if(srvr != null) {
+            if (srvr != null) {
                 return new Tuple<int, string>(srvr.ID, srvr.Address);
-            } else {
+            }
+            else {
                 throw new PadIntNotFoundException(uid);
             }
         }
@@ -109,18 +111,25 @@ namespace MasterServer {
             int newServerID;
             try {
                 newServerID = LoadBalancer.GetAvailableServer(registeredServers, serverIsPrimary);
-            } catch(NoServersFoundException) {
+            }
+            catch (NoServersFoundException) {
                 throw;
             }
 
             ServerRegistry oldServer = getServerRegistry(uid);
 
-            if(oldServer == null) {
+            if (oldServer == null) {
                 registeredServers[newServerID].AddPadInt(uid);
                 return new Tuple<int, string>(newServerID, registeredServers[newServerID].Address);
-            } else {
+            }
+            else {
                 throw new PadIntAlreadyExistsException(uid, oldServer.ID);
             }
+        }
+
+        public void UpdateServerAddress(int id, string address) {
+            Logger.Log(new String[] { "Master", "UpdateServerAddress", "server id", id.ToString(), "address", address.ToString() });
+            registeredServers[id].Address = address;
         }
 
         /// <summary>
@@ -132,17 +141,21 @@ namespace MasterServer {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This is master server and the last TID given was " + LastTID);
             Console.WriteLine("Primary Servers registered are:");
-            for(int i = 0; i < registeredServers.Count; i++) {
+            for (int i = 0; i < registeredServers.Count; i++) {
                 Console.WriteLine("Server " + i + " with address " + registeredServers[i].Address + " and carrying PadInts " + registeredServers[i].DumpPadInts());
             }
 
-            foreach(ServerRegistry srvr in registeredServers) {
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
+            foreach (ServerRegistry srvr in registeredServers) {
+                IServer server = (IServer)Activator.GetObject(typeof(IServer), srvr.Address);
                 server.Status();
             }
             Console.WriteLine("-----------------------");
 
             return true;
+        }
+
+        public override object InitializeLifetimeService() {
+            return null;
         }
     }
 }

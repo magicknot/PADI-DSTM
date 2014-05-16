@@ -14,8 +14,8 @@ namespace CommonTypes {
     /// </summary>
     public interface IServer {
         void ImAlive();
-        void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts);
-        void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts);
+        void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts, bool changeAddress);
+        void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts, bool changeAddress);
         bool CreatePadInt(int uid);
         bool ConfirmPadInt(int uid);
         int ReadPadInt(int tid, int uid);
@@ -25,13 +25,13 @@ namespace CommonTypes {
         bool Status();
         bool Freeze();
         bool Fail();
-        bool Recover();
         void MovePadInts(List<int> padInts, string receiverAddress);
         void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts);
+        void RemovePadInts(List<int> receivedPadInts);
     }
 
     public interface IServerMachine {
-        void restartServer(int ID);
+        bool RestartServer();
     }
 
     /// <summary>
@@ -43,6 +43,7 @@ namespace CommonTypes {
         Tuple<int, string> GetPadIntServer(int uid);
         Tuple<int, string> RegisterPadInt(int uid);
         bool Status();
+        void UpdateServerAddress(int id, string address);
     }
 
     /// <summary>
@@ -103,16 +104,17 @@ namespace CommonTypes {
         /// <param name="args">The log message arguments</param>
         public static void Log(String[] args) {
             message = "";
-            if(debugOn) {
-                if(isLocal) {
-                    foreach(String s in args) {
+            if (debugOn) {
+                if (isLocal) {
+                    foreach (String s in args) {
                         message += s + " ";
                     }
                     Console.WriteLine(message);
-                } else {
+                }
+                else {
                     TcpChannel channel = new TcpChannel();
                     ChannelServices.RegisterChannel(channel, false);
-                    ILog logServer = (ILog) Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
+                    ILog logServer = (ILog)Activator.GetObject(typeof(ILog), "tcp://localhost:7002/LogServer");
                     logServer.log(args);
                 }
             }

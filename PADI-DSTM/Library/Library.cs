@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Remoting;
@@ -46,7 +47,7 @@ namespace ClientLibrary {
             props["timeout"] = 30000; // in milliseconds
             channel = new TcpChannel(props, null, null);
             ChannelServices.RegisterChannel(channel, false);
-            masterServer = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+            masterServer = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
             return true;
         }
 
@@ -70,7 +71,7 @@ namespace ClientLibrary {
             bool result = true;
             IServer server;
 
-            if(cache.ServersWPadInts.Count == 0) {
+            if (cache.ServersWPadInts.Count == 0) {
                 Logger.Log(new String[] { "Library", "txCommit", "nothing to commit" });
                 return result;
             }
@@ -79,12 +80,24 @@ namespace ClientLibrary {
 
             List<int> commitList = new List<int>();
 
-            foreach(ServerRegistry srvr in cache.ServersWPadInts.Values) {
-                foreach(PadIntRegistry pd in srvr.PdInts) {
+            foreach (KeyValuePair<int,ServerRegistry> pair in cache.ServersWPadInts) {
+                foreach (PadIntRegistry pd in pair.Value.PdInts) {
                     commitList.Add(pd.UID);
                 }
-                server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
-                result = server.Commit(actualTID, commitList) && result;
+
+                server = (IServer)Activator.GetObject(typeof(IServer), pair.Value.Address);
+                try {
+                    result = server.Commit(actualTID, commitList) && result;
+                }
+                catch (SocketException) {
+                    try {
+                        cache.UpdatePadIntServer(pair.Key, pair.Value.PdInts.First<PadIntRegistry>().UID);
+                        result = server.Abort(actualTID, commitList) && result;
+                    }
+                    catch (PadIntNotFoundException) {
+                        throw;
+                    }
+                }
 
                 commitList = new List<int>();
             }
@@ -102,20 +115,31 @@ namespace ClientLibrary {
             bool result = true;
             IServer server;
 
-            if(cache.ServersWPadInts.Count == 0) {
+            if (cache.ServersWPadInts.Count == 0) {
                 Logger.Log(new String[] { "Library", "txAbort", "nothing to abort" });
                 return result;
             }
 
             List<int> abortList = new List<int>();
 
-            foreach(ServerRegistry srvr in cache.ServersWPadInts.Values) {
-                foreach(PadIntRegistry pd in srvr.PdInts) {
+            foreach (KeyValuePair<int,ServerRegistry> pair in cache.ServersWPadInts) {
+                foreach (PadIntRegistry pd in pair.Value.PdInts) {
                     abortList.Add(pd.UID);
                 }
 
-                server = (IServer) Activator.GetObject(typeof(IServer), srvr.Address);
-                result = server.Abort(actualTID, abortList) && result;
+                server = (IServer)Activator.GetObject(typeof(IServer), pair.Value.Address);
+                try {
+                    result = server.Abort(actualTID, abortList) && result;
+                }
+                catch (SocketException) {
+                    try {
+                        cache.UpdatePadIntServer(pair.Key, pair.Value.PdInts.First<PadIntRegistry>().UID);
+                        result = server.Abort(actualTID, abortList) && result;
+                    }
+                    catch (PadIntNotFoundException) {
+                        throw;
+                    }
+                }
 
                 abortList = new List<int>();
             }
@@ -137,19 +161,22 @@ namespace ClientLibrary {
                 Tuple<int, string> serverInfo = masterServer.RegisterPadInt(uid);
                 string serverAddr = serverInfo.Item2;
                 int serverID = serverInfo.Item1;
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
+                IServer server = (IServer)Activator.GetObject(typeof(IServer), serverAddr);
                 server.CreatePadInt(uid);
 
-                if(!cache.HasServer(serverID)) {
+                if (!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
                 cache.AddPadInt(serverID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
-            } catch(PadIntAlreadyExistsException) {
+            }
+            catch (PadIntAlreadyExistsException) {
                 throw;
-            } catch(WrongPadIntRequestException) {
+            }
+            catch (WrongPadIntRequestException) {
                 throw;
-            } catch(NoServersFoundException) {
+            }
+            catch (NoServersFoundException) {
                 throw;
             }
         }
@@ -166,19 +193,22 @@ namespace ClientLibrary {
                 Tuple<int, string> serverInfo = masterServer.GetPadIntServer(uid);
                 string serverAddr = serverInfo.Item2;
                 int serverID = serverInfo.Item1;
-                IServer server = (IServer) Activator.GetObject(typeof(IServer), serverAddr);
+                IServer server = (IServer)Activator.GetObject(typeof(IServer), serverAddr);
                 server.ConfirmPadInt(uid);
 
-                if(!cache.HasServer(serverID)) {
+                if (!cache.HasServer(serverID)) {
                     cache.AddServer(serverID, serverAddr);
                 }
                 cache.AddPadInt(serverID, new PadIntRegistry(uid));
                 return new PadInt(uid, actualTID, serverID, serverAddr, cache);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(NoServersFoundException) {
+            }
+            catch (NoServersFoundException) {
                 throw;
-            } catch(WrongPadIntRequestException) {
+            }
+            catch (WrongPadIntRequestException) {
                 throw;
             }
         }
@@ -190,7 +220,7 @@ namespace ClientLibrary {
         /// <returns>true if successful</returns>
         public static bool Freeze(String address) {
             Logger.Log(new String[] { "Library", "Freeze", "address", address });
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
 
             return server.Freeze();
         }
@@ -203,7 +233,7 @@ namespace ClientLibrary {
         public static bool Fail(String address) {
             Logger.Log(new String[] { "Library", "Fail", "address", address });
 
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
+            IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
             return server.Fail();
         }
 
@@ -215,8 +245,8 @@ namespace ClientLibrary {
         public static bool Recover(String address) {
             Logger.Log(new String[] { "Library", "Recover", "address", address });
 
-            IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
-            return server.Recover();
+            IServerMachine server = (IServerMachine)Activator.GetObject(typeof(IServerMachine), address + "Machine");
+            return server.RestartServer();
         }
 
         /// <summary>

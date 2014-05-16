@@ -33,9 +33,12 @@ namespace PadIntServer {
         /// </summary>
         private string serverAddress;
 
-        public Server(string address) {
-            serverState = new FailedState(this);
+        private ServerMachine serverMachine;
+
+        public Server(string address, ServerMachine machine) {
             Address = address;
+            this.serverMachine = machine;
+            this.serverState = new FailedState(this);
         }
 
         internal int ID {
@@ -54,16 +57,17 @@ namespace PadIntServer {
         }
 
         public bool Init(int port) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "Init", " on port", port.ToString() });
+            Logger.Log(new String[] { "Server", ID.ToString(), "Init", " on port", port.ToString(), serverState.StateMsg });
             try {
-                IMaster master = (IMaster) Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
+                IMaster master = (IMaster)Activator.GetObject(typeof(IMaster), "tcp://localhost:8086/MasterServer");
                 Tuple<int, string> info = master.RegisterServer(Address);
                 ID = info.Item1;
                 string primaryServerAddr = info.Item2;
-                if(primaryServerAddr != NO_SERVER_ADDRESS) {
-                    CreateBackupServer(primaryServerAddr, serverState.padIntDictionary);
+                if (primaryServerAddr != NO_SERVER_ADDRESS) {
+                    CreateBackupServer(primaryServerAddr, serverState.padIntDictionary, false);
                 }
-            } catch(ServerAlreadyExistsException) {
+            }
+            catch (ServerAlreadyExistsException) {
                 throw;
             }
             return true;
@@ -75,9 +79,12 @@ namespace PadIntServer {
         /// <param name="backupAddress">Backup server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
+        public void CreatePrimaryServer(string backupAddress, Dictionary<int, IPadInt> padInts, bool changeAddress) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createPrimaryServer", "backupAddress ", backupAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString(), serverState.StateMsg });
             serverState = new PrimaryServer(this, backupAddress, padInts);
+            if (changeAddress) {
+                serverMachine.getNewPort();
+            }
         }
 
         /// <summary>
@@ -86,33 +93,39 @@ namespace PadIntServer {
         /// <param name="primaryAddress">Primary server address</param>
         /// <param name="id">Server identifier</param>
         /// <param name="padInts">Structure that maps UID to PadInt</param>
-        public void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString() });
+        public void CreateBackupServer(string primaryAddress, Dictionary<int, IPadInt> padInts, bool changeAddress) {
+            Logger.Log(new String[] { "Server", ID.ToString(), "createBackupServer", "primaryAddress ", primaryAddress, "id ", ID.ToString(), "padInts ", padInts.Count.ToString(), serverState.StateMsg });
+            if (changeAddress) {
+                serverMachine.getNewPort();
+            }
             serverState = new BackupServer(this, primaryAddress, padInts);
         }
 
         public void ImAlive() {
-            Logger.Log(new String[] { "Server", ID.ToString(), "ImAlive" });
             serverState.ImAlive();
         }
 
         public bool CreatePadInt(int uid) {
             try {
                 return serverState.CreatePadInt(uid);
-            } catch(PadIntAlreadyExistsException) {
+            }
+            catch (PadIntAlreadyExistsException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
 
         public bool ConfirmPadInt(int uid) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "confirmPadInt ", "uid", uid.ToString() });
+            Logger.Log(new String[] { "Server", ID.ToString(), "confirmPadInt ", "uid", uid.ToString(), serverState.StateMsg });
             try {
                 return serverState.ConfirmPadInt(uid);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
@@ -122,29 +135,35 @@ namespace PadIntServer {
          * Throw an exception if PadInt not found. 
          */
         public int ReadPadInt(int tid, int uid) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString() });
+            Logger.Log(new String[] { "Server", ID.ToString(), "readPadInt ", "tid", tid.ToString(), "uid", uid.ToString(), serverState.StateMsg });
 
             try {
                 return serverState.ReadPadInt(tid, uid);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(AbortException) {
+            }
+            catch (AbortException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
 
         public bool WritePadInt(int tid, int uid, int value) {
-            Logger.Log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString() });
+            Logger.Log(new String[] { "Server ", ID.ToString(), " writePadInt ", "tid", tid.ToString(), "uid", uid.ToString(), "value", value.ToString(), serverState.StateMsg });
 
             try {
                 return serverState.WritePadInt(tid, uid, value);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(AbortException) {
+            }
+            catch (AbortException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
@@ -156,20 +175,15 @@ namespace PadIntServer {
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
         public bool Commit(int tid, List<int> usedPadInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "commit", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+            Logger.Log(new String[] { "Server", ID.ToString(), "commit", "tid", tid.ToString(), serverState.StateMsg });
+
             try {
                 return serverState.Commit(tid, usedPadInts);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
@@ -181,41 +195,31 @@ namespace PadIntServer {
         /// <param name="usedPadInts">Identifiers of PadInts involved</param>
         /// <returns>A predicate confirming the sucess of the operations</returns>
         public bool Abort(int tid, List<int> usedPadInts) {
-            Logger.Log(new String[] { "Server", ID.ToString(), "abort", "tid", tid.ToString() });
-            /* TODO !!!!!
-             * 
-             * se por acaso usarmos o tab no cliente para guardar valores para
-             *  evitar andar a fazer varias chamadas remotas se calhar mete-se
-             *  no cliente que ao chamar o commit (do cliente) esse metodo chama
-             *  primeiro os writes para todos os PadInt que escreveu para assim
-             *  actualizar no server.
-             */
+            Logger.Log(new String[] { "Server", ID.ToString(), "abort", "tid", tid.ToString(), serverState.StateMsg });
 
             try {
                 return serverState.Abort(tid, usedPadInts);
-            } catch(PadIntNotFoundException) {
+            }
+            catch (PadIntNotFoundException) {
                 throw;
-            } catch(ServerDoesNotReplyException) {
+            }
+            catch (ServerDoesNotReplyException) {
                 throw;
             }
         }
 
         public bool Freeze() {
-            Logger.Log(new String[] { "Server", "Freeze" });
             serverState = new FrozeState(this);
+            Logger.Log(new String[] { "Server", "Freeze", serverState.StateMsg });
             return true;
         }
 
         public bool Fail() {
-            Logger.Log(new String[] { "Server", "Fail" });
+            State.imAliveTimer.Stop();
+            State.imAliveTimer.Close();
             serverState = new FailedState(this);
-            ServerMachine.killServer();
-            return true;
-        }
-
-        public bool Recover() {
-            Logger.Log(new String[] { "Server", "Recover" });
-            serverState.Recover();
+            Logger.Log(new String[] { "Server", "Fail", serverState.StateMsg });
+            serverMachine.KillServer();
             return true;
         }
 
@@ -225,15 +229,26 @@ namespace PadIntServer {
         }
 
         public void MovePadInts(List<int> padInts, string receiverAddress) {
+            Logger.Log(new String[] { "Server", "MovePadInts", serverState.StateMsg });
             serverState.MovePadInts(padInts, receiverAddress);
         }
 
         public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
+            Logger.Log(new String[] { "Server", "ReceivePadInts", serverState.StateMsg });
             serverState.ReceivePadInts(receivedPadInts);
+        }
+
+        public void RemovePadInts(List<int> receivedPadInts) {
+            Logger.Log(new String[] { "Server", "RemovePadInts", serverState.StateMsg });
+            serverState.RemovePadInts(receivedPadInts);
         }
 
         public void Dispose() {
             serverState.Dispose();
+        }
+
+        public override object InitializeLifetimeService() {
+            return null;
         }
     }
 }
