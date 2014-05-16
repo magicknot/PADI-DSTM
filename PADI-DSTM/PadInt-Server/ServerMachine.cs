@@ -57,5 +57,9 @@ namespace PadIntServer {
         public void Dispose() {
             padIntServer.Dispose();
         }
+
+        public override object InitializeLifetimeService() {
+            return null;
+        }
     }
 }
