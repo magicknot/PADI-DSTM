@@ -1,4 +1,4 @@
-\subsection{Abort}
+\subsubsection{Abort}
 \label{abort}
 
 O método \textit{TxAbort} da \textit{Library} é em tudo semelhante ao método \textit{TxCommit} excepto em dois pontos. A primeira diferença é que antes ser libertádo cada lock de escrita associado a cada \textit{UID} referenciado pela transação, o valor actual do \textit{PadInt} é substituído pelo valor registado como sendo o valor original antes da transação o ter alterado, isto é, é reposto o valor do último commit realizado com sucesso. A segunda diferença está relacionada com a \textit{Cache}, pois não existe a escrita dos valores nos \textit{Server}s, devido à primeira diferença enunciada.

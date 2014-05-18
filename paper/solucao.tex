@@ -1,12 +1,12 @@
 \section{Solução}
 
 \subsection{Optimista vs Pessimista}
-
+\label{Optimista vs Pessimista}
 Inicialmente considerámos seguir uma abordagem optimista. No entanto, não conhecendo a relação existente entre o número de leituras e escritas, admitimos que existe igual número de leituras e escritas, logo o número de conflitos poderá vir a ser grande. 
 
-Constatando esse potencial bottleneck de performance no nosso sistema, optámos por abandonar as soluções optimistas. Outro dos argumentos contra as soluções optimistas é o facto das transacções poderem abortar (se surgir algum conflito) depois de já terem realizado trabalho, o que levaria a refazer esse trabalho.
+Constatando esse potencial bottleneck de performance no nosso sistema e o facto das transacções poderem abortar (se surgir algum conflito) depois de já terem realizado trabalho, o que levaria a refazer esse trabalho, optámos por abandonar as soluções optimistas.
 
-Assim, escolhemos utilizar \textit{Strict Two Phase Locking} ou \textit{S2PL}
+Assim, escolhemos utilizar \textit{Strict Two Phase Locking} ou \textit{S2PL}.
 
 \subsection{Replicação activa vs replicação passiva}
 

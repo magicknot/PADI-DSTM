@@ -1,0 +1,20 @@
+%\subsection{Redistribuição de PadInts}
+
+%De forma a demonstrar a redistribuição da carga quando são criados novos pares (primário, secundário) de \textit{Server}s realizámos um teste. No inicio do teste para além do \textit{Master} é criado um par (primário, secundário) de \textit{Server}s. Existem dois clientes A e B. O cliente A cria 30 \textit{PadInt}s que serão guardados pelo único par de \textit{Server}s que existe. De seguida o cliente B é executado, sendo que este acede aos \textit{PadInt}s criados pelo cliente A para realizar uma escrita em cada um deles. Por fim, repete-se duas vezes a criação de um novo par de \textit{Server}s e a execução do cliente B.
+%\begin{table}[H]
+%\centering
+%\begin{tabular}{| p{2.2cm} | p{2.2cm} | p{2.2cm} |}
+%\hline
+%\textbf{Número de pares de \textit{Server}s} &\textbf{Número de \textit{PadInt} por \textit{Server}} & \textbf{Escritas no \textit{Server}} \\
+%\hline
+%1 & 30 & 30  \\
+%\hline
+%2 & 15 & 15  \\
+%\hline
+%3 & 10 & 10 \\
+%\hline
+%\end{tabular}
+%\caption{Distribuição da carga pelos servers} \label{lib}
+%\end{table}
+
+%Como se pode verificar pelos resultados obtidos a carga vai sendo distribuida pelos \textit{Server}s à medida que novos pares (primário, secundário) de \textit{Server}s são criados.

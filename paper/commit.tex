@@ -1,4 +1,4 @@
-\subsection{Commit}
+\subsubsection{Commit}
 \label{commit}
 
 Quando é invocado o método TxCommit da \textit{Library}, caso tenham sido criados ou acedidos \textit{PadInt}s, são efectuados dois passos. O primeiro passo corresponde à escrita de todos os valores escritos em \textit{Cache} e encontra-se descrito na secção \ref{cache}. No segundo passo, é enviado a cada \textit{Server} um pedido de commit contendo todos os \textit{UID} dos \textit{PadInt}s acedidos nesse \textit{Server} e a cache é re-iniciada.
