@@ -2,17 +2,30 @@
 
 Esta classe gere o sistema de memória distribuída e é responsável por armazenar os dados globais do sistema.
 
-É importante salientar que a lista \textit{Servidores} tem como finalidade garantir que no caso em que o servidor primário é substituído, o endereço registado é actualizado e os clientes continuam a aceder aos \textit{PadInt}s sem perturbações. Para além disso, os \textit{TID} são atribuídos de forma sequencial e única. De seguida apresentam-se as estruturas internas desta classe.
+A lista \textit{registered servers} tem como finalidade registar os servidores primários existentes, assim como, permitir identificar quais os \textit{PadInt}s atribuídos a cada servidor. Garantindo, que no caso em que o servidor primário é substituído, o endereço registado é actualizado e os clientes continuam a aceder aos \textit{PadInt}s sem perturbações. Para além disso, os \textit{Transaction ID (TID)} são atribuídos de forma sequencial e única.
 \begin{table}[H]
 \centering
 \begin{tabular}{| p{2cm} | p{5cm} |}
 \hline
 \textbf{Variável} & \textbf{Descrição} \\
 \hline
-TID & Último \textit{Transaction ID} atribuído \\
+Last transaction
+identifier & Último \textit{Transaction ID} atribuído \\
 \hline
-Servidores & Estrutura que mapeia o identificador de cada servidor primário com o seu endereço \\
+Registered
+servers & Estrutura que armazena \textit{ Server Registry} referente a cada servidor primário registado no master \\
 \hline
 \end{tabular}
 \caption{Atributos da classe Master}
 \end{table}
+
+
+\subsubsection{Server Registry}
+A classe \textit{Server Registry} é responsável por armazenar o identificador e endereço de cada servidor primário registado no master. Para além disto, guarda também uma lista com os identificadores dos \textit{PadInt}s  (UID) que foram atribuídos ao servidor.
+
+Na nossa solução optámos por guardar apenas os servidores primários no \textit{Master} em detrimento de guardar também os servidores secundários. Estes últimos precisam de ser conhecidos apenas pelos servidores primários, sendo que o master necessita apenas de lhes atribuir o seu papel (de servidor secundário) quando se tentam registar.
+
+\subsubsection{LoadBalancer}
+Com o objectivo de distribuir a carga pelos vários servidores criamos a classe \textit{Load Balancer}. Esta classe é usada, pelo \textit{Master}, para decidir qual o servidor primário a que deve ser atribuído um \textit{PadInt} na sua criação. Para esta distribuição o critério escolhido foi atribuir o novo \textit{PadInt} ao servidor primário que actualmente tem menos \textit{PadInt}s atribuídos.
+
+Esta classe é também utilizada na redistribuição dos \textit{PadInt}s quando um novo par (primário, secundário) de servidores é criado. Nessa altura os \textit{PadInt}s são distribuídos de forma a que cada par de servidores fique com um número de \textit{PadInt}s aproximadamente igual. Este número resulta da média entre o número total de \textit{PadInt}s criados e o número de pares de servidores existentes.

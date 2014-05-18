@@ -9,21 +9,15 @@ Esta classe representa o objecto gerido pelo \textit{PADI-DSTM} que guarda um in
 \hline
 UID & Identificador do PadInt que representa \\
 \hline
-Valor actual & Valor no momento actual da transacção \\
+Actual value & Valor no momento actual da transacção \\
 \hline
-Valor original & Valor no início da transacção \\
+Original value & Valor no início da transacção \\
 \hline
-Temporizador & Usado na detecção de deadlocks \\
+Lock type & Tipo do lock (leitura ou escrita) atribuído actualmente\\
 \hline
-Promoção & Referência para a próxima transação a ser promovida\\
+Readers & Lista de transacções com locks de leitura atribuídos \\
 \hline
-Leitores & Fila de transacções com locks de leitura atribuídos \\
-\hline
-Escritor & Transacção com lock de escrita atribuído\\
-\hline
-Leitores à espera & Fila de transações com locks de leitura à espera \\
-\hline
-Escritores à espera & Fila de transações com locks de escrita à espera\\
+Writter & Transacção com lock de escrita atribuído\\
 \hline
 \end{tabular}
 \caption{Atributos da classe PadInt}\label{tab:padint}

@@ -1,5 +1,5 @@
 \subsection{Biblioteca}
-Esta é a classe que representa a biblioteca usada pelos clientes para comunicar com o sistema de memória distribuída. Esta classe tem a seguinte estrutura:
+A biblioteca usada pelos clientes para comunicar com o sistema de memória distribuída encontra-se representada na classe \textit{Library}. Esta classe tem a seguinte estrutura:
 
 \begin{table}[H]
 \centering
@@ -7,26 +7,35 @@ Esta é a classe que representa a biblioteca usada pelos clientes para comunicar
 \hline
 \textbf{Variável} & \textbf{Descrição} \\
 \hline
-Nº de Servidores & Número total de servidores primários existentes  \\
+Master server & Referência para o \textit{Master}  \\
 \hline
-TID & Transacção atribuída pelo \textit{Master} \\
+Actual tid & Identificador da transacção atribuído pelo \textit{Master} \\
 \hline
-(UID, Servidor) & Lista de associações entre \textit{UID}s e o número do seu respectivo \textit{Servidor} \\
+Cache & Cache usada para guardar os valores temporários dos \textit{PadInt}s \\
 \hline
-Cache de Servidores & Estrutura que mapeia o número do \textit{Servidor} no respectivo endereço \\
-\hline
-Temporizadores & Lista de \textit{timers} para cada servidor \\
+Channel & Canal usado pela biblioteca \\
 \hline
 \end{tabular}
-\caption{Atributos da classe Biblioteca} \label{lib}
+\caption{Atributos da classe Library} \label{lib}
 \end{table}
 
 De seguida apresentam-se alguns métodos da Biblioteca:
 \begin{itemize}
-\item \textit{bool init()}: A Biblioteca pergunta ao Master qual é o número de servidores primários existentes;
-\item \textit{bool TxBegin()}: A Biblioteca pede ao Master para criar um novo \textit{TID} para a transacção e regista-o;
-\item \textit{PadInt CreatePadInt(int UID)}: A Biblioteca calcula qual o servidor primário onde vai alocar o novo \textit{PadInt}. De seguida pergunta ao Master qual é o endereço do servidor que escolheu e depois de obter o endereço, pede ao servidor para alocar o novo \textit{PadInt}. O servidor primário cria um \textit{PadInt} inicializado a zero, sem \textit{locks} e pede ao secundário para fazer o mesmo, só respondendo à Biblioteca, com um \textit{ack}, depois de ter recebido o \textit{ack} do secundário. Por fim a Biblioteca cria o \textit{Stub} do \textit{PadInt} para retornar ao cliente;
-\item \textit{PadInt AccessPadInt(int UID)}: A Biblioteca calcula qual o servidor primário onde está alocado o \textit{PadInt}, pede ao Master o seu endereço e pergunta ao servidor se tem o \textit{PadInt}. Caso a resposta seja afirmativa, a Biblioteca retorna ao cliente uma nova instância do \textit{Stub} do \textit{PadInt}. Caso contrário retorna \textit{null};
-\item \textit{int Read()}: A Biblioteca envia um pedido de leitura para o servidor primário onde está alocado o \textit{PadInt}. O servidor primário invoca o método \textit{obterLockLeitura(TID,UID)} e se obtiver o \textit{lock} de leitura (ou se já possuir o lock de escrita), obtém o valor actual do \textit{PadInt}. De seguida o servidor primário envia uma mensagem ao secundário para que execute o método \textit{obterLockLeitura(TID,UID)}, de modo a que os estados fiquem coerentes. Depois do servidor executar o método e enviar um \textit{ack} ao primário, o valor do \textit{PadInt} é retornado ao cliente. No caso em que o \textit{lock} de leitura não foi obtido, o servidor primário insere a transacção nos \textit{Leitores à espera} desse \textit{PadInt}, sendo os passos anteriores executados mal a transacção saia dos \textit{Leitores à espera} e entre nos \textit{Leitores};
-\item \textit{void Write(int value)}: Este método é semelhante ao \textit{Read()} mas, altera o valor actual do \textit{PadInt} em vez de o ler e retorna do servidor primário para Biblioteca um \textit{ack} em vez de um \textit{PadInt}.
+\item \textit{bool init()}: cria o canal a ser usado pela \textit{Library} e inicializa a variável master server. Quando o canal é criado é também definido um valor de \textit{timeout} ao fim do qual a \textit{Library} deixa de estar bloqueada à espera de resposta a pedido que efectuou;
+
+\item \textit{bool TxBegin()}: a Biblioteca pede ao Master para criar um novo \textit{TID} para a transacção e regista-o. É criada uma nova \textit{Cache};
+
+\item \textit{bool TxCommit()}: descrito na secção \ref{commit};
+
+\item \textit{bool TxAbort()}:descrito na secção \ref{abort};
+
+\item \textit{PadInt CreatePadInt(int UID)}: a \textit{Library} pede ao \textit{Master} para registar o \textit{PadInt} e se este não tiver já sido registado anteriormente o \textit{Master} retorna um tuplo contendo o identificador e endereço do \textit{Server} onde esse \textit{PadInt} deverá ser criado. De seguida, o \textit{Server} primário, em resposta ao pedido da \textit{Library}, cria um \textit{PadInt} inicializado a zero, sem \textit{locks} e pede ao secundário para fazer o mesmo, só respondendo à \textit{Library}, com um \textit{ack}, depois de ter recebido o \textit{ack} do secundário. Por fim, a \textit{Library} insere o \textit{PadIntRegistry}, relativo ao \textit{PadInt}, na cache, criando de seguida o \textit{Stub} do \textit{PadInt} para retornar ao cliente;
+
+\item \textit{PadInt AccessPadInt(int UID)}: a \textit{Library} pergunta ao \textit{Master} qual é o \textit{Server} onde está o \textit{PadInt}. Caso o \textit{PadInt} exista,  o \textit{Master} retorna um tuplo contendo o identificador e endereço do \textit{Server} onde esse \textit{PadInt} se encontra. De seguida a \textit{Library} pergunta ao \textit{Server} se tem o \textit{PadInt}. Caso a resposta seja afirmativa, a \textit{Library} insere o \textit{PadIntRegistry}, relativo ao \textit{PadInt}, na cache,  e retorna ao cliente uma nova instância do \textit{Stub} do \textit{PadInt}. Caso contrário é lançada uma excepção;
 \end{itemize}
+
+\subsubsection{Cache}
+\label{cache}
+Com o objectivo de melhorar o desempenho relativo a leituras e escritas criámos a classe \textit{Cache}. Esta classe permite guardar valores temporários relativos a cada \textit{PadInt} usado pelo cliente. A ideia base do funcionamento das leituras e escritas usando a \textit{Cache} foi já descrita anteriormente na secção \ref{Stub do PadInt}. Para tornar definitivos os valores escritos na \textit{Cache} antes de ser efectuado o \textit{commit}, descrito na secção \ref{commit}, todos os \textit{PadInt} acedidos para escrita são escritos no \textit{Server} que os armazena.
+
+Uma das vantagens obtidas com o uso da \textit{Cache} é que se reduz drasticamente o número de pedidos efectuados ao \textit{Server}, reduzindo assim a carga a que este está sujeito. Outra vantagem é reduzir o tempo consumido nas transações, pois as leituras e escritas são mais rápidas devido a serem realizadas localmente.

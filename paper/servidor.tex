@@ -1,19 +1,45 @@
-\subsection{Servidor}
-O conjunto das instâncias da classe Servidor representa a memória distribuída onde são armazenados os \textit{PadInt}s. De seguida apresentam-se os atributos desta classe.
+\subsection{Server}
+O conjunto das instâncias da classe \textit{Server} representam a memória distribuída onde são armazenados os \textit{PadInt}s.
+
+Um dos atributos desta classe é uma instância da classe \textit{Server machine}. Esta a classe encapsula o \textit{Server} de forma a permitir simular que este deixou de funcionar em resposta ao pedido de \textit{Fail}. Permite ainda re-iniciá-lo como se trata-se de um novo \textit{Server} acabado de criar.
+
+Quando o \textit{Server} precisa de realizar uma leitura ou escrita num dado \textit{PadInt} usa os métodos descritos nas secções \ref{GetReadLock} e \ref{GetWriteLock} para obter o lock respectivo e poder depois efectuar a leitura ou escrita, respectivamente.
+
 \begin{table}[H]
 \centering
 \begin{tabular}{| p{2cm} | p{5,5cm} |}
 \hline
 \textbf{Variável} & \textbf{Descrição} \\
 \hline
-Pedidos & Lista de pedidos feitos ao servidor enquanto o servidor está no modo \textit{Freeze} \\
+Identifier & Identificador do servidor \\
 \hline
-Réplica & Endereço do outro servidor \\
+Address & Endereço do servidor \\
 \hline
-(UID,PadInt) & Estrutura que mapeia \textit{UID}s em \textit{PadInt}s \\
+Server state & Estado do servidor\\
+\hline
+Server machine & Classe que contém o servidor\\
 \hline
 \end{tabular}
 \caption{Atributos da classe Servidor}
 \end{table}
 
-A localização de cada \textit{PadInt} depende do número total de servidores primários, ou seja, é dada por: \textit{UID} \textbf{mod}  \textit{Nº de Servidores.}
+\subsubsection{Server State}
+A classe servidor contém um dos seguintes estados: \textit{primary, backup, failed, froze}. Indicando respectivamente que o servidor é o servidor primário, secundário, recebeu pedido  \textit{Fail} ou \textit{Freeze}. Cada estado modela o comportamento do servidor, dependo do papel que lhe foi atribuido.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{2cm} | p{5,5cm} |}
+\hline
+\textbf{Variável} & \textbf{Descrição} \\
+\hline
+padInt Dictionary & Estrutura que mapeia \textit{uid} em \textit{PadInt} \\
+\hline
+Im alive timer & Timer usado para o envio e recepção de mensagens \textit{Im alive}\\
+\hline
+Pair server reference & Referência para o outro servidor do par\\
+\hline
+Pair server address & Endereço do outro servidor do par\\
+\hline
+\end{tabular}
+\caption{Atributos da classe Server State}
+\end{table}

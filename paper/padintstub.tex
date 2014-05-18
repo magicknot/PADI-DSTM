@@ -1,6 +1,7 @@
 \subsection{Stub do PadInt}
+\label{Stub do PadInt}
 
-A Biblioteca envia ao cliente stubs da classe \textit{PadInt}. Esta classe tem a seguinte estrutura:
+A \textit{Library} envia ao cliente stubs da classe \textit{PadInt}. Esta classe tem a seguinte estrutura:
 
 \begin{table}[H]
 \centering
@@ -10,15 +11,21 @@ A Biblioteca envia ao cliente stubs da classe \textit{PadInt}. Esta classe tem a
 \hline
 UID & Identificador do PadInt que representa \\
 \hline
-Biblioteca & Referência para a Biblioteca do Cliente \\
+TID & Identificador da transação \\
+\hline
+ServerID & Identificador \textit{Server} onde o \textit{PadInt} está guardado \\
+\hline
+Address & Endereço do \textit{Server} onde o \textit{PadInt} está guardado \\
+\hline
+Cache & Referência para a  \textit{Cache} da \textit{Library} \\
 \hline
 \end{tabular}
 \caption{Atributos da classe Stub do PadInt}
 \end{table}
 
-Esta classe tem os seguintes métodos:
+Esta classe disponibiliza os seguintes métodos:
 
 \begin{itemize}
-	\item \textit{int Read()}: Invoca o método \textit{Read} da Biblioteca
-	\item \textit{void Write(int value)}: Invoca o método \textit{Write} da Biblioteca
+	\item \textit{int Read()}: lê o valor guardado na \textit{Cache} se este estiver disponível. Isto é, já foi feito anteriormente um pedido de leitura ou escrita ao \textit{Server} e foi obtido o \textit{lock} de leitura ou escrita, respectivamente. Caso contrário, efectua a leitura no \textit{Server} e guarda o valor em \textit{Cache}.
+	\item \textit{void Write(int value)}: escreve o valor na \textit{Cache} se este estiver disponível. Isto é, já foi feito anteriormente um pedido de escrita ao \textit{Server} e foi obtido o \textit{lock} de escrita. Caso contrário, efectua a escrita no \textit{Server} e guarda o valor em \textit{Cache}.
 \end{itemize}

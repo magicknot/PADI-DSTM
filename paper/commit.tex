@@ -1,15 +1,6 @@
 \subsection{Commit}
+\label{commit}
 
-Quando é invocado o método TxCommit, são percorridos os pares \textit{(UID, servidor)} na estrutura descrita na Tabela~\ref{lib}, enviando a cada servidor primário um pedido para que faça commit de todos os \textit{PadInts} que foram acedidos para leitura ou escrita durante o decorrer da transação atual.
+Quando é invocado o método TxCommit da \textit{Library}, caso tenham sido criados ou acedidos \textit{PadInt}s, são efectuados dois passos. O primeiro passo corresponde à escrita de todos os valores escritos em \textit{Cache} e encontra-se descrito na secção \ref{cache}. No segundo passo, é enviado a cada \textit{Server} um pedido de commit contendo todos os \textit{UID} dos \textit{PadInt}s acedidos nesse \textit{Server} e a cache é re-iniciada.
 
-Ao receber o pedido de commit, o servidor primário percorre a lista de identificadores de \textit{PadInt}s envolvidos no commit e, para cada um deles, verifica se o \textit{TID} recebido como argumento pertence a alguma das variáveis da classe \textit{PadInt} ilustradas na Tabela~\ref{tab:padint}: Leitores, Escritor, Leitores à espera, Escritores à espera, Promoção.
-
-Se \textit{TID} que identifica a transacção estiver contido nalguma das variáveis acima descritas, este é removido dessa variável. É também criado e guardado um par \textit{(TID,valor final da transação)}. Este par é usado se eventualmente o servidor primário deixar de responder, o secundário assumir o papel de primário e a Biblioteca lhe pedir para responder a um commit/abort de uma transacção terminada, mas à qual o primário (agora em modo \textit{Fail}), nunca chegou a enviar uma mensagem de \textit{ack}.
-
-O servidor primário faz o pedido ao servidor secundário para que execute o commit, invocando o mesmo método com os mesmos argumentos. Depois de executar o pedido do primário, o secundário envia um \textit{ack} ao primário a confirmar que executou o método.
-
-O servidor primário recebe o \textit{ack} do secundário e reporta à Biblioteca o sucesso do commit.
-
-Se na etapa anterior o \textit{TID} não pertence a nenhuma das variáveis anteriormente descritas e o \textit{TID} da transacção a ser tratada é o mesmo que foi registado da última vez que se guardou o par descrito acima, então o valor registado no par como resultado final da transacção é devolvido como retorno à Biblioteca e o par é apagado.
-
-É importante referir que no passo em que são removidos os \textit{locks}, a motivação para se verificar se o \textit{TID} se encontra na lista de variáveis acima referidas e não apenas nas variáveis \textit{Leitores} e \textit{Escritor}, prende-se com o facto de não existir nenhuma forma de impedir que o cliente tente obter locks e faça commit ou abort à transacção antes sequer de os ter obtido.
+O \textit{Server} ao receber este pedido verifica se guarda todos os \textit{PadInt}s identificados pelos \textit{UID} recebidos. Caso não guarde algum deles lança uma execepção a indicar que não guarda o \textit{PadInt}. Caso contrário, usando os métodos da classe \textit{PadInt} descritos nas secções \ref{FreeReadLock} e \ref{FreeWriteLock} são libertados os locks de leitura ou escrita atribuídos à transação que está a efectuar o commit.
