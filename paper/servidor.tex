@@ -1,4 +1,5 @@
 \subsection{Server}
+\label{Server}
 O conjunto das instâncias da classe \textit{Server} representam a memória distribuída onde são armazenados os \textit{PadInt}s.
 
 Um dos atributos desta classe é uma instância da classe \textit{Server machine}. Esta a classe encapsula o \textit{Server} de forma a permitir simular que este deixou de funcionar em resposta ao pedido de \textit{Fail}. Permite ainda re-iniciá-lo como se trata-se de um novo \textit{Server} acabado de criar.
@@ -24,6 +25,7 @@ Server machine & Classe que contém o servidor\\
 \end{table}
 
 \subsubsection{Server State}
+\label{Server State}
 A classe servidor contém um dos seguintes estados: \textit{primary, backup, failed, froze}. Indicando respectivamente que o servidor é o servidor primário, secundário, recebeu pedido  \textit{Fail} ou \textit{Freeze}. Cada estado modela o comportamento do servidor, dependo do papel que lhe foi atribuido.
 
 \begin{table}[H]

@@ -3,6 +3,9 @@
 Esta classe gere o sistema de memória distribuída e é responsável por armazenar os dados globais do sistema.
 
 A lista \textit{registered servers} tem como finalidade registar os servidores primários existentes, assim como, permitir identificar quais os \textit{PadInt}s atribuídos a cada servidor. Garantindo, que no caso em que o servidor primário é substituído, o endereço registado é actualizado e os clientes continuam a aceder aos \textit{PadInt}s sem perturbações. Para além disso, os \textit{Transaction ID (TID)} são atribuídos de forma sequencial e única.
+
+Quando um servidor é criado ele regista-se no \textit{Master} de forma a que lhe seja atribuído um papel (servidor primário ou secundário). Tendo em conta que esta solução usa replicação passiva é necessário existir número par de servidores para atribuir um papel. Desta forma quando o primeiro servidor do par se regista ele irá ficar com estado \textit{FailedState}, pois ainda não tem um papel atribuido e não é suposto responder a nenhum pedido por parte do cliente. Quando o segundo servidor do par se regista é lhe atribuido o papel de servidor secundário (o servidor irá ter um estado \textit{BackupState}). O servidor secundário irá de seguida atribuir o papel de servidor primário ao primeiro servidor do par. Esta atribuição do papel de servidor primário é feita pelo servidor secundário de forma a diminuir a carga no \textit{Master}.
+
 \begin{table}[H]
 \centering
 \begin{tabular}{| p{2cm} | p{5cm} |}
