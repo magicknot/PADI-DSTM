@@ -2,7 +2,7 @@
 \label{Server}
 O conjunto das instâncias da classe \textit{Server} representam a memória distribuída onde são armazenados os \textit{PadInt}s.
 
-Um dos atributos desta classe é uma instância da classe \textit{Server machine}. Esta a classe encapsula o \textit{Server} de forma a permitir simular que este deixou de funcionar em resposta ao pedido de \textit{Fail}. Permite ainda re-iniciá-lo como se trata-se de um novo \textit{Server} acabado de criar.
+Um dos atributos desta classe é uma instância da classe \textit{Server machine}. Esta a classe encapsula o \textit{Server} de forma a permitir simular que este deixou de funcionar em resposta ao pedido de \textit{Fail}. Permite ainda reiniciá-lo como se trata-se de um novo \textit{Server} acabado de criar.
 
 Quando o \textit{Server} precisa de realizar uma leitura ou escrita num dado \textit{PadInt} usa os métodos descritos nas secções \ref{GetReadLock} e \ref{GetWriteLock} para obter o lock respectivo e poder depois efectuar a leitura ou escrita, respectivamente.
 
@@ -26,7 +26,7 @@ Server machine & Classe que contém o servidor\\
 
 \subsubsection{Server State}
 \label{Server State}
-A classe servidor contém um dos seguintes estados: \textit{primary, backup, failed, froze}. Indicando respectivamente que o servidor é o servidor primário, secundário, recebeu pedido  \textit{Fail} ou \textit{Freeze}. Cada estado modela o comportamento do servidor, dependo do papel que lhe foi atribuido.
+A classe servidor contém um dos seguintes estados: \textit{primary, backup, failed, froze}. Indicando respectivamente que o servidor é o servidor primário, secundário, recebeu pedido  \textit{Fail} ou \textit{Freeze}. Cada estado modela o comportamento do servidor, dependo do papel que lhe foi atribuído.
 
 \begin{table}[H]
 \centering
