@@ -1,52 +1,39 @@
 \subsection{Aborts}
-Para identificar a taxa de aborts de transações submetemos a nossa solução a três testes. Antes de mais salientamos que estes testes foram realizados de forma a não fazerem uso da \textit{Cache}, pois nunca são feitas duas ou mais leituras ou escritas no mesmo \textit{PadInt}. No primeiro destes testes foram clientes exactamente iguais, sendo que cada um realizou trezentas iterações (por iteração entenda-se iniciar a transação, realizar as leituras e escritas, realizando o commit no final) de três leituras e escritas em três \textit{PadInts}. Durante este teste realizámos algumas modificações no número  de clientes e pares de \textit{Server}s (primário, secundário) de forma a cobrir vários casos. Os resultados são apresentados na tabela \ref{figAAborts}. Como se pode verificar o número de aborts é bastante menor no caso em que existem apenas dois clientes e aumenta com o aumentod do número de clientes. Salientamos que neste teste todos os clientes efectuam leituras e escritas nos mesmos \textit{PadInt}s, sendo por isso normal o número de aborts observados.
+Para identificar a taxa de aborts de transações submetemos a nossa solução a três testes. Antes de mais salientamos que a forma como estes testes foram realizados não tiram partido da utilização da \textit{Cache}, pois nunca são feitas duas ou mais leituras ou escritas no mesmo \textit{PadInt} durante uma transação. No primeiro destes testes os clientes realizaram 3 leituras e 3 escritas por iteração em três \textit{PadInts}, durante 300 iterações (por iteração entenda-se iniciar a transação, realizar as leituras e escritas e realizar o commit no final). Durante este teste variámos o número de clientes e pares de \textit{Server}s (primário, secundário) de forma a cobrir vários casos. Os resultados são apresentados na tabela \ref{figAAborts}. Como se pode verificar o número de aborts é bastante menor no caso em que existem apenas dois clientes e aumenta conforme o crescimento do número de clientes. Salientamos que neste teste todos os clientes efectuam leituras e escritas nos mesmos \textit{PadInt}s, sendo por isso normal o número de aborts observados.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
-\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
-\hline
-\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
-\hline
-1 & 300 & 300 & 600  \\
-\hline
-2 & 300 & 300 & 600  \\
-\hline
-Total & 600 & 600 & 1200  \\
-\hline
+\begin{tabular}{l|c|c|c|c|c|}
+\cline{2-6}
+                                 & \multicolumn{5}{c|}{Clientes}                                                                                                   \\ \cline{2-6} 
+                                 & \multicolumn{2}{c|}{2}                            & \multicolumn{3}{c|}{3}                                                      \\ \hline
+\multicolumn{1}{|l|}{Servidores} & \multicolumn{1}{l|}{C1} & \multicolumn{1}{l|}{C2} & \multicolumn{1}{l|}{C1} & \multicolumn{1}{l|}{C2} & \multicolumn{1}{l|}{C3} \\ \hline
+\multicolumn{1}{|c|}{2}          & 6                       & 6                       & 136                     & 125                     & 131                     \\ \hline
+\multicolumn{1}{|c|}{4}          & -                       & -                       & 153                     & 154                     & 164                     \\ \hline
 \end{tabular}
 \caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figAAborts}
 \end{table}
 
 Durante o segundo teste foram realizadas duas leituras e oito escritas por cada iteração, no total de dez. No terceiro teste foram realizadas oito leituras e duas escritas também no total de dez iterações. Os resultados apresentados nas tabelas \ref{figBAborts} e \ref{figCAborts} confirmam as conclusões suportadas pelo primeiro teste.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
-\hline
-\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
-\hline
-1 & 300 & 300 & 600  \\
-\hline
-2 & 300 & 300 & 600  \\
-\hline
-Total & 600 & 600 & 1200  \\
-\hline
+\begin{table}[h]
+\begin{tabular}{c|c|c|c|c|c|}
+\cline{2-6}
+                                 & \multicolumn{5}{c|}{Clientes}                   \\ \cline{2-6} 
+                                 & \multicolumn{2}{c|}{2} & \multicolumn{3}{c|}{3} \\ \hline
+\multicolumn{1}{|c|}{Servidores} & C1         & C2        & C1     & C2    & C3    \\ \hline
+\multicolumn{1}{|c|}{2}          & 0          & 0         & 4      & 5     &       \\ \hline
 \end{tabular}
-\caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figBAborts}
+\caption{Número de aborts tendo 2 leituras e 8 escritas por iteração} \label{figBAborts}
 \end{table}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
-\hline
-\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
-\hline
-1 & 300 & 300 & 600  \\
-\hline
-2 & 300 & 300 & 600  \\
-\hline
-Total & 600 & 600 & 1200  \\
-\hline
+\begin{table}[h]
+\begin{tabular}{c|c|c|c|c|c|}
+\cline{2-6}
+                                 & \multicolumn{5}{c|}{Clientes}                   \\ \cline{2-6} 
+                                 & \multicolumn{2}{c|}{2} & \multicolumn{3}{c|}{3} \\ \hline
+\multicolumn{1}{|c|}{Servidores} & C1         & C2        & C1     & C2    & C3    \\ \hline
+\multicolumn{1}{|c|}{2}          & 1          & 0         & 4      & 5     & 2     \\ \hline
 \end{tabular}
-\caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figCAborts}
+\caption{Número de aborts tendo 8 leituras e 2 escritas por iteração} \label{figCAborts}
 \end{table}
