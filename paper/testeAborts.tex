@@ -1,5 +1,5 @@
 \subsection{Aborts}
-...
+Para identificar a taxa de aborts de transações submetemos a nossa solução a três testes. Antes de mais salientamos que estes testes foram realizados de forma a não fazerem uso da \textit{Cache}, pois nunca são feitas duas ou mais leituras ou escritas no mesmo \textit{PadInt}. No primeiro destes testes foram clientes exactamente iguais, sendo que cada um realizou trezentas iterações (por iteração entenda-se iniciar a transação, realizar as leituras e escritas, realizando o commit no final) de três leituras e escritas em três \textit{PadInts}. Durante este teste realizámos algumas modificações no número  de clientes e pares de \textit{Server}s (primário, secundário) de forma a cobrir vários casos. Os resultados são apresentados na tabela \ref{figAAborts}. Como se pode verificar o número de aborts é bastante menor no caso em que existem apenas dois clientes e aumenta com o aumentod do número de clientes. Salientamos que neste teste todos os clientes efectuam leituras e escritas nos mesmos \textit{PadInt}s, sendo por isso normal o número de aborts observados.
 
 \begin{table}[H]
 \centering
@@ -17,4 +17,36 @@ Total & 600 & 600 & 1200  \\
 \caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figAAborts}
 \end{table}
 
-nº de servers; nº de clientes  
+Durante o segundo teste foram realizadas duas leituras e oito escritas por cada iteração, no total de dez. No terceiro teste foram realizadas oito leituras e duas escritas também no total de dez iterações. Os resultados apresentados nas tabelas \ref{figBAborts} e \ref{figCAborts} confirmam as conclusões suportadas pelo primeiro teste.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
+\hline
+1 & 300 & 300 & 600  \\
+\hline
+2 & 300 & 300 & 600  \\
+\hline
+Total & 600 & 600 & 1200  \\
+\hline
+\end{tabular}
+\caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figBAborts}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
+\hline
+1 & 300 & 300 & 600  \\
+\hline
+2 & 300 & 300 & 600  \\
+\hline
+Total & 600 & 600 & 1200  \\
+\hline
+\end{tabular}
+\caption{Número de aborts tendo 3 leituras e 3 escritas por iteração} \label{figCAborts}
+\end{table}
