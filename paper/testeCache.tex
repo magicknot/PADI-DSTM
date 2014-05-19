@@ -1,7 +1,7 @@
 \subsection{Cache}
-Para demostrar o efeito positivo que a \textit{Cache} tem na nossa solução apresentamos de seguida duas tabelas que mostram as diferenças de usar ou não a \textit{Cache}. Este exemplo pressupõe a existência de um cliente que acede a dois \textit{PadInts} guardados no mesmo \textit{Server} e efectua uma sequência de 300 leituras e escritas a intercaladas a cada um dos \textit{PadInts}.
+Para demonstrar o efeito positivo que a \textit{Cache} tem na nossa solução apresentamos de seguida duas tabelas que mostram as diferenças de usar ou não a \textit{Cache}. Este exemplo pressupõe a existência de um cliente que acede a dois \textit{PadInts} guardados no mesmo \textit{Server} e efectua uma sequência de 300 leituras e escritas a intercaladas a cada um dos \textit{PadInts}.
 
-Os dados apresentados nas tabelas que confirmam que o número de pedidos que o \textit{Server} recebe com o uso da \textit{Cache} é muito menor do que quando não é utilizada uma \textit{Cache}. Para além destes dados foi também possível verificar que ao usar a \textit{Cache} é que o tempo consumido pelo cliente foi menor quando a \textit{Cache} foi usada.
+Os dados apresentados nas tabelas confirmam que o número de pedidos que o \textit{Server} recebe com o uso da \textit{Cache} é muito menor do que quando não é utilizada uma \textit{Cache}. Para além destes dados foi também possível verificar que ao usar a \textit{Cache}  o tempo consumido pelo cliente foi menor relativamente ao caso em que a \textit{Cache} não foi usada.
 
 É importante referir que estes efeitos se verificam sempre para leituras. Em relação às escritas estes resultados apenas se verificam para um número mínimo de duas escritas. Quando o cliente faz apenas uma escrita devido ao uso da \textit{Cache} serão efectuadas duas escritas, uma para obter o lock de escrita e outra antes de efectuar o commit.
 

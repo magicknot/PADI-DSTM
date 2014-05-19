@@ -21,15 +21,15 @@ Channel & Canal usado pela biblioteca \\
 
 De seguida apresentam-se alguns métodos da Biblioteca:
 \begin{itemize}
-\item \textit{bool init()}: cria o canal a ser usado pela \textit{Library} e inicializa a variável master server. Quando o canal é criado é também definido um valor de \textit{timeout} ao fim do qual a \textit{Library} deixa de estar bloqueada à espera de resposta a pedido que efectuou;
+\item \textit{bool init()}: cria o canal a ser usado pela \textit{Library} e inicializa a variável\textit{ master server}. Quando o canal é criado é também definido um valor de \textit{timeout} ao fim do qual a \textit{Library} deixa de estar bloqueada à espera de resposta a pedido que efectuou;
 
 \item \textit{bool TxBegin()}: a Biblioteca pede ao Master para criar um novo \textit{TID} para a transacção e regista-o. É criada uma nova \textit{Cache};
 
 \item \textit{bool TxCommit()}: descrito na secção \ref{commit};
 
-\item \textit{bool TxAbort()}:descrito na secção \ref{abort};
+\item \textit{bool TxAbort()}: descrito na secção \ref{abort};
 
-\item \textit{PadInt CreatePadInt(int UID)}: a \textit{Library} pede ao \textit{Master} para registar o \textit{PadInt} e se este não tiver já sido registado anteriormente o \textit{Master} retorna um tuplo contendo o identificador e endereço do \textit{Server} onde esse \textit{PadInt} deverá ser criado. De seguida, o \textit{Server} primário, em resposta ao pedido da \textit{Library}, cria um \textit{PadInt} inicializado a zero, sem \textit{locks} e pede ao secundário para fazer o mesmo, só respondendo à \textit{Library}, com um \textit{ack}, depois de ter recebido o \textit{ack} do secundário. Por fim, a \textit{Library} insere o \textit{PadIntRegistry}, relativo ao \textit{PadInt}, na cache, criando de seguida o \textit{Stub} do \textit{PadInt} para retornar ao cliente;
+\item \textit{PadInt CreatePadInt(int UID)}: a \textit{Library} pede ao \textit{Master} para registar o \textit{PadInt} e se este não tiver já sido registado anteriormente o \textit{Master} retorna um tuplo contendo o identificador e endereço do \textit{Server} onde esse \textit{PadInt} deverá ser criado. De seguida, o \textit{Server} primário, em resposta ao pedido da \textit{Library}, cria um \textit{PadInt} inicializado a zero, sem \textit{locks} e pede ao secundário para fazer o mesmo, só respondendo à \textit{Library}, com um \textit{ack}, depois de ter recebido o \textit{ack} do secundário. Por fim, a \textit{Library} insere o \textit{PadIntRegistry} (classe usada para guardar o \textit{PadInt} na \textit{Cache}), relativo ao \textit{PadInt}, na cache, criando de seguida o \textit{Stub} do \textit{PadInt} para retornar ao cliente;
 
 \item \textit{PadInt AccessPadInt(int UID)}: a \textit{Library} pergunta ao \textit{Master} qual é o \textit{Server} onde está o \textit{PadInt}. Caso o \textit{PadInt} exista,  o \textit{Master} retorna um tuplo contendo o identificador e endereço do \textit{Server} onde esse \textit{PadInt} se encontra. De seguida a \textit{Library} pergunta ao \textit{Server} se tem o \textit{PadInt}. Caso a resposta seja afirmativa, a \textit{Library} insere o \textit{PadIntRegistry}, relativo ao \textit{PadInt}, na cache,  e retorna ao cliente uma nova instância do \textit{Stub} do \textit{PadInt}. Caso contrário é lançada uma excepção;
 \end{itemize}

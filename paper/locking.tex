@@ -21,8 +21,8 @@ Um pedido fica em espera num de dois casos. O primeiro é quando o tipo de lock 
 
 \subsubsection{FreeWriteLock(TID)}
 \label{FreeWriteLock}
-O servidor remove o lock de escrita da transacção identificada por \textit{TID}, associado ao \textit{PadInt}.  Neste passo basta apenas inutilizar a variável \textit{writer}, atribuíndo-lhe um valor que não identique numa transação.
+Remove o lock de escrita da transacção identificada por \textit{TID}, associado ao \textit{PadInt}.  Neste passo basta apenas inutilizar a variável \textit{writer}, atribuíndo-lhe um valor que não identifique numa transação.
 
 \subsubsection{FreeReadLock(TID)}
 \label{FreeReadLock}
-O servidor remove o lock de leitura, da transacção identificada pelo \textit{TID}, associado ao \textit{PadInt} identificado por \textit{UID}. Neste passo basta apenas remover o \textit{TID} da variável \textit{readers}.
+É removido o lock de leitura, da transacção identificada pelo \textit{TID}, associado ao \textit{PadInt} identificado por \textit{UID}. Neste passo basta apenas remover o \textit{TID} da variável \textit{readers}.
