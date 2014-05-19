@@ -1,2 +1,4 @@
 \section{Conclusão}
-A nossa solução garante as propriedades ACID para transações, consistência sequencial e tolera a falha de um servidor.
+A nossa solução garante as propriedades ACID para transações, consistência sequencial e tolera a falha de um servidor. 
+
+Podemos concluir também que o uso de cache e a redistribuição dos \textit{PadInt}s, aquando da criação de um novo par (primário, secundário) de \textit{Server}s permite  reduzir drasticamente o número de pedidos efectuados ao \textit{Server}, reduzindo assim a carga a que este está sujeito. Outra vantagem é reduzir o tempo consumido nas transações, pois as leituras e escritas são mais rápidas devido a serem realizadas localmente.
