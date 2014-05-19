@@ -1,38 +1,38 @@
 \subsection{Cache}
-%Para demostrar o efeito positivo que a \textit{Cache} tem na nossa solução apresentamos de seguida duas tabelas que mostram as diferenças de usar ou não a \textit{Cache}. Este exemplo pressupõe a existência de um cliente que acede a dois \textit{PadInts} guardados no mesmo \textit{Server} e efectua uma sequência de 300 leituras e escritas a intercaladas a cada um dos \textit{PadInts}.
+Para demostrar o efeito positivo que a \textit{Cache} tem na nossa solução apresentamos de seguida duas tabelas que mostram as diferenças de usar ou não a \textit{Cache}. Este exemplo pressupõe a existência de um cliente que acede a dois \textit{PadInts} guardados no mesmo \textit{Server} e efectua uma sequência de 300 leituras e escritas a intercaladas a cada um dos \textit{PadInts}.
 
-%Os dados apresentados nas tabelas que confirmam que o número de pedidos que o \textit{Server} recebe com o uso da \textit{Cache} é muito menor do que quando não é utilizada uma \textit{Cache}. Para além destes dados foi também possível verificar que ao usar a \textit{Cache} é que o tempo consumido pelo cliente foi menor quando a \textit{Cache} foi usada.
+Os dados apresentados nas tabelas que confirmam que o número de pedidos que o \textit{Server} recebe com o uso da \textit{Cache} é muito menor do que quando não é utilizada uma \textit{Cache}. Para além destes dados foi também possível verificar que ao usar a \textit{Cache} é que o tempo consumido pelo cliente foi menor quando a \textit{Cache} foi usada.
 
-%É importante referir que estes efeitos se verificam sempre para leituras. Em relação às escritas estes resultados apenas se verificam para um número mínimo de duas escritas. Quando o cliente faz apenas uma escrita devido ao uso da \textit{Cache} serão efectuadas duas escritas, uma para obter o lock de escrita e outra antes de efectuar o commit.
+É importante referir que estes efeitos se verificam sempre para leituras. Em relação às escritas estes resultados apenas se verificam para um número mínimo de duas escritas. Quando o cliente faz apenas uma escrita devido ao uso da \textit{Cache} serão efectuadas duas escritas, uma para obter o lock de escrita e outra antes de efectuar o commit.
 
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
-%\hline
-%\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
-%\hline
-%1 & 300 & 300 & 600  \\
-%\hline
-%2 & 300 & 300 & 600  \\
-%\hline
-%Total & 600 & 600 & 1200  \\
-%\hline
-%\end{tabular}
-%\caption{Número de pedidos ao Server sem uso de Cache} \label{figAcache}
-%\end{table}
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
+\hline
+1 & 300 & 300 & 600  \\
+\hline
+2 & 300 & 300 & 600  \\
+\hline
+Total & 600 & 600 & 1200  \\
+\hline
+\end{tabular}
+\caption{Número de pedidos ao Server sem uso de Cache} \label{figAcache}
+\end{table}
 
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
-%\hline
-%\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
-%\hline
-%1 & 1 & 2 & 3  \\
-%\hline
-%2 & 1 & 2 & 3  \\
-%\hline
-%Total & 2 & 4 & 6  \\
-%\hline
-%\end{tabular}
-%\caption{Número de pedidos ao Server com uso de Cache} \label{figBcache}
-%\end{table}
+\begin{table}[H]
+\centering
+\begin{tabular}{| p{1.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+\textbf{UID do \textit{PadInt}} & \textbf{Leituras no \textit{Server}} & \textbf{Escritas no \textit{Server}} & \textbf{Total} \\
+\hline
+1 & 1 & 2 & 3  \\
+\hline
+2 & 1 & 2 & 3  \\
+\hline
+Total & 2 & 4 & 6  \\
+\hline
+\end{tabular}
+\caption{Número de pedidos ao Server com uso de Cache} \label{figBcache}
+\end{table}
