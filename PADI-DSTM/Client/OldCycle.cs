@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ClientLibrary;
 
 namespace Client {
-    class Cycle {
+    class OldCycle {
 
         /*public static void Main(string[] args) {
 

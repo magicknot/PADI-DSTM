@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 
 namespace ClientLibrary {
 
-    public class Library {
+    public class PadiDstm {
         /// <summary>
         /// Master Server reference
         /// </summary>

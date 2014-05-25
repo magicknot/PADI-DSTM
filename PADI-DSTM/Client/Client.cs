@@ -57,15 +57,15 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 Console.WriteLine("padInt0 read: " + padInt0.Read());
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -86,17 +86,17 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(20)) {
                     Console.WriteLine("padInt0 write done with value (20) : " + padInt0.Read());
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -117,26 +117,26 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(20)) {
                     Console.WriteLine("padInt0 write done with value (20) : " + padInt0.Read());
                 }
 
-                Library.TxAbort();
+                PadiDstm.TxAbort();
                 Console.WriteLine("txAbort Done");
 
                 /* do a read to test if the abort was successful */
                 Console.WriteLine("I will test if the abort was successful...");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = PadiDstm.AccessPadInt(uid0);
 
                 /* the padInt's value must be equal to initialization value */
                 int value = padInt0A.Read();
@@ -146,7 +146,7 @@ namespace Client {
                 } else {
                     Console.WriteLine("BUG!!!!!: abort was not successful... value = " + value);
                 }
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -167,27 +167,27 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(21)) {
                     Console.WriteLine("padInt0 write done with value (21) : " + padInt0.Read());
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 /* do a read to test if the abort was successful */
                 Console.WriteLine("I will test if the commit was successful...");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
                 /* the padInt's value must be equal to initialization value */
-                PadInt padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = PadiDstm.AccessPadInt(uid0);
 
                 if(padInt0A.Read() == 21) {
                     Console.WriteLine("it's OK");
@@ -195,7 +195,7 @@ namespace Client {
                     Console.WriteLine("BUG!!!!!: commit was not successful...");
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -216,14 +216,14 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
-                PadInt padInt1 = Library.CreatePadInt(uid1);
+                PadInt padInt1 = PadiDstm.CreatePadInt(uid1);
                 Console.WriteLine("padInt1 created with uid: " + uid1);
-                PadInt padInt2 = Library.CreatePadInt(uid2);
+                PadInt padInt2 = PadiDstm.CreatePadInt(uid2);
                 Console.WriteLine("padInt2 created with uid: " + uid2);
 
                 bool result = padInt0.Read() == 0;
@@ -236,7 +236,7 @@ namespace Client {
                     Console.WriteLine("BUG!!!!!: multiple read was not successful...");
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -257,10 +257,10 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 //read
@@ -282,7 +282,7 @@ namespace Client {
                     Console.WriteLine("padInt0 write done with value (211) : " + padInt0.Read());
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -303,10 +303,10 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
                 if(padInt0.Write(211)) {
@@ -316,7 +316,7 @@ namespace Client {
                 //read
                 Console.WriteLine("padInt0 read: " + padInt0.Read());
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -337,10 +337,10 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
 
@@ -359,7 +359,7 @@ namespace Client {
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
                 // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
-                bool res = Library.Freeze("tcp://localhost:2001/PadIntServer");
+                bool res = PadiDstm.Freeze("tcp://localhost:2001/PadIntServer");
                 //res = Library.Fail("tcp://localhost:2002/PadIntServer");
                 Console.WriteLine("####################################################################");
                 Console.WriteLine("Fiz o freeze res= " + res + "Vou fazer o segundo ciclo de 5 writes. Depois vem o commit");
@@ -369,19 +369,19 @@ namespace Client {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
                 /* the padInt's value must be equal to initialization value */
-                PadInt padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = PadiDstm.AccessPadInt(uid0);
                 Console.WriteLine("####################################################################");
                 Console.WriteLine("Fiz os 10 writes. padInt0A.Read()= " + padInt0A.Read() + " Press enter para commit.");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -402,10 +402,10 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
 
@@ -425,7 +425,7 @@ namespace Client {
                 Console.ReadLine();
                 // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
                 //bool res = Library.Freeze("tcp://localhost:2001/PadIntServer");
-                bool res = Library.Fail("tcp://localhost:2001/PadIntServer");
+                bool res = PadiDstm.Fail("tcp://localhost:2001/PadIntServer");
                 Console.WriteLine("####################################################################");
                 Console.WriteLine("Fiz o fail res= " + res + "Vou fazer o segundo ciclo de 5 writes. Depois vem o commit");
                 Console.WriteLine("####################################################################");
@@ -434,17 +434,17 @@ namespace Client {
                     Console.WriteLine("Fiz um Write no uid 1. uid() = " + padInt0.Write(i).ToString());
                 }
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
-                PadInt padInt0A = Library.AccessPadInt(uid0);
+                PadInt padInt0A = PadiDstm.AccessPadInt(uid0);
                 Console.WriteLine("####################################################################");
                 Console.WriteLine("Fiz os 10 writes. padInt0A.Read()= " + padInt0A.Read() + " Press enter para commit.");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -465,10 +465,10 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
-                PadInt padInt0 = Library.CreatePadInt(uid0);
+                PadInt padInt0 = PadiDstm.CreatePadInt(uid0);
                 Console.WriteLine("padInt0 created with uid: " + uid0);
 
 
@@ -485,7 +485,7 @@ namespace Client {
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");
@@ -506,17 +506,17 @@ namespace Client {
             try {
                 Console.WriteLine("init() Done");
 
-                Library.TxBegin();
+                PadiDstm.TxBegin();
                 Console.WriteLine("txBegin Done");
 
                 // The following 2 lines assume we have 2 servers: one at port 2001 and another at port 2002
-                bool res = Library.Recover("tcp://localhost:2001/PadIntServer");
+                bool res = PadiDstm.Recover("tcp://localhost:2001/PadIntServer");
                 Console.WriteLine("####################################################################");
                 Console.WriteLine("Fiz o recover res= " + res + " Depois vem o commit");
                 Console.WriteLine("####################################################################");
                 Console.ReadLine();
 
-                Library.TxCommit();
+                PadiDstm.TxCommit();
                 Console.WriteLine("txCommit Done");
 
                 Console.WriteLine("closeChannel Done");

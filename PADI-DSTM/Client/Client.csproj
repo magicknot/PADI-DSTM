@@ -43,17 +43,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Final\10000Objs.cs" />
+    <Compile Include="Final\Cicle.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientApp.cs" />
+    <Compile Include="Final\CrossedLocks.cs" />
     <Compile Include="CrossedLocksWW.cs" />
     <Compile Include="CrossedLocksRR.cs" />
+    <Compile Include="Final\Freeze.cs" />
+    <Compile Include="Final\SampleApp.cs" />
     <Compile Include="TestCache.cs" />
     <Compile Include="CrossedLocksRW.cs" />
     <Compile Include="CrossedLocksWR.cs" />
-    <Compile Include="CrossedLocks.cs" />
-    <Compile Include="Cycle.cs" />
+    <Compile Include="OldCrossedLocks.cs" />
+    <Compile Include="OldCycle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleApp.cs" />
+    <Compile Include="OldSampleApp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

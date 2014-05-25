@@ -44,7 +44,7 @@
     <Compile Include="Cache.cs" />
     <Compile Include="PadIntRegistry.cs" />
     <Compile Include="PadInt.cs" />
-    <Compile Include="Library.cs" />
+    <Compile Include="PadiDstm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerRegistry.cs" />
   </ItemGroup>

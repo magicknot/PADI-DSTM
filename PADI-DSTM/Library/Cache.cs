@@ -71,7 +71,7 @@ namespace ClientLibrary {
         /// <param name="uid">PadInt identifier</param>
         internal void UpdatePadIntServer(int serverID, int uid) {
             try {
-                Tuple<int, string> serverInfo = Library.MasterServer.GetPadIntServer(uid);
+                Tuple<int, string> serverInfo = PadiDstm.MasterServer.GetPadIntServer(uid);
                 string serverAddr = serverInfo.Item2;
                 int newServerID = serverInfo.Item1;
 

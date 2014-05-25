@@ -12,14 +12,14 @@ using System.Runtime.Remoting;
 namespace Client {
     class ClientApp {
 
-        public static void Main(string[] args) {
+        public static void Maina(string[] args) {
 
             Client client = new Client();
 
             Console.Title = "Client";
             Console.WriteLine("Client up and running..");
 
-            if(Library.Init()) {
+            if(PadiDstm.Init()) {
 
                 string input;
 
@@ -97,7 +97,7 @@ namespace Client {
                     }
 
                     if(input.Equals("13")) {
-                        Library.Status();
+                        PadiDstm.Status();
                     }
                 }
             } else {

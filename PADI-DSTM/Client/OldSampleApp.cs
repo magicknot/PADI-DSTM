@@ -2,7 +2,7 @@
 //using PADI_DSTM;
 using ClientLibrary;
 
-class SampleApp {
+class OldSampleApp {
     /*static void Main(string[] args) {
         bool res;
 

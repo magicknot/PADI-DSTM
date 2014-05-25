@@ -2,7 +2,7 @@
 //using PADI_DSTM;
 using ClientLibrary;
 
-class CrossedLocks {
+class OldCrossedLocks {
     /*static void Main(string[] args) {
         bool res;
         PadInt pi_a, pi_b;
