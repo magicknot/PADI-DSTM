@@ -54,40 +54,33 @@ namespace ClientLibrary {
 
             try {
                 int result;
-                if (cache.HasWritePadInt(serverID, uid) || cache.HasReadPadInt(serverID, uid)) {
+                if(cache.HasWritePadInt(serverID, uid) || cache.HasReadPadInt(serverID, uid)) {
                     result = cache.GetPadIntValue(serverID, uid);
                     cache.UpdatePadIntValue(serverID, uid, result);
-                }
-                else {
-                    IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
+                } else {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     result = server.ReadPadInt(tid, uid);
                 }
                 cache.setPadIntAsRead(serverID, uid);
                 return result;
-            }
-            catch (PadIntNotFoundException) {
+            } catch(PadIntNotFoundException) {
                 try {
                     cache.UpdatePadIntServer(serverID, uid);
                     return Read();
-                }
-                catch (PadIntNotFoundException) {
+                } catch(PadIntNotFoundException) {
                     throw;
                 }
-            }
-            catch (WrongPadIntRequestException) {
+            } catch(WrongPadIntRequestException) {
                 throw;
-            }
-            catch (AbortException) {
+            } catch(AbortException) {
                 Console.WriteLine("Abort Exception: cannot obtain the read lock.");
                 PadiDstm.TxAbort();
                 throw;
-            }
-            catch (SocketException) {
+            } catch(SocketException) {
                 try {
                     cache.UpdatePadIntServer(serverID, uid);
                     return Read();
-                }
-                catch (PadIntNotFoundException) {
+                } catch(PadIntNotFoundException) {
                     throw;
                 }
             }
@@ -102,38 +95,32 @@ namespace ClientLibrary {
             Logger.Log(new String[] { "PadIntStub", "write" + "value" + value.ToString() });
 
             try {
-                if (!cache.HasWritePadInt(serverID, uid)) {
-                    IServer server = (IServer)Activator.GetObject(typeof(IServer), address);
+                if(!cache.HasWritePadInt(serverID, uid)) {
+                    IServer server = (IServer) Activator.GetObject(typeof(IServer), address);
                     server.WritePadInt(tid, uid, value);
                     cache.setPadIntAsWrite(serverID, uid);
                 }
 
                 cache.UpdatePadIntValue(serverID, uid, value);
                 return true;
-            }
-            catch (PadIntNotFoundException) {
+            } catch(PadIntNotFoundException) {
                 try {
                     cache.UpdatePadIntServer(serverID, uid);
                     return Write(value);
-                }
-                catch (PadIntNotFoundException) {
+                } catch(PadIntNotFoundException) {
                     throw;
                 }
-            }
-            catch (WrongPadIntRequestException) {
+            } catch(WrongPadIntRequestException) {
                 throw;
-            }
-            catch (AbortException) {
+            } catch(AbortException) {
                 Console.WriteLine("Abort Exception: cannot obtain the write lock.");
                 PadiDstm.TxAbort();
                 throw;
-            }
-            catch (SocketException) {
+            } catch(SocketException) {
                 try {
                     cache.UpdatePadIntServer(serverID, uid);
                     return Write(value);
-                }
-                catch (PadIntNotFoundException) {
+                } catch(PadIntNotFoundException) {
                     throw;
                 }
             }

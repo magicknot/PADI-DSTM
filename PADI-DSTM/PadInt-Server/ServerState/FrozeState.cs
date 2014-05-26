@@ -141,7 +141,9 @@ namespace PadIntServer {
                 recover = true;
                 Monitor.Pulse(this);
             }
+
             Server.State = oldState;
+            oldState.RestartTimer();
             return true;
         }
     }

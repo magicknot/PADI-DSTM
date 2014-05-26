@@ -72,14 +72,16 @@ namespace PadIntServer {
         internal abstract bool Abort(int tid, List<int> usedPadInts);
         internal virtual bool Recover() { return false; }
 
+        internal virtual void RestartTimer() {
+            //Nothing to do here
+        }
 
         protected virtual void VerifyPadInts(List<int> padInts) {
             try {
-                foreach (int uid in padInts) {
+                foreach(int uid in padInts) {
                     GetPadInt(uid);
                 }
-            }
-            catch (PadIntNotFoundException) {
+            } catch(PadIntNotFoundException) {
                 throw;
             }
         }
@@ -89,10 +91,9 @@ namespace PadIntServer {
         }
 
         protected virtual PadInt GetPadInt(int uid) {
-            if (padIntDictionary.ContainsKey(uid)) {
-                return (PadInt)padIntDictionary[uid];
-            }
-            else {
+            if(padIntDictionary.ContainsKey(uid)) {
+                return (PadInt) padIntDictionary[uid];
+            } else {
                 throw new PadIntNotFoundException(uid, Server.ID);
             }
         }
@@ -101,8 +102,7 @@ namespace PadIntServer {
             try {
                 GetPadInt(uid);
                 return true;
-            }
-            catch (PadIntNotFoundException) {
+            } catch(PadIntNotFoundException) {
                 throw;
             }
         }
@@ -111,12 +111,12 @@ namespace PadIntServer {
             Logger.Log(new String[] { "ServerState", "MovePadInts", "to Server", receiverAddress });
             Dictionary<int, IPadInt> removedPadInt = new Dictionary<int, IPadInt>();
 
-            foreach (int padIntId in padInts) {
+            foreach(int padIntId in padInts) {
                 removedPadInt.Add(padIntId, padIntDictionary[padIntId]);
                 padIntDictionary.Remove(padIntId);
             }
 
-            IServer receiverServer = (IServer)Activator.GetObject(typeof(IServer), receiverAddress);
+            IServer receiverServer = (IServer) Activator.GetObject(typeof(IServer), receiverAddress);
             receiverServer.ReceivePadInts(removedPadInt);
             pairServerReference.RemovePadInts(padInts);
 
@@ -124,14 +124,14 @@ namespace PadIntServer {
 
         public void ReceivePadInts(Dictionary<int, IPadInt> receivedPadInts) {
             Logger.Log(new String[] { "ServerState", "ReceivePadInts" });
-            foreach (KeyValuePair<int, IPadInt> pair in receivedPadInts) {
+            foreach(KeyValuePair<int, IPadInt> pair in receivedPadInts) {
                 padIntDictionary.Add(pair.Key, pair.Value);
             }
         }
 
         public void RemovePadInts(List<int> receivedPadInts) {
             Logger.Log(new String[] { "ServerState", "RemovePadInts" });
-            foreach (int pd in receivedPadInts) {
+            foreach(int pd in receivedPadInts) {
                 padIntDictionary.Remove(pd);
             }
         }
@@ -140,8 +140,8 @@ namespace PadIntServer {
             Console.WriteLine("-----------------------");
             Console.WriteLine("This server has id " + server.ID + " and has address " + server.Address);
             Console.WriteLine("PadInts stored on this server are:");
-            foreach (KeyValuePair<int, IPadInt> pd in padIntDictionary) {
-                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt)pd.Value).ActualValue);
+            foreach(KeyValuePair<int, IPadInt> pd in padIntDictionary) {
+                Console.WriteLine("PadInt with uid " + pd.Key + " and has value " + ((PadInt) pd.Value).ActualValue);
             }
             Console.WriteLine("-----------------------");
             return true;

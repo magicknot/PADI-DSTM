@@ -209,6 +209,8 @@ namespace PadIntServer {
         }
 
         public bool Freeze() {
+            State.imAliveTimer.Stop();
+            //State.imAliveTimer.Close();
             serverState = new FrozeState(this);
             Logger.Log(new String[] { "Server", "Freeze", serverState.StateMsg });
             return true;

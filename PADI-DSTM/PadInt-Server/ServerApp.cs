@@ -18,10 +18,9 @@ namespace PadIntServer {
             Console.Title = "Server";
             int port;
 
-            if (args.Length > 0) {
+            if(args.Length > 0) {
                 port = Int32.Parse(args[0]);
-            }
-            else {
+            } else {
                 Random random = new Random();
                 port = 8000 + random.Next(0, 100);
             }
@@ -36,12 +35,11 @@ namespace PadIntServer {
 
                 server.Init(port);
                 Console.WriteLine("Server up and running on port " + (port));
-            }
-            catch (ServerAlreadyExistsException e) {
+            } catch(ServerAlreadyExistsException e) {
                 Console.WriteLine(e.GetMessage());
             }
 
-            while (true)
+            while(true)
                 ;
         }
     }
