@@ -128,6 +128,10 @@ namespace PadIntServer {
                 while(!IsPossibleAcquire(tid, requiredLockType) && IsNotPossibleAcquire(tid, requiredLockType)) {
                     bool res = Monitor.Wait(this, DEADLOCK_INTERVAL);
                     if(!res) {
+                        readers.Remove(tid);
+                        if(writer == tid) {
+                            writer = INITIALIZATION;
+                        }
                         throw new AbortException(tid, uid);
                     }
                 }

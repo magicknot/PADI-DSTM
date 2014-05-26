@@ -79,6 +79,7 @@ namespace ClientLibrary {
             }
             catch (AbortException) {
                 Console.WriteLine("Abort Exception: cannot obtain the read lock.");
+                PadiDstm.TxAbort();
                 throw;
             }
             catch (SocketException) {
@@ -124,6 +125,7 @@ namespace ClientLibrary {
             }
             catch (AbortException) {
                 Console.WriteLine("Abort Exception: cannot obtain the write lock.");
+                PadiDstm.TxAbort();
                 throw;
             }
             catch (SocketException) {
